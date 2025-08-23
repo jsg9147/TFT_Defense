@@ -38,9 +38,9 @@ public class GameManager : MonoSingleton<GameManager>
         SetGameState(GameState.Prepare);
         StartCoroutine(WaveLoop());
 
-        // (선택) 필드 한도 패배 이벤트 구독 중이면 그대로 유지
-        // var field = (IMonsterFieldService)MonsterFieldManager.Instance;
-        // field.OnLimitReached += () => SetGameState(GameState.Lose);
+        // 한도 도달시 패배
+        var field = (IMonsterFieldService)MonsterFieldManager.Instance;
+        field.OnLimitReached += () => SetGameState(GameState.Lose);
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;

@@ -25,7 +25,7 @@ public class ShopSlotUI : MonoBehaviour
 
         unitIconImage.sprite = data.icon;
         unitNameText.text = data.unitName;
-        starText.text = "★ 1성";  // 상점은 항상 1성 기준
+        starText.text = $"★ {data.cost}";  // 상점은 항상 1성 기준
 
         buyButton.onClick.RemoveAllListeners();
         buyButton.onClick.AddListener(OnBuyClicked);

@@ -179,29 +179,67 @@ public class Unit : MonoBehaviour
 
         var go = Instantiate(prefab, firePoint.position, Quaternion.identity);
         var b = go.GetComponent<Bullet>();
-        if (b != null) b.Initialize(target, damage);
+        if (b != null)
+        {
+            var payload = new DamagePayload
+            {
+                BaseDamage = damage,
+                Type = DetermineDamageType(),   // Unit 내부 로직: 물리/마법/고정/광역
+                Source = this.gameObject
+            };
+            b.Initialize(target, payload, this);
+        }
     }
+
 
     private void ApplyHit(Monster target)
     {
         if (!target) return;
 
-        // 기본 피해
-        target.TakeDamage(GetAttackDamage());
+        var payload = new DamagePayload
+        {
+            BaseDamage = GetAttackDamage(),
+            Type = DetermineDamageType(),
+            Source = this.gameObject
+        };
 
-        // 추가 효과: Poison(DoT)
-        if (Has(data.types, UnitType.Poison))
-            StartCoroutine(CoPoison(target));
-        // Debuff/Buff/Summon은 추후 시너지/스킬 시스템과 연동 권장
+        // IDamageable로 받아서 처리
+        if (target is IDamageable dmg)
+            dmg.TakeDamage(payload);
     }
 
+    private DamageType DetermineDamageType()
+    {
+        if (Has(data.types, UnitType.Magic))
+            return DamageType.Magic;
+        if (Has(data.types, UnitType.Elemental))
+            return DamageType.True;
+
+        // AOE 패턴이면 피해 타입도 Area로 태깅(방어 50% 규칙 적용 목적)
+        if (Has(data.types, UnitType.Area))
+            return DamageType.Area;
+
+        return DamageType.Physical;
+    }
+
+    // Poison(DoT)도 페이로드로 전송
     private System.Collections.IEnumerator CoPoison(Monster target)
     {
         int ticks = Mathf.Max(1, data.poisonTickCount);
         for (int i = 0; i < ticks; i++)
         {
             if (!target) yield break;
-            target.TakeDamage(Mathf.Max(1, data.poisonDamagePerTick));
+
+            var payload = new DamagePayload
+            {
+                BaseDamage = Mathf.Max(1, data.poisonDamagePerTick),
+                Type = DamageType.True, // 초기엔 고정피해로 처리
+                Source = this.gameObject
+            };
+
+            if (target is IDamageable dmg)
+                dmg.TakeDamage(payload);
+
             yield return new WaitForSeconds(Mathf.Max(0.05f, data.poisonTickInterval));
         }
     }

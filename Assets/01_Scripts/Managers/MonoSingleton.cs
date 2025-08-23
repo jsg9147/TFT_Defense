@@ -24,7 +24,15 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
 
     protected virtual void Awake()
     {
-        if (instance == null) instance = (T)this;
-        else if (instance != this) Destroy(gameObject);
+        if (instance == null)
+        {
+            instance = (T)this;
+            DontDestroyOnLoad(gameObject); // 이거 추가
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
+
 }

@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class Monster : MonoBehaviour
+public class Monster : MonoBehaviour, IDamageable
 {
     public delegate void MonsterDieHandler(Monster monster);
     public event MonsterDieHandler OnMonsterDie;
@@ -17,6 +17,10 @@ public class Monster : MonoBehaviour
     private int currentWaypointIndex = 0; // 현재 웨이포인트 인덱스
 
     private bool _unregistered;
+
+    public bool IsAlive => currentHP > 0;
+
+    public Transform Transform => transform;
 
     private void Start()
     {
@@ -70,14 +74,39 @@ public class Monster : MonoBehaviour
         target = MonsterPathManager.Instance.GetWaypoint(currentWaypointIndex);
     }
 
-    public void TakeDamage(int amount)
+    private void UpdateHpUI()
     {
-        currentHP -= amount;
-        hpText.text = currentHP.ToString(); // 현재 HP 표시 업데이트
-        if (currentHP <= 0)
+        if (hpText) hpText.text = currentHP.ToString();
+    }
+
+
+    // 인터페이스 적용: 데미지 페이로드로 받기
+    public void TakeDamage(DamagePayload payload)
+    {
+        int raw = Mathf.Max(0, payload.BaseDamage);
+        int finalDamage = raw;
+
+        switch (payload.Type)
         {
-            Die();
+            case DamageType.Physical:
+                finalDamage = Mathf.Max(1, raw - data.defense);
+                break;
+            case DamageType.Magic:
+                finalDamage = Mathf.Max(1, raw - data.magicResistance);
+                break;
+            case DamageType.True:
+                finalDamage = raw; // 그대로
+                break;
+            case DamageType.Area:
+                finalDamage = Mathf.Max(1, raw - Mathf.RoundToInt(data.defense * 0.5f));
+                break;
         }
+
+        currentHP -= finalDamage;
+        UpdateHpUI();
+
+        if (currentHP <= 0)
+            Die();
     }
 
     private void Die()

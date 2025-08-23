@@ -20,10 +20,12 @@ public class MonsterSpawner : MonoBehaviour
 
     private List<Monster> aliveMonsters = new();
     private MonsterPool pool;
+    private IMonsterFieldService field;
 
     private void Start()
     {
         pool = new MonsterPool(prefab, maxSpawnCount, poolParent);
+        field = MonsterFieldManager.Instance;
     }
 
     private void Update()
@@ -42,37 +44,45 @@ public class MonsterSpawner : MonoBehaviour
         }
     }
 
-    /// <summary>몬스터 스폰</summary>
     public void SpawnMonster(int index, Vector3 spawnPos)
     {
         if (index < 0 || index >= spawnList.Length) return;
 
+        // 한도 체크: 넘치면 스폰 안 함
+        if (field != null && field.CurrentCount >= field.FieldLimit) return;
+
         Monster monster = pool.Get();
         monster.transform.position = spawnPos;
         monster.data = spawnList[index];
-        monster.Init();
-
-        // 필드 누적 등록
-        MonsterFieldManager.Instance.Register(monster);
-
+        monster.Init();                               // 체력/웨이포인트 리셋 권장 
         monster.OnMonsterDie += HandleMonsterDeath;
+
+        // 필드 카운트 등록
+        field?.Register(monster);                     // 카운트 +1, 이벤트 발행 
+
         aliveMonsters.Add(monster);
         currentSpawnCount++;
     }
 
-
     /// <summary>몬스터 사망 처리</summary>
     private void HandleMonsterDeath(Monster deadMonster)
     {
+        // 필드 카운트 해제
+        MonsterFieldManager.Instance?.Unregister(deadMonster);  // 카운트 -1 
+
         if (aliveMonsters.Contains(deadMonster))
             aliveMonsters.Remove(deadMonster);
 
         deadMonster.OnMonsterDie -= HandleMonsterDeath;
-
-        MonsterFieldManager.Instance.Unregister(deadMonster);
-
         pool.Return(deadMonster);
+
+        if (IsWaveFinished())
+        {
+            Debug.Log("웨이브 종료: 모든 몬스터 처치 완료");
+            GameManager.Instance.SetGameState(GameManager.GameState.Shop);
+        }
     }
+
 
     /// <summary>웨이브 시작</summary>
     public void StartWave(int waveCount)

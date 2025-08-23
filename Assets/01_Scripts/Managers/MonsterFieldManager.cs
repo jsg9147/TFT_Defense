@@ -19,6 +19,8 @@ public class MonsterFieldManager : MonoSingleton<MonsterFieldManager>, IMonsterF
         OnCountChanged?.Invoke(CurrentCount, fieldLimit);
         if (CurrentCount >= fieldLimit)
             OnLimitReached?.Invoke();
+
+        Debug.Log($"Monster registered: {m.name}, Current Count: {CurrentCount}, Field Limit: {fieldLimit}");
     }
 
     public void Unregister(Monster m)
