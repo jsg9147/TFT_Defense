@@ -14,8 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: "\uC6D0\uAC70\uB9AC"
   icon: {fileID: 2003643120, guid: 99c3bfc96fe7dd04b904c4b5a86f7a49, type: 3}
+  types: 17
+  cost: 1
   baseAttack: 2
   attackSpeed: 10
   range: 10
-  cost: 1
-  type: 1
+  projectilePrefab: {fileID: 0}
+  multishotCount: 3
+  areaRadius: 1.5
+  chainCount: 3
+  chainRange: 2.5
+  poisonDamagePerTick: 2
+  poisonTickInterval: 0.5
+  poisonTickCount: 6
+  buffValue: 0
+  debuffValue: 0

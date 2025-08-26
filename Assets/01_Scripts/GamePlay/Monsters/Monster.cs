@@ -79,28 +79,14 @@ public class Monster : MonoBehaviour, IDamageable
         if (hpText) hpText.text = currentHP.ToString();
     }
 
-
     // 인터페이스 적용: 데미지 페이로드로 받기
-    public void TakeDamage(DamagePayload payload)
+    public void TakeDamage(in DamagePayload payload)
     {
-        int raw = Mathf.Max(0, payload.BaseDamage);
-        int finalDamage = raw;
-
-        switch (payload.Type)
-        {
-            case DamageType.Physical:
-                finalDamage = Mathf.Max(1, raw - data.defense);
-                break;
-            case DamageType.Magic:
-                finalDamage = Mathf.Max(1, raw - data.magicResistance);
-                break;
-            case DamageType.True:
-                finalDamage = raw; // 그대로
-                break;
-            case DamageType.Area:
-                finalDamage = Mathf.Max(1, raw - Mathf.RoundToInt(data.defense * 0.5f));
-                break;
-        }
+        int finalDamage = DamageFormula.ComputeFinal(
+            payload,
+            data.defense,
+            data.magicResistance
+        );
 
         currentHP -= finalDamage;
         UpdateHpUI();

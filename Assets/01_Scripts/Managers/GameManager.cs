@@ -56,13 +56,14 @@ public class GameManager : MonoSingleton<GameManager>
         Debug.Log("[GameManager] 씬 매니저 바인딩 완료");
     }
 
+    // / <summary> 웨이브 루프: 준비 -> 전투 -> 상점 반복 </summary>
     private IEnumerator WaveLoop()
     {
         while (true)
         {
             // 1) 준비 페이즈
             SetGameState(GameState.Prepare);
-            OnWaveChanged?.Invoke(currentWave);
+            OnWaveChanged?.Invoke(currentWave); 
             yield return StartCoroutine(RunTimer(prepareTime));
 
             // 2) 전투 페이즈

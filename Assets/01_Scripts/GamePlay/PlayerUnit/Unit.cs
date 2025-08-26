@@ -68,29 +68,38 @@ public class Unit : MonoBehaviour
 
     // ===== 패턴 구현 =====
 
+    // Unit.cs 변경 포인트만 발췌
+
+    // === 발사 로직 ===
     private void FireSingleShot()
     {
         var target = SelectPrimaryTarget();
         if (!target) return;
 
-        ApplyHit(target);
-
-        // 발사체 사용 (원거리형)
         if (ShouldUseProjectile())
-            SpawnProjectile(target.transform, GetAttackDamage());
+        {
+            SpawnProjectile(target.transform);   // 즉시 데미지 X
+        }
+        else
+        {
+            ApplyHit(target);                    // 투사체 미사용(근접 등)일 때만 즉시 데미지
+        }
     }
 
     private void FireMultiShot()
     {
-        // 가까운 순으로 N개
         var targets = GetSortedTargetsByDistance().Take(Mathf.Max(1, data.multishotCount)).ToList();
         if (targets.Count == 0) return;
 
-        foreach (var t in targets)
+        if (ShouldUseProjectile())
         {
-            ApplyHit(t);
-            if (ShouldUseProjectile())
-                SpawnProjectile(t.transform, GetAttackDamage());
+            foreach (var t in targets)
+                SpawnProjectile(t.transform);    // 즉시 데미지 X
+        }
+        else
+        {
+            foreach (var t in targets)
+                ApplyHit(t);
         }
     }
 
@@ -99,15 +108,18 @@ public class Unit : MonoBehaviour
         var center = SelectPrimaryTarget();
         if (!center) return;
 
-        // 반경 내 몬스터 모두
-        var hits = Physics2D.OverlapCircleAll(center.transform.position, data.areaRadius)
-                            .Select(c => c.GetComponent<Monster>())
-                            .Where(m => m != null).ToList();
-
-        foreach (var m in hits)
-            ApplyHit(m);
-
-        // 시각화/발사체가 필요하면 여기서 AOE 이펙트 스폰
+        if (ShouldUseProjectile())
+        {
+            // AOE는 탄이 명중한 지점에서 Bullet이 반경 타격 처리
+            SpawnProjectile(center.transform);
+        }
+        else
+        {
+            var hits = Physics2D.OverlapCircleAll(center.transform.position, data.areaRadius)
+                                .Select(c => c.GetComponent<Monster>())
+                                .Where(m => m != null).ToList();
+            foreach (var m in hits) ApplyHit(m);
+        }
     }
 
     private void FireChain()
@@ -115,23 +127,59 @@ public class Unit : MonoBehaviour
         var first = SelectPrimaryTarget();
         if (!first) return;
 
-        var damage = GetAttackDamage();
-        var current = first;
-        var visited = new HashSet<Monster>() { current };
-
-        for (int i = 0; i < Mathf.Max(1, data.chainCount); i++)
+        if (ShouldUseProjectile())
         {
-            ApplyHit(current);
-
-            // 다음 대상 찾기
-            var next = FindNearestMonster(current.transform.position, data.chainRange, visited);
-            if (next == null) break;
-            visited.Add(next);
-            current = next;
+            // 체인은 첫 타겟으로 쏘고, 이후 바운스는 Bullet이 처리
+            SpawnProjectile(first.transform);
         }
-
-        // 필요하면 체인 라인/이펙트 그려도 좋음
+        else
+        {
+            var current = first;
+            var visited = new HashSet<Monster>() { current };
+            for (int i = 0; i < Mathf.Max(1, data.chainCount); i++)
+            {
+                ApplyHit(current);
+                var next = FindNearestMonster(current.transform.position, data.chainRange, visited);
+                if (next == null) break;
+                visited.Add(next);
+                current = next;
+            }
+        }
     }
+
+    // === 투사체 스폰 ===
+    // (서명 변경) _legacyDamage 제거, attacker(this) 전달
+    private void SpawnProjectile(Transform target)
+    {
+        var prefab = data.projectilePrefab != null ? data.projectilePrefab : bulletPrefab;
+        if (!prefab || !firePoint) return;
+
+        var go = Instantiate(prefab, firePoint.position, Quaternion.identity);
+        var b = go.GetComponent<Bullet>();
+        if (b != null)
+            b.Initialize(target, /*payload:*/ default, /*attacker:*/ this); // payload는 Bullet에서 명중 시 생성
+    }
+
+    // === Bullet이 쓸 수 있도록 공개 ===
+    public DamagePayload BuildImpactPayload()
+    {
+        int baseDmg = GetAttackDamage();
+        var type = Has(data.types, UnitType.Magic) ? DamageType.Magic
+                 : Has(data.types, UnitType.Elemental) ? DamageType.Magic
+                 : DamageType.Physical;
+
+        return new DamagePayload
+        {
+            BaseDamage = baseDmg,
+            Type = type,
+            CritChance = 0.1f,
+            CritMultiplier = 1.5f,
+            ArmorPen = 0f,
+            MagicPen = 0f,
+            Source = this
+        };
+    }
+
 
     // ===== 타겟/유틸 =====
 
@@ -172,23 +220,14 @@ public class Unit : MonoBehaviour
         return (data.projectilePrefab != null) || (bulletPrefab != null && data.projectilePrefab == null);
     }
 
-    private void SpawnProjectile(Transform target, int damage)
+    private void SpawnProjectile(Transform target, int _legacyDamage)
     {
         var prefab = data.projectilePrefab != null ? data.projectilePrefab : bulletPrefab;
         if (!prefab || !firePoint) return;
 
         var go = Instantiate(prefab, firePoint.position, Quaternion.identity);
         var b = go.GetComponent<Bullet>();
-        if (b != null)
-        {
-            var payload = new DamagePayload
-            {
-                BaseDamage = damage,
-                Type = DetermineDamageType(),   // Unit 내부 로직: 물리/마법/고정/광역
-                Source = this.gameObject
-            };
-            b.Initialize(target, payload, this);
-        }
+        if (b != null) b.Initialize(target, BuildBasicPayload());
     }
 
 
@@ -196,16 +235,29 @@ public class Unit : MonoBehaviour
     {
         if (!target) return;
 
-        var payload = new DamagePayload
-        {
-            BaseDamage = GetAttackDamage(),
-            Type = DetermineDamageType(),
-            Source = this.gameObject
-        };
+        var payload = BuildBasicPayload();  
+        target.TakeDamage(payload);          
 
-        // IDamageable로 받아서 처리
-        if (target is IDamageable dmg)
-            dmg.TakeDamage(payload);
+        if (Has(data.types, UnitType.Poison))
+            StartCoroutine(CoPoison(target));
+    }
+    private DamagePayload BuildBasicPayload()
+    {
+        int baseDmg = GetAttackDamage();
+        var type = Has(data.types, UnitType.Magic) ? DamageType.Magic
+                 : Has(data.types, UnitType.Elemental) ? DamageType.Magic // 원소도 당장은 마법 취급
+                 : DamageType.Physical;
+
+        return new DamagePayload
+        {
+            BaseDamage = baseDmg,
+            Type = type,
+            CritChance = 0.1f,        // 필요 시 UnitData/성급/시너지에서 끌어오기
+            CritMultiplier = 1.5f,
+            ArmorPen = 0f,
+            MagicPen = 0f,
+            Source = this
+        };
     }
 
     private DamageType DetermineDamageType()
