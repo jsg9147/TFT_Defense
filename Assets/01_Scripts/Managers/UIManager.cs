@@ -7,6 +7,7 @@ public class UIManager : MonoSingleton<UIManager>
     public GameObject battlePanel;
     public GameObject winPanel;
     public GameObject losePanel;
+    public GameObject upgradePanel;
 
     [Header("UI 풀링")]
     public ShopSlotPool ShopSlotPool { get; private set; } // 외부 접근용
@@ -51,12 +52,19 @@ public class UIManager : MonoSingleton<UIManager>
         losePanel?.SetActive(true);
     }
 
+    public void ShowUpgradeUI()
+    {
+        HideAllPanels();
+        upgradePanel?.SetActive(true);
+    }
+
     public void HideAllPanels()
     {
         shopPanel?.SetActive(false);
         battlePanel?.SetActive(false);
         winPanel?.SetActive(false);
         losePanel?.SetActive(false);
+        upgradePanel?.SetActive(false);
     }
     #endregion
 }

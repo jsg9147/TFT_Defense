@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
+using System.Reflection;
 
 public class Unit : MonoBehaviour
 {
@@ -19,13 +20,49 @@ public class Unit : MonoBehaviour
     public int starLevel = 1;
     public bool isPlaced = false;
 
+    // === 디버그 토글 ===
+    [Header("Debug")]
+    [SerializeField] private bool logOnApply = false;     // 적용 한 줄 요약
+    [SerializeField] private bool logBreakdown = false;    // 축별(코스트/직업/오리진) 기여도 상세
+
     private float attackCooldown;
     private float lastAttackTime;
     private readonly List<Monster> monstersInRange = new();
 
+    // === 추가: 업그레이드 배율 캐시 ===
+    private float _atkMul = 1f;
+    private float _aspdMul = 1f;
+
+
+    // === 추가: 이벤트 구독/해제 ===
+    private void OnEnable()
+    {
+        if (UpgradeManager.Instance != null)
+            UpgradeManager.Instance.OnUpgradeChanged += HandleUpgradeChanged;
+
+        // 유닛이 활성화될 때도 한 번 적용 (data가 이미 세팅되어 있으면 바로 반영)
+        ApplyUpgradesNow();
+    }
+
+    private void OnDisable()
+    {
+        if (UpgradeManager.Instance != null)
+            UpgradeManager.Instance.OnUpgradeChanged -= HandleUpgradeChanged;
+    }
+
+    private void HandleUpgradeChanged()
+    {
+        ApplyUpgradesNow();
+    }
+
+
     private void Start()
     {
-        attackCooldown = 1f / Mathf.Max(0.01f, data.attackSpeed);
+        // 기존
+        // attackCooldown = 1f / Mathf.Max(0.01f, data.attackSpeed);
+
+        // === 변경: 배율 포함(초기엔 _aspdMul=1f 이지만 이벤트 직후에도 일관성 유지) ===
+        attackCooldown = 1f / Mathf.Max(0.01f, data.attackSpeed * _aspdMul);
 
         var col = GetComponent<CircleCollider2D>();
         if (col != null)
@@ -35,13 +72,26 @@ public class Unit : MonoBehaviour
         }
     }
 
+
     public void Init(UnitData unitData)
     {
         data = unitData;
         if (unitSprite) unitSprite.sprite = data.icon;
         if (nameText) nameText.text = data.unitName;
         if (starText) starText.text = $"★ {starLevel}성";
+
+        // === 추가: 데이터가 바뀌었으니 업그레이드 재적용 ===
+        ApplyUpgradesNow();
+
+        // (선택) 콜라이더 반경도 갱신하고 싶으면:
+        var col = GetComponent<CircleCollider2D>();
+        if (col != null)
+        {
+            col.isTrigger = true;
+            col.radius = data.range;
+        }
     }
+
 
     private void Update()
     {
@@ -241,23 +291,64 @@ public class Unit : MonoBehaviour
         if (Has(data.types, UnitType.Poison))
             StartCoroutine(CoPoison(target));
     }
+    // ===== Unit.cs 안에 넣는 최종본 =====
     private DamagePayload BuildBasicPayload()
     {
-        int baseDmg = GetAttackDamage();
-        var type = Has(data.types, UnitType.Magic) ? DamageType.Magic
-                 : Has(data.types, UnitType.Elemental) ? DamageType.Magic // 원소도 당장은 마법 취급
-                 : DamageType.Physical;
+        // 1) 기본 타입 판정
+        DamageType type =
+            Has(data.types, UnitType.Magic) ? DamageType.Magic :
+            Has(data.types, UnitType.Elemental) ? DamageType.Magic : // 원소는 초기에 마법 취급
+            Has(data.types, UnitType.Area) ? DamageType.Area :
+                                                   DamageType.Physical;
 
+        // 2) 기본 공격력
+        float dmg = GetAttackDamage();
+
+        // 3) 시너지 스냅샷 받아서 보정 (없으면 기본값)
+        var snap = (SynergyManager.Instance != null)
+            ? SynergyManager.Instance.GetSnapshotFor(this)
+            : SynergySnapshot.Default;
+
+        // 4) 타입별 배율 적용 + 평딜 가산
+        dmg += snap.flatAdd;
+        switch (type)
+        {
+            case DamageType.Physical: dmg *= snap.physMul; break;
+            case DamageType.Magic: dmg *= snap.magicMul; break;
+            case DamageType.Area: dmg *= snap.areaMul; break;
+            case DamageType.True: dmg *= snap.trueMul; break;
+        }
+
+        // 5) 크리/관통 보정
+        float critChance = Mathf.Clamp01(0.10f + snap.critAdd);   // 기본 10% + 시너지
+        float critMultiplier = Mathf.Max(1f, 1.50f + snap.critMultAdd);
+        float armorPen = Mathf.Clamp01(snap.armorPenAdd);
+        float magicPen = Mathf.Clamp01(snap.magicPenAdd);
+
+        // 6) 페이로드 구성
         return new DamagePayload
         {
-            BaseDamage = baseDmg,
+            BaseDamage = Mathf.Max(1, Mathf.RoundToInt(dmg)),
             Type = type,
-            CritChance = 0.1f,        // 필요 시 UnitData/성급/시너지에서 끌어오기
-            CritMultiplier = 1.5f,
-            ArmorPen = 0f,
-            MagicPen = 0f,
+            CritChance = critChance,
+            CritMultiplier = critMultiplier,
+            ArmorPen = armorPen,
+            MagicPen = magicPen,
             Source = this
         };
+    }
+
+    // Unit.cs (필드 배치/회수 시점에서 호출한다고 가정)
+    public void SetPlaced(bool placed)
+    {
+        if (isPlaced == placed) return;
+
+        isPlaced = placed;
+
+        if (placed)
+            SynergyManager.Instance.RegisterUnit(this);
+        else
+            SynergyManager.Instance.UnregisterUnit(this);
     }
 
     private DamageType DetermineDamageType()
@@ -298,9 +389,17 @@ public class Unit : MonoBehaviour
 
     private int GetAttackDamage()
     {
-        // 성급 보정 등
-        return data.baseAttack + (starLevel - 1) * 5;
+        int baseDmg = data.baseAttack + (starLevel - 1) * 5;
+
+        // === 추가: 업그레이드 고정 증가량 ===
+        int flat = 0;
+        if (UpgradeManager.Instance != null)
+            flat = UpgradeManager.Instance.GetFinalAttackFlat(data);
+
+        float scaled = (baseDmg + flat) * Mathf.Max(0f, _atkMul);
+        return Mathf.Max(1, Mathf.RoundToInt(scaled));
     }
+
 
     // 범용 플래그 체크
     private static bool Has(UnitType mask, UnitType flag) => (mask & flag) == flag;
@@ -321,4 +420,117 @@ public class Unit : MonoBehaviour
     {
         if (unitSprite != null) unitSprite.color = active ? Color.yellow : Color.white;
     }
+
+    // === 추가: 업그레이드 적용 본체 ===
+    private void ApplyUpgradesNow()
+    {
+        if (data == null || UpgradeManager.Instance == null) return;
+
+        var (atkMul, aspdMul) = UpgradeManager.Instance.GetFinalMultipliers(data);
+        _atkMul = Mathf.Max(0f, atkMul);
+        _aspdMul = Mathf.Max(0.0001f, aspdMul);
+
+        // 공속 상한(선택)
+        float aps = data.attackSpeed * _aspdMul;
+        aps = Mathf.Min(aps, 5f); // 예: 초당 5타 상한
+
+        attackCooldown = 1f / Mathf.Max(0.01f, aps);  // ← 이 줄만 남기고, 중복 계산 줄은 제거
+
+        if (logOnApply || logBreakdown) LogUpgradeApplied();
+    }
+    // === 실제 로그 출력 ===
+    private void LogUpgradeApplied()
+    {
+        var um = UpgradeManager.Instance;
+        if (um == null) return;
+
+        int baseDmg = data.baseAttack + (starLevel - 1) * 5;
+        int flat = 0;
+        if (um != null) flat = um.GetFinalAttackFlat(data);   // Flat 안 쓰면 0 반환
+
+        float finalDmg = (baseDmg + flat) * _atkMul;
+        float aps = Mathf.Min(data.attackSpeed * _aspdMul, 5f);
+        float cd = 1f / Mathf.Max(0.01f, aps);
+
+        if (logOnApply)
+        {
+            Debug.Log(
+                $"[Upgrade][{name}] cost={data.cost}, jobs={data.jobs}, origins={data.origins} | " +
+                $"ATK {baseDmg} + {flat} → {finalDmg:F1} (x{_atkMul:F2}), " +
+                $"APS {data.attackSpeed:F2} → {aps:F2} (x{_aspdMul:F2}) | CD {cd:F3}s");
+        }
+
+        if (logBreakdown)
+        {
+            var bd = um.BuildBreakdown(data); // 아래 2) 참고
+            var lines = string.Join("\n   ", bd.lines);
+            Debug.Log(
+                $"[Upgrade-Breakdown][{name}] sums: +ATK% {bd.atkPctSum:P1}, +ASPD% {bd.aspdPctSum:P1}, +Flat {bd.flatSum}\n   {lines}");
+        }
+
+        if (logBreakdown)
+        {
+            var bd = um.BuildBreakdown(data); // 이미 쓰고 있는 브레이크다운
+            var lines = string.Join("\n   ", bd.lines);
+            Debug.Log(
+                $"[Upgrade-Breakdown][{name}] sums: +ATK% {bd.atkPctSum:P1}, +ASPD% {bd.aspdPctSum:P1}, +Flat {bd.flatSum}\n   {lines}");
+#if UNITY_EDITOR
+            LogCurvePresenceEditor();   // ← 커브 유무/스테이지 한 줄 요약
+#endif
+        }
+
+    }
+
+#if UNITY_EDITOR
+    private void LogCurvePresenceEditor()
+    {
+        try
+        {
+            var um = UpgradeManager.Instance;
+            if (um == null || data == null) return;
+
+            // UpgradeManager의 private 'config' 읽기
+            var cfgField = typeof(UpgradeManager).GetField("config",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+            var cfg = cfgField?.GetValue(um) as UpgradeConfig;
+            bool hasCfg = cfg != null;
+
+            bool hasCost = hasCfg && cfg.FindCostCurve(data.cost).HasValue;
+            int stCost = um.GetCostStage(data.cost);
+
+            var jobFlags = System.Enum.GetValues(typeof(JobSynergy))
+                .Cast<JobSynergy>()
+                .Where(f => f != JobSynergy.None && data.jobs.HasFlag(f));
+
+            var originFlags = System.Enum.GetValues(typeof(OriginSynergy))
+                .Cast<OriginSynergy>()
+                .Where(f => f != OriginSynergy.None && data.origins.HasFlag(f));
+
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"[Upgrade-CurvePresence][{name}] cfg={(hasCfg ? "OK" : "NULL")} | ");
+            sb.Append($"Cost {data.cost}: s{stCost}, curve={hasCost} ; ");
+
+            foreach (var jf in jobFlags)
+            {
+                bool has = hasCfg && cfg.jobCurves != null && cfg.jobCurves.ContainsKey(jf);
+                int st = um.GetJobStage(jf);
+                sb.Append($"Job {jf}: s{st}, curve={has} ; ");
+            }
+            foreach (var of in originFlags)
+            {
+                bool has = hasCfg && cfg.originCurves != null && cfg.originCurves.ContainsKey(of);
+                int st = um.GetOriginStage(of);
+                sb.Append($"Origin {of}: s{st}, curve={has} ; ");
+            }
+
+            sb.Append($" | atkMul={_atkMul:F2}, aspdMul={_aspdMul:F2}");
+            Debug.Log(sb.ToString());
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[Upgrade-CurvePresence] failed: {e.Message}");
+        }
+    }
+#endif
+
 }

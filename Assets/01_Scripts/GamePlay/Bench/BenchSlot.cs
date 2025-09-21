@@ -16,7 +16,7 @@ public class BenchSlot : MonoBehaviour, IDropHandler
         CurrentHero = heroObj;
     }
 
-    public void RemoveHero()
+    public void Clear()
     {
         CurrentHero = null;
     }

@@ -58,6 +58,15 @@ MonoBehaviour:
     - id: DuplicateLayersDetector
       group: 0
       enabled: 1
+    - id: InvalidRendererBatchingDetector
+      group: 0
+      enabled: 1
+    - id: InvalidRendererMaterialsDetector
+      group: 0
+      enabled: 1
+    - id: InvalidSortingLayerDetector
+      group: 0
+      enabled: 1
     missingReferences: 0
     shadersWithErrors: 0
     missingComponents: 0
@@ -96,4 +105,4 @@ MonoBehaviour:
   referencesFinderSettings:
     pathIgnoresFilters: []
     pathIncludesFilters: []
-  version: 1.17.1
+  version: 2.0.0

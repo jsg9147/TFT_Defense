@@ -128,8 +128,25 @@ public class IPrefabFileHandler : MonoBehaviour, IFileHandler
         var sourcePath = AssetDatabase.GetAssetPath(asset);
         var FileName = sourcePath.Split("/");
         var path = manager.isSaveSamePath ? sourcePath.Replace(FileName[FileName.Length-1], "") : manager.unitPath;
-        Debug.Log(sourcePath.Replace(asset.name+".prefab", "").Replace(asset.name+".Prefab", "")  );
-        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs,path+SpumUnitData._code+".prefab");
+
+        // 폴더가 없으면 생성
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+            AssetDatabase.Refresh();
+        }
+
+        Debug.Log(sourcePath.Replace(asset.name+".prefab", "").Replace(asset.name+".Prefab", ""));
+        var prefabFullPath = path + SpumUnitData._code + ".prefab";
+        var prefabDir = Path.GetDirectoryName(prefabFullPath);
+        if (!Directory.Exists(prefabDir))
+        {
+            Directory.CreateDirectory(prefabDir);
+            AssetDatabase.Refresh();
+        }
+
+        Debug.Log(sourcePath.Replace(asset.name+".prefab", "").Replace(asset.name+".Prefab", ""));
+        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs, prefabFullPath);
         DestroyImmediate(prefabs);
         AssetDatabase.Refresh();
         manager.UIManager.ToastOn("Saved Unit Object " + prefabName);

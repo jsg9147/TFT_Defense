@@ -22502,6 +22502,2177 @@ MonoBehaviour:
     - rare
     - dark
     - common
+  - FileName: Hair_m01
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Short
+    - Neat
+    Class: []
+    Style: []
+  - FileName: Hair_m02
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Short
+    - Spiky
+    Class: []
+    Style: []
+  - FileName: Hair_m03
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Medium
+    - Parted
+    Class: []
+    Style: []
+  - FileName: Hair_m04
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Medium
+    - Mullet
+    Class: []
+    Style: []
+  - FileName: Hair_m05
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Short
+    - Forward
+    Class: []
+    Style: []
+  - FileName: Hair_m06
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Spiky
+    - Up
+    Class: []
+    Style: []
+  - FileName: Hair_m07
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Bald
+    Class: []
+    Style: []
+  - FileName: Hair_m08
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Top
+    - Knot
+    Class: []
+    Style: []
+  - FileName: Hair_m09
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Long
+    - Straight
+    Class: []
+    Style: []
+  - FileName: Hair_m10
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Buzz
+    - Cut
+    Class: []
+    Style: []
+  - FileName: Hair_m11
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Long
+    - Straight
+    Class: []
+    Style: []
+  - FileName: Hair_m12
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Fade
+    - Undercut
+    Class: []
+    Style: []
+  - FileName: Hair_m13
+    Part: Hair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: hair
+    Addon: ModernPackVer1
+    Properties:
+    - Medium
+    - Slicked
+    - Back
+    Class: []
+    Style: []
+  - FileName: face_acc_m01
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Glasses
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: face_acc_m02
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Glasses
+    Addon: ModernPackVer1
+    Properties:
+    - Plastic
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: face_acc_m03
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Glasses
+    Addon: ModernPackVer1
+    Properties:
+    - Plastic
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: face_acc_m04
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Earring
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: face_acc_m05
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Earring
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: face_acc_m06
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Mask
+    Addon: ModernPackVer1
+    Properties:
+    - Cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: face_cheek
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Makeup
+    Addon: ModernPackVer1
+    Properties:
+    - Blush
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: face_eyelash
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Makeup
+    Addon: ModernPackVer1
+    Properties:
+    - Eyelash
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: face_lip
+    Part: FaceHair
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Makeup
+    Addon: ModernPackVer1
+    Properties:
+    - Lipstick
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: dress_1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_1_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_1_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_1_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: dress_2_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: dress_2_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: dress_2_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: dress_3
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_3_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_3_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_3_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_4
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_4_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_4_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_4_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: dress_5
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: dress_5_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: dress_5_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: dress_5_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Dress
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: farmer
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Overalls
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: farmer_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Overalls
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: farmer_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Overalls
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: farmer_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Overalls
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: hoodie
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Hoodie
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: hoodie_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Hoodie
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: hoodie_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Hoodie
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: suit_1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_1_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_1_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_1_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_2_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_2_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_2_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_3
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_3_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_3_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: suit_3_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Suit
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: tee_1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_1_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_1_g1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_1_g2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_2_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_2_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_2_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_3
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_3_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_3_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: tee_3_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shirt
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Apparel
+    Class: []
+    Style:
+    - common
+  - FileName: winter1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter1_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter1_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter1_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter2_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter2_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter2_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter3
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter3_c1
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter3_c2
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: winter3_g
+    Part: Cloth
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Jacket
+    Addon: ModernPackVer1
+    Properties:
+    - wool
+    - Apparel
+    Class: []
+    Style:
+    - rare
+  - FileName: Foot_m01
+    Part: Pant
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Shoes
+    Addon: ModernPackVer1
+    Properties:
+    - Leather
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Foot_m02
+    Part: Pant
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Shoes
+    Addon: ModernPackVer1
+    Properties:
+    - Leather
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Foot_m03
+    Part: Pant
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shoes
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Foot_m04
+    Part: Pant
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shoes
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Foot_m05
+    Part: Pant
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shoes
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m01
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m01_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m01_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m01_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m01_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m02
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m02_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m02_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m02_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m02_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: Ribbon
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m03
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m03_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m03_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m03_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m03_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m04
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m04_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m04_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m04_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m04_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beanie
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m05
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m05_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m05_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m05_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m05_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m06
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m06_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m06_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m06_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m06_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: beret
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m07
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m07_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m07_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m07_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m07_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m08
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m08_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m08_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m08_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m08_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: female
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m09
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m09_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m09_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m09_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m09_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: male
+    Type: cap
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - common
+  - FileName: Helmet_m10
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: headset
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m10_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: headset
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m10_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: headset
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m10_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: headset
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m10_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: headset
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m11
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: fedora
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m11_black
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: fedora
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m11_blonde
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: fedora
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m11_brown
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: fedora
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Helmet_m11_color
+    Part: Helmet
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: fedora
+    Addon: ModernPackVer1
+    Properties:
+    - cloth
+    - Accessory
+    Class: []
+    Style:
+    - rare
+  - FileName: Weapon_m_beer
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Mug
+    Addon: ModernPackVer1
+    Properties:
+    - Glass
+    - Equipment
+    Class: []
+    Style:
+    - common
+  - FileName: Weapon_m_board
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: board
+    Addon: ModernPackVer1
+    Properties:
+    - Wood
+    - Equipment
+    Class: []
+    Style:
+    - rare
+  - FileName: Weapon_m_coffee
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Cup
+    Addon: ModernPackVer1
+    Properties:
+    - Paper
+    - Equipment
+    Class: []
+    Style:
+    - common
+  - FileName: Weapon_m_laptop
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Laptop
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Equipment
+    Class: []
+    Style:
+    - rare
+  - FileName: Weapon_m_map
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Flipper
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Equipment
+    Class: []
+    Style:
+    - common
+  - FileName: Weapon_m_mic
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Microphone
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Equipment
+    Class: []
+    Style:
+    - rare
+  - FileName: Weapon_m_pan
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Pan
+    Addon: ModernPackVer1
+    Properties:
+    - Steel
+    - Equipment
+    Class: []
+    Style:
+    - common
+  - FileName: Weapon_m_phone
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Phone
+    Addon: ModernPackVer1
+    Properties:
+    - steel
+    - Equipment
+    Class: []
+    Style:
+    - rare
+  - FileName: Weapon_m_pouch
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Pouch
+    Addon: ModernPackVer1
+    Properties:
+    - Leather
+    - Equipment
+    Class: []
+    Style:
+    - common
+  - FileName: Weapon_m_shovel
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Shovel
+    Addon: ModernPackVer1
+    Properties:
+    - plastic
+    - Equipment
+    Class: []
+    Style:
+    - common
+  - FileName: Weapon_m_surf
+    Part: Weapons
+    Theme:
+    - modern
+    Race: 
+    Gender: 
+    Type: Surfboard
+    Addon: ModernPackVer1
+    Properties:
+    - plastic
+    - Equipment
+    Class: []
+    Style:
+    - rare
   enableStyleFilterFallback: 0
   verboseLogging: 0
 --- !u!4 &439774416
@@ -27016,7 +29187,7 @@ MonoBehaviour:
   ChangeRandomButton: {fileID: 1167503493}
   ResetSpriteButton: {fileID: 380024167}
   LockButton: {fileID: 53775491}
-  MaskToggle: {fileID: 0}
+  MaskToggle: {fileID: 480247717}
   ToggleTarget: {fileID: 0}
   Direction: 
   UnitType: 
@@ -80195,7 +82366,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3744046105682257370, guid: bd557657e7bee7142bb30988e7fdb00e, type: 3}
       propertyPath: _version
-      value: 180
+      value: 182
       objectReference: {fileID: 0}
     - target: {fileID: 3744046105682257370, guid: bd557657e7bee7142bb30988e7fdb00e, type: 3}
       propertyPath: unitPath

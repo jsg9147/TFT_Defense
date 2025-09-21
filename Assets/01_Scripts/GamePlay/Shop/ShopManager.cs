@@ -19,6 +19,19 @@ public class ShopManager : MonoBehaviour
     public ShopProbabilityUI probabilityUI;
     public List<ShopProbabilityTable> probabilityTables;
 
+    [Header("필터 UI(선택)")]
+    [SerializeField] private Transform costButtonParent;
+    [SerializeField] private Transform jobButtonParent;
+    [SerializeField] private Transform originButtonParent;
+
+    private readonly Dictionary<int, List<UnitData>> byCost = new();
+    private readonly Dictionary<JobSynergy, List<UnitData>> byJob = new();
+    private readonly Dictionary<OriginSynergy, List<UnitData>> byOrigin = new();
+
+    private readonly HashSet<int> selectedCosts = new();
+    private readonly HashSet<JobSynergy> selectedJobs = new();
+    private readonly HashSet<OriginSynergy> selectedOrigins = new();
+
     private List<ShopSlotUI> currentSlots = new List<ShopSlotUI>();
 
     void Start()

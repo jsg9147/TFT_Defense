@@ -67,8 +67,10 @@ public class MouseClickDetector2D : MonoBehaviour
             {
                 Transform tile = hit.collider.transform;
                 Unit draggingUnit = UnitDragHandler.Instance.GetDraggingUnit();
+                bool isPlaced = hit.collider.transform.tag == "Tile";
+
                 draggingUnit.transform.position = tile.position;
-                draggingUnit.isPlaced = true;
+                draggingUnit.SetPlaced(isPlaced);
 
                 Debug.Log($"유닛을 타일 {tile.name}에 배치함");
             }

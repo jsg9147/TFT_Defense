@@ -34,12 +34,12 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
     void OnEnable()
     {
         RefreshFolderStates();
-
+        
         SetDefaultAsset();
     }
     void OnGUI()
     {
-        GUILayout.Label("Assets to Export", EditorStyles.boldLabel, GUILayout.ExpandWidth(true));
+        GUILayout.Label("Assets to Export", EditorStyles.boldLabel,GUILayout.ExpandWidth(true));
 
         if (GUILayout.Button("Select be Exported Addon Folder"))
         {
@@ -53,7 +53,7 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
         {
             EditorGUILayout.BeginHorizontal();
 
-
+           
 
             if (folderInfos.TryGetValue(folder, out FolderInfo info))
             {
@@ -76,32 +76,29 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
 
         EditorGUILayout.Space();
 
-        GUILayout.Label("Required Asset", EditorStyles.boldLabel);
-        if (GUILayout.Button("Default asset files selected for the package"))
-        {
-            SetDefaultAsset();
-        }
+    GUILayout.Label("Required Asset", EditorStyles.boldLabel);
+    if (GUILayout.Button("Default asset files selected for the package"))
+    {
+        SetDefaultAsset();
+    }
+    defaultAssetsScrollPosition = EditorGUILayout.BeginScrollView(defaultAssetsScrollPosition);
+    foreach (var folder in DefualtAssetStates.Keys.ToList())
+    {
+        EditorGUILayout.BeginHorizontal();
 
-        // Add selected files to DefaultExport
-        if (GUILayout.Button("Add Selected File(s) to DefaultExport"))
-        {
-            AddSelectedFilesToDefaultExport();
-        }
+        EditorGUILayout.LabelField(folder, EditorStyles.wordWrappedLabel);
+        bool isChecked = EditorGUILayout.Toggle(DefualtAssetStates[folder], GUILayout.Width(20));
 
-        defaultAssetsScrollPosition = EditorGUILayout.BeginScrollView(defaultAssetsScrollPosition);
-        foreach (var folder in DefualtAssetStates.Keys.ToList())
+        EditorGUILayout.EndHorizontal();
+
+        if (isChecked != DefualtAssetStates[folder])
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(folder, EditorStyles.wordWrappedLabel);
-            bool isChecked = EditorGUILayout.Toggle(DefualtAssetStates[folder], GUILayout.Width(20));
-            EditorGUILayout.EndHorizontal();
-            if (isChecked != DefualtAssetStates[folder])
-            {
-                DefualtAssetStates[folder] = isChecked;
-                UpdateAssetsToExport();
-            }
+            DefualtAssetStates[folder] = isChecked;
+            UpdateAssetsToExport();
         }
-        EditorGUILayout.EndScrollView();
+    }
+
+    EditorGUILayout.EndScrollView();
 
         if (GUILayout.Button("Export Package"))
         {
@@ -112,31 +109,30 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
             ExportCleanInstallPackage();
             AssetDatabase.Refresh();
             float version = GameObject.Find("SPUM_Manager").GetComponent<SPUM_Manager>()._version;
-
-
-            ExportPackage("Assets/SPUM/Package/SPUM" + version + ".unitypackage");
+            
+            
+            ExportPackage("Assets/SPUM/Package/SPUM"+version+".unitypackage");
             AssetDatabase.Refresh();
-            ExportPackage("Assets/SPUM/Package/SPUM" + version + ".unitypackage");
+            ExportPackage("Assets/SPUM/Package/SPUM"+version+".unitypackage");
         }
         if (GUILayout.Button("README File Path"))
         {
             ReadMeFilePath();
         }
     }
-    void SetDefaultAsset()
-    {
+    void SetDefaultAsset(){
         DefaultExport.Clear();
+        DefualtAssetStates.Clear();
         string[] array = new string[] {
-        "Assets/SPUM/Resources/Addons/Legacy",
-        "Assets/SPUM/Core/Basic_Resources/Animator",
-        "Assets/SPUM/Core/Basic_Resources/Materials",
-        "Assets/SPUM/Core/Basic_Resources/Ect",
-        "Assets/SPUM/Core/Basic_Resources/Font",
-        "Assets/SPUM/Core/Script/Data",
-        "Assets/SPUM/Sample"
-    };
+            "Assets/SPUM/Resources/Addons/Legacy", 
+            "Assets/SPUM/Core/Basic_Resources/Animator",
+            "Assets/SPUM/Core/Basic_Resources/Materials",
+            "Assets/SPUM/Core/Basic_Resources/Ect",
+            "Assets/SPUM/Core/Script/Data",
+            "Assets/SPUM/Sample"
+        };
         DefaultExport.AddRange(array);
-
+        
         foreach (string asset in array)
         {
             if (!DefualtAssetStates.ContainsKey(asset))
@@ -144,25 +140,7 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
                 DefualtAssetStates[asset] = true;
             }
         }
-
-        UpdateAssetsToExport();
-    }
-
-    // 선택된 파일을 DefaultExport에 추가하는 함수 
-    void AddSelectedFilesToDefaultExport()
-    {
-        string[] selectedAssets = Selection.assetGUIDs.Select(AssetDatabase.GUIDToAssetPath).ToArray();
-        foreach (string asset in selectedAssets)
-        {
-            if (!DefaultExport.Contains(asset))
-            {
-                DefaultExport.Add(asset);
-            }
-            if (!DefualtAssetStates.ContainsKey(asset))
-            {
-                DefualtAssetStates[asset] = true;
-            }
-        }
+        
         UpdateAssetsToExport();
     }
     void RefreshSelectedAssets()
@@ -244,49 +222,7 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
         }
         return assets;
     }
-    void ExportPackage()
-    {
-        // 선택된 폴더들의 Name 정보를 수집
-        List<string> selectedNames = new List<string>();
-        foreach (var folder in folderStates.Keys)
-        {
-            if (folderStates[folder] && folderInfos.TryGetValue(folder, out FolderInfo info))
-            {
-                if (!string.IsNullOrEmpty(info.Name))
-                {
-                    selectedNames.Add(info.Name);
-                }
-            }
-        }
-
-        // 패키지 이름 생성
-        string packageName = string.Join("_", selectedNames);
-        if (string.IsNullOrEmpty(packageName))
-        {
-            packageName = "SPUM_ExportedPackage"; // 기본 이름
-        }
-
-        string packagePath = EditorUtility.SaveFilePanel(
-            "Export Package",
-            "",
-            packageName,
-            "unitypackage"
-        );
-
-        if (string.IsNullOrEmpty(packagePath))
-        {
-            return;
-        }
-
-        AssetDatabase.ExportPackage(
-            assetsToExport.ToArray(),
-            packagePath,
-            ExportPackageOptions.Default | ExportPackageOptions.Recurse
-        );
-
-        Debug.Log("Package exported successfully: " + packagePath);
-    }
-   void ExportPackage(string Path = null)
+    void ExportPackage(string Path = null)
     {
         // 선택된 폴더들의 Name 정보를 수집
         List<string> selectedNames = new List<string>();
@@ -330,18 +266,19 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
 
         Debug.Log("Package exported successfully: " + packagePath);
     }
+
     void ExportCleanInstallPackage()
     {
         DeleteFilesWithExtension("Assets/SPUM/Package", ".unitypackage");
-
+        
         DefaultExport.Clear();
         DefualtAssetStates.Clear();
         string ReadMePath = ReadMeFilePath();
         string[] array = new string[] {
-            "Assets/SPUM/Resources/Addons/Legacy",
-            "Assets/SPUM/Resources/Addons/Ver121",
-            "Assets/SPUM/Resources/Addons/Ver300",
-            "Assets/SPUM/Package",
+            "Assets/SPUM/Resources/Addons/Legacy", 
+            "Assets/SPUM/Resources/Addons/Ver121", 
+            "Assets/SPUM/Resources/Addons/Ver300", 
+            "Assets/SPUM/Package", 
             "Assets/SPUM/Core",
             "Assets/SPUM/Scene",
             "Assets/SPUM/Script",
@@ -349,7 +286,7 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
             "Assets/SPUM/Sprite_Editor(Beta)",
             "Assets/SPUM/Sample",
             ReadMePath
-
+            
         };
         DefaultExport.AddRange(array);
 
@@ -360,12 +297,12 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
                 DefualtAssetStates[asset] = true;
             }
         }
-
+        
         UpdateAssetsToExport();
     }
     string ReadMeFilePath()
     {
-        string specificPath = "Assets/SPUM";
+        string specificPath = "Assets/SPUM"; 
         string[] files = Directory.GetFiles(specificPath, "*ReadMe*", SearchOption.AllDirectories);
 
         string highestVersionFile = null;
@@ -393,7 +330,7 @@ public class SPUM_AssetExporterWithPreview : EditorWindow
         }
         else
         {
-            Debug.Log("ReadMe file not found");
+           Debug.Log("ReadMe file not found");
         }
         return highestVersionFile;
     }

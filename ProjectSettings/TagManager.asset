@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Monster
+  - Target
+  - Missile
+  - Tile
   layers:
   - Default
   - TransparentFX
@@ -14,7 +17,7 @@ TagManager:
   - UI
   - Tile
   - Monster
-  - 
+  - Bench
   - 
   - 
   - 

@@ -2,6 +2,7 @@ using UnityEngine;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
+using System;
 
 [CreateAssetMenu(menuName = "Unit/UnitData")]
 public class UnitData : ScriptableObject
@@ -9,10 +10,21 @@ public class UnitData : ScriptableObject
     [Header("기본")]
     public string unitName;
     public Sprite icon;
+    [Header("유닛 타입")]
 #if ODIN_INSPECTOR
     [EnumToggleButtons, HideLabel]
 #endif
     public UnitType types = UnitType.SingleShot | UnitType.Physical;
+    [Header("유닛 직업")]
+#if ODIN_INSPECTOR
+    [EnumToggleButtons, HideLabel]
+#endif
+    public JobSynergy jobs = JobSynergy.None;
+    [Header("고유 시너지")]
+#if ODIN_INSPECTOR
+    [EnumToggleButtons, HideLabel]
+#endif
+    public OriginSynergy origins = OriginSynergy.None;
     public int cost = 1;          // 1~9 가정 (게임 내 비용, UI 표시용 아님)
 
     [Header("전투 스탯")]
@@ -65,4 +77,33 @@ public enum UnitType
     Buff = 1 << 8,   // 아군 강화
     Debuff = 1 << 9,   // 적 약화
     Summon = 1 << 10,  // 소환
+}
+
+
+[Flags]
+public enum JobSynergy
+{
+    None = 0,
+    Warrior = 1 << 0,
+    Mage = 1 << 1,
+    Ranger = 1 << 2,
+    Assassin = 1 << 3,
+    Guardian = 1 << 4,
+    Support = 1 << 5,
+    Engineer = 1 << 6,
+    Summoner = 1 << 7,
+}
+
+[Flags]
+public enum OriginSynergy
+{
+    None = 0,
+    Kingdom = 1 << 0,
+    Undead = 1 << 1,
+    Beast = 1 << 2,
+    Mech = 1 << 3,
+    Spirit = 1 << 4,
+    Void = 1 << 5,
+    Goblin = 1 << 6,
+    Slime = 1 << 7,
 }
