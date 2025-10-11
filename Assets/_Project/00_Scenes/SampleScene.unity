@@ -250,7 +250,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 155, y: 85.2}
+  m_SizeDelta: {x: 155, y: 47.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &61578649
 MonoBehaviour:
@@ -1679,23 +1679,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 310472875}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
   m_Padding:
     m_Left: 0
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 150, y: 80}
+  m_Spacing: {x: 30, y: 20}
+  m_Constraint: 2
+  m_ConstraintCount: 2
 --- !u!1001 &312045791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2250,8 +2248,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -30, y: -30}
-  m_SizeDelta: {x: 60, y: 60}
+  m_AnchoredPosition: {x: -30, y: -22}
+  m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &411730026
 MonoBehaviour:
@@ -2901,7 +2899,7 @@ GameObject:
   - component: {fileID: 465854931}
   - component: {fileID: 465854930}
   m_Layer: 5
-  m_Name: Frame
+  m_Name: TopBarFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2924,7 +2922,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -6.799988}
-  m_SizeDelta: {x: -23.399956, y: 100}
+  m_SizeDelta: {x: -23.399956, y: 69.2}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &465854930
 MonoBehaviour:
@@ -3306,7 +3304,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 155, y: 85.2}
+  m_SizeDelta: {x: 155, y: 47.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &595645839
 MonoBehaviour:
@@ -4175,10 +4173,10 @@ RectTransform:
   - {fileID: 310472876}
   m_Father: {fileID: 1347752182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -200, y: 353}
+  m_SizeDelta: {x: 1301.6, y: 313.9}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &761176521
 MonoBehaviour:
@@ -5110,23 +5108,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 902856592}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
   m_Padding:
     m_Left: 0
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 150, y: 80}
+  m_Spacing: {x: 30, y: 20}
+  m_Constraint: 2
+  m_ConstraintCount: 2
 --- !u!1 &921769582
 GameObject:
   m_ObjectHideFlags: 0
@@ -8182,7 +8178,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 155, y: 85.2}
+  m_SizeDelta: {x: 155, y: 47.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1353031064
 MonoBehaviour:
@@ -9050,23 +9046,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1491758376}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
   m_Padding:
     m_Left: 0
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 150, y: 80}
+  m_Spacing: {x: 30, y: 20}
+  m_Constraint: 2
+  m_ConstraintCount: 2
 --- !u!1 &1495353176
 GameObject:
   m_ObjectHideFlags: 0
@@ -10714,8 +10708,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 21.140015, y: -13.21}
-  m_SizeDelta: {x: 742.3, y: 85.2}
+  m_AnchoredPosition: {x: 21.140137, y: -13.209991}
+  m_SizeDelta: {x: 697.26, y: 54.1}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1768940063
 MonoBehaviour:
@@ -10743,8 +10737,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
-    m_Right: 0
+    m_Left: -20
+    m_Right: -20
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
@@ -11672,7 +11666,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 155, y: 85.2}
+  m_SizeDelta: {x: 155, y: 47.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1891408046
 MonoBehaviour:
@@ -11745,7 +11739,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1894518997}
-  - component: {fileID: 1894518996}
+  - component: {fileID: 1894518998}
   m_Layer: 5
   m_Name: CostUpgradeButton Group_1
   m_TagString: Untagged
@@ -11753,32 +11747,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &1894518996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1894518995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!224 &1894518997
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11798,6 +11766,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -158.9}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &1894518998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894518995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 150, y: 80}
+  m_Spacing: {x: 30, y: 20}
+  m_Constraint: 2
+  m_ConstraintCount: 2
 --- !u!1 &1907282534
 GameObject:
   m_ObjectHideFlags: 0
