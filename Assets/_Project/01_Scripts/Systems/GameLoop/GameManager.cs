@@ -18,7 +18,6 @@ public class GameManager : MonoSingleton<GameManager>
     [Header("씬 종속 매니저")]
     public ShopManager shopManager;
     public MonsterSpawner monsterSpawner;
-    public BenchManager benchManager;
 
     // ⬇️ UI 이벤트
     public event Action<int> OnWaveChanged;                 // 웨이브 시작 시
@@ -52,7 +51,6 @@ public class GameManager : MonoSingleton<GameManager>
     {
         if (shopManager == null) shopManager = FindAnyObjectByType<ShopManager>();
         if (monsterSpawner == null) monsterSpawner = FindAnyObjectByType<MonsterSpawner>();
-        if (benchManager == null) benchManager = FindAnyObjectByType<BenchManager>();
         Debug.Log("[GameManager] 씬 매니저 바인딩 완료");
     }
 

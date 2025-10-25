@@ -18,7 +18,6 @@ public class Unit : MonoBehaviour
 
     [Header("상태")]
     public int starLevel = 1;
-    public bool isPlaced = false;
 
     // === 디버그 토글 ===
     [Header("Debug")]
@@ -95,8 +94,6 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
-        if (!isPlaced) return;
-
         // 무효 타겟 정리
         monstersInRange.RemoveAll(m => m == null || !m.gameObject.activeInHierarchy);
         if (monstersInRange.Count == 0) return;
@@ -336,19 +333,6 @@ public class Unit : MonoBehaviour
             MagicPen = magicPen,
             Source = this
         };
-    }
-
-    // Unit.cs (필드 배치/회수 시점에서 호출한다고 가정)
-    public void SetPlaced(bool placed)
-    {
-        if (isPlaced == placed) return;
-
-        isPlaced = placed;
-
-        if (placed)
-            SynergyManager.Instance.RegisterUnit(this);
-        else
-            SynergyManager.Instance.UnregisterUnit(this);
     }
 
     private DamageType DetermineDamageType()

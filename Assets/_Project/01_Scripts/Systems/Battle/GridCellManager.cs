@@ -5,29 +5,37 @@ public class GridCellManager : MonoBehaviour
 {
     public GameObject cellPrefab;
     public Transform cellParent;
-    public int width = 8;
-    public int height = 5;
-    public float spacing = 1f;
 
-    private Dictionary<Vector3Int, GameObject> cells = new();
+    private readonly Dictionary<Vector3Int, BoardSlot> slots = new();
 
     void Start() => GenerateGrid();
 
     void GenerateGrid()
     {
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
+        var gm = GridManager.Instance;
+        if (gm == null || gm.grid == null) { Debug.LogWarning("GridManager/grid 없음"); return; }
+
+        // 재생성 시 정리
+        for (int i = cellParent.childCount - 1; i >= 0; --i)
+            Destroy(cellParent.GetChild(i).gameObject);
+
+        for (int y = 0; y < gm.height; y++)
+            for (int x = 0; x < gm.width; x++)
             {
-                Vector3Int cellPos = new(x, y, 0);
-                Vector3 worldPos = GridManager.Instance.CellToWorldCenter(cellPos);
+                var cell = new Vector3Int(gm.origin.x + x, gm.origin.y + y, 0);
+                var world = gm.CellToWorldCenter(cell);
 
-                GameObject tile = Instantiate(cellPrefab, worldPos, Quaternion.identity, cellParent);
-                tile.name = $"Cell_{x}_{y}";
+                var go = Instantiate(cellPrefab, world, Quaternion.identity, cellParent);
+                go.name = $"Cell_{cell.x}_{cell.y}";
 
-                cells[cellPos] = tile;
+                var slot = go.GetComponent<BoardSlot>();
+                if (slot == null) slot = go.AddComponent<BoardSlot>();
+                slot.Init(cell);
+
+                slots[cell] = slot;
             }
     }
 
-    public GameObject GetCellObject(Vector3Int pos) =>
-        cells.TryGetValue(pos, out var tile) ? tile : null;
+    public BoardSlot GetSlot(Vector3Int cell)
+        => slots.TryGetValue(cell, out var s) ? s : null;
 }

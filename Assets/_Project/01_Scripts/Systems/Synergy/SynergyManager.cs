@@ -90,6 +90,7 @@ public class SynergyManager : MonoSingleton<SynergyManager>
         DebouncedRecalc();
     }
 
+    // 유닛 제거
     public void UnregisterUnit(Unit u)
     {
         if (!u) return;

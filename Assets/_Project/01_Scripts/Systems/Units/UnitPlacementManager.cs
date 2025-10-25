@@ -1,50 +1,82 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class UnitPlacementManager : MonoBehaviour
 {
     public static UnitPlacementManager Instance;
 
-    [Header("¼³Á¤")]
-    public GameObject unitPrefab; // ÀÎ½ºÅÏ½ºÈ­ÇÒ À¯´Ö º»Ã¼ (ºó ¿ÀºêÁ§Æ®¿¡ SpriteRenderer + UnitInstance.cs Æ÷ÇÔ)
+    [Header("ì„¤ì •")]
+    public GameObject unitPrefab;
 
     private UnitData selectedUnitData = null;
     private bool isPlacing = false;
+    public bool IsPlacing => isPlacing;
 
-    void Awake()
-    {
-        Instance = this;
-    }
+    void Awake() => Instance = this;
 
-    /// <summary>
-    /// »óÁ¡¿¡¼­ ±¸¸ÅµÈ À¯´ÖÀ» ¹èÄ¡ ÁØºñ »óÅÂ·Î ¼³Á¤
-    /// </summary>
     public void SetSelectedUnit(UnitData data)
     {
         selectedUnitData = data;
         isPlacing = true;
-        Debug.Log($"{data.unitName} ¹èÄ¡ ÁØºñµÊ");
+        Debug.Log($"{data.unitName} ë°°ì¹˜ ì¤€ë¹„ë¨");
+    }
+
+    public void CancelPlacement()
+    {
+        isPlacing = false;
+        selectedUnitData = null;
     }
 
     /// <summary>
-    /// ¸ÊÀÇ Å¸ÀÏÀÌ Å¬¸¯µÇ¾úÀ» ¶§ È£Ãâ
+    /// ì›”ë“œ ì¢Œí‘œ ê¸°ì¤€ ë°°ì¹˜. ì„±ê³µ ì‹œ true, ì‹¤íŒ¨ ì‹œ false.
+    /// ì„±ê³µí•˜ë©´ ë°°ì¹˜ ëª¨ë“œ í•´ì œ, ì‹¤íŒ¨í•˜ë©´ ì„ íƒ ìœ ì§€(ë‹¤ë¥¸ ì¹¸ ì‹œë„ ê°€ëŠ¥).
     /// </summary>
-    public void TryPlaceUnit(Vector3 worldPos)
+    public bool TryPlaceUnit(Vector3 worldPos)
     {
         if (!isPlacing || selectedUnitData == null)
-            return;
+            return false;
 
-        Vector3Int gridPos = GridManager.Instance.WorldToCell(worldPos);
-        if (!GridManager.Instance.IsPlaceable(gridPos))
+        var gm = GridManager.Instance;
+        if (gm == null) return false;
+
+        Vector3Int cellPos = gm.WorldToCell(worldPos);
+
+        if (!gm.IsPlaceable(cellPos))
         {
-            Debug.Log("ÇØ´ç À§Ä¡´Â ¹èÄ¡ ºÒ°¡");
-            return;
+            Debug.Log("í•´ë‹¹ ìœ„ì¹˜ëŠ” ë°°ì¹˜ ë¶ˆê°€");
+            return false;
         }
 
-        GameObject unit = Instantiate(unitPrefab, GridManager.Instance.CellToWorldCenter(gridPos), Quaternion.identity);
-        unit.GetComponent<Unit>().Init(selectedUnitData);
+        // ìœ ë‹› ìƒì„±
+        GameObject go = Instantiate(unitPrefab, gm.CellToWorldCenter(cellPos), Quaternion.identity);
+        Unit unit = go.GetComponent<Unit>();
+        unit.Init(selectedUnitData);
 
-        GridManager.Instance.Occupy(gridPos);
-        isPlacing = false;
-        selectedUnitData = null;
+        SynergyManager.Instance.RegisterUnit(unit);
+
+        if (gm.TryPlaceUnit(unit, cellPos))
+        {
+            Debug.Log($"ìœ ë‹› {unit.name}ì´ ì…€ {cellPos}ì— ë°°ì¹˜ë¨");
+            // ì„±ê³µ ì‹œ ë°°ì¹˜ ëª¨ë“œ í•´ì œ
+            isPlacing = false;
+            selectedUnitData = null;
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning("ë°°ì¹˜ ì‹¤íŒ¨: ì´ë¯¸ ì ìœ ëœ ì¹¸");
+            Destroy(go);
+            // ì‹¤íŒ¨ ì‹œ ì„ íƒ ìœ ì§€
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// ì…€ ê¸°ì¤€ ë°°ì¹˜. ë‚´ë¶€ì—ì„œ ì›”ë“œ ë³€í™˜ í›„ TryPlaceUnit í˜¸ì¶œ.
+    /// </summary>
+    public bool TryPlaceAtCell(Vector3Int cell)
+    {
+        var gm = GridManager.Instance;
+        if (gm == null) return false;
+        return TryPlaceUnit(gm.CellToWorldCenter(cell));
     }
 }

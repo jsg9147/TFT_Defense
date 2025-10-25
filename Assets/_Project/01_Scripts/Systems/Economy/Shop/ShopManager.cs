@@ -181,23 +181,21 @@ public class ShopManager : MonoBehaviour
     /// </summary>
     void OnBuyUnit(UnitData data)
     {
-        // CurrencyManager에서 골드 체크
-        if (!CurrencyManager.Instance.SpendGold(unitCost))
+        var gm = GridManager.Instance;
+        if (!gm.HasPlaceableCell())
         {
-            Debug.Log("골드 부족");
+            //UIToast.Show("배치할 칸이 없습니다."); // 네 UI 체계에 맞게
             return;
         }
 
-        bool success = GameManager.Instance.benchManager.TryAddHero(data);
-        if (!success)
+        if (!CurrencyManager.Instance.SpendGold(data.cost))
         {
-            Debug.Log("유닛 구매 실패: 벤치가 가득 찼습니다.");
-
-            // 구매 실패 시 골드 환불
-            CurrencyManager.Instance.AddGold(unitCost);
+            //UIToast.Show("골드가 부족합니다.");
             return;
         }
 
+        // 구매 성공 → 배치 모드 진입 (보드 슬롯 클릭 시 스폰+배치)
+        UnitPlacementManager.Instance.SetSelectedUnit(data);
         Debug.Log($"{data.unitName} 구매됨");
     }
 
