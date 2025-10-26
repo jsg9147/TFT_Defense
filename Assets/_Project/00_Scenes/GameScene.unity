@@ -2080,28 +2080,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d02d400dee98a0049863aa55165879a6, type: 2}
   - {fileID: 11400000, guid: 1e7502c1aa571684d817562e4b30944a, type: 2}
   - {fileID: 11400000, guid: 03639499916c10a4bb695bba25965d43, type: 2}
-  - {fileID: 11400000, guid: 99a9c3c992b157845a298fc10bbee5cc, type: 2}
-  - {fileID: 11400000, guid: 1ad6628086b848c49a934c644e921ec2, type: 2}
   - {fileID: 11400000, guid: b007c01f73d114d48929e369ffd7ca6e, type: 2}
   - {fileID: 11400000, guid: 7ebcabb3dd0557243828ca237b8cbbce, type: 2}
   - {fileID: 11400000, guid: 5229b9ad7bc40e2409566462b50a8cb1, type: 2}
-  - {fileID: 11400000, guid: 542e4e0b7e6242f4fa1f254e0ce8c68c, type: 2}
-  - {fileID: 11400000, guid: ee49b367d847cf641bf1af45d0783909, type: 2}
   - {fileID: 11400000, guid: 9cb809ad21084e24f91a609756185db8, type: 2}
   - {fileID: 11400000, guid: f89732b9d9afa3c489cea11d708cdb0b, type: 2}
   - {fileID: 11400000, guid: 728bdb4ccd119ea4bba6c072426379d2, type: 2}
-  - {fileID: 11400000, guid: d18fa3220b6840c43a42d0831d3aa8e7, type: 2}
-  - {fileID: 11400000, guid: e54622490101d084e834820839d31ced, type: 2}
   - {fileID: 11400000, guid: 7535ec90c5cc47c468df9de0f1cd9fa3, type: 2}
   - {fileID: 11400000, guid: 6ab6420a3b970564c8645de471297fdf, type: 2}
   - {fileID: 11400000, guid: 49cf89a6c3a7b7747961e94ea23a8d59, type: 2}
-  - {fileID: 11400000, guid: dbff0a42e6400e54198e2642e67594b4, type: 2}
-  - {fileID: 11400000, guid: a507f4875b5659e40aa20460334e5715, type: 2}
   - {fileID: 11400000, guid: 990beef3368c2c8488405865aa198e9e, type: 2}
   - {fileID: 11400000, guid: 4033ff033caee93408c5e347331b3d55, type: 2}
   - {fileID: 11400000, guid: bf582849af77b1149a0c8d1a0420c1c2, type: 2}
-  - {fileID: 11400000, guid: f6cae40ee49995141b730d3800a4e57f, type: 2}
-  - {fileID: 11400000, guid: 8d71a8695bbc2fa468ea301881e50c11, type: 2}
   unitCost: 2
   expCost: 4
   expPerBuy: 4
@@ -12552,6 +12542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7828146b27a0524c9a934fd794b5783, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultUnitPrefab: {fileID: 0}
   unitPrefab: {fileID: 3473315158773837763, guid: c42116fc4a7fdc74294ef7ee7945c51c, type: 3}
 --- !u!4 &1803024592
 Transform:

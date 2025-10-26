@@ -4,27 +4,21 @@ public class UnitPlacementManager : MonoBehaviour
 {
     public static UnitPlacementManager Instance;
 
+    [Header("Fallback 프리팹(없으면 생성 거부)")]
+    public GameObject defaultUnitPrefab;
+
     [Header("설정")]
     public GameObject unitPrefab;
 
     private UnitData selectedUnitData = null;
+    private UnitData _selected;
+
     private bool isPlacing = false;
     public bool IsPlacing => isPlacing;
 
     void Awake() => Instance = this;
 
-    public void SetSelectedUnit(UnitData data)
-    {
-        selectedUnitData = data;
-        isPlacing = true;
-        Debug.Log($"{data.unitName} 배치 준비됨");
-    }
-
-    public void CancelPlacement()
-    {
-        isPlacing = false;
-        selectedUnitData = null;
-    }
+    public void SetSelectedUnit(UnitData data) => _selected = data;
 
     /// <summary>
     /// 월드 좌표 기준 배치. 성공 시 true, 실패 시 false.
@@ -70,13 +64,40 @@ public class UnitPlacementManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 셀 기준 배치. 내부에서 월드 변환 후 TryPlaceUnit 호출.
-    /// </summary>
     public bool TryPlaceAtCell(Vector3Int cell)
     {
+        if (_selected == null) return false;
+
         var gm = GridManager.Instance;
-        if (gm == null) return false;
-        return TryPlaceUnit(gm.CellToWorldCenter(cell));
+        if (!gm.IsPlaceable(cell)) return false;
+
+        // 1) 스폰 포지션
+        Vector3 pos = gm.CellToWorldCenter(cell);
+
+        // 2) 프리팹 선택: UnitData 우선, 없으면 fallback
+        GameObject prefab = _selected.unitPrefab != null ? _selected.unitPrefab : defaultUnitPrefab;
+        if (prefab == null)
+        {
+            Debug.LogError("[UnitPlacement] unitPrefab / defaultUnitPrefab 둘 다 비었습니다.");
+            return false;
+        }
+
+        // 3) 생성 + Init
+        var go = Instantiate(prefab, pos, Quaternion.identity);
+        var unit = go.GetComponent<Unit>();
+        if (unit == null)
+        {
+            Debug.LogError("[UnitPlacement] 생성된 객체에 Unit 컴포넌트가 없습니다.");
+            Destroy(go);
+            return false;
+        }
+
+        unit.Init(_selected);
+
+        // 4) 그리드 점유 등록
+        gm.TryPlaceUnit(unit, cell);
+        return true;
     }
+
+    public void CancelPlacement() => _selected = null;
 }

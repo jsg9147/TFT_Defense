@@ -6,10 +6,12 @@ using System.Reflection;
 
 public class Unit : MonoBehaviour
 {
+    [Header("Range Detector(자동 생성/연결)")]
+    [SerializeField] private UnitRangeDetector rangeDetectorPrefab; // 비워도 자동 생성 가능
+    [SerializeField] private UnitRangeDetector rangeDetectorRef;
+
     [Header("기본 구성")]
-    public SpriteRenderer unitSprite;
-    public TextMeshPro nameText;
-    public TextMeshPro starText;
+    public CanvasGroup canvasGroup;
     public Transform firePoint;
 
     [Header("기본 데이터")]
@@ -32,7 +34,10 @@ public class Unit : MonoBehaviour
     private float _atkMul = 1f;
     private float _aspdMul = 1f;
 
-
+#if UNITY_EDITOR
+    private void Reset() { EnsureRangeDetector(); }
+    private void OnValidate() { if (Application.isEditor && !Application.isPlaying) EnsureRangeDetector(); }
+#endif
     // === 추가: 이벤트 구독/해제 ===
     private void OnEnable()
     {
@@ -75,11 +80,9 @@ public class Unit : MonoBehaviour
     public void Init(UnitData unitData)
     {
         data = unitData;
-        if (unitSprite) unitSprite.sprite = data.icon;
-        if (nameText) nameText.text = data.unitName;
-        if (starText) starText.text = $"★ {starLevel}성";
 
-        // === 추가: 데이터가 바뀌었으니 업그레이드 재적용 ===
+        if(canvasGroup == null)
+            canvasGroup = GetComponentInChildren<CanvasGroup>();
         ApplyUpgradesNow();
 
         // (선택) 콜라이더 반경도 갱신하고 싶으면:
@@ -89,8 +92,31 @@ public class Unit : MonoBehaviour
             col.isTrigger = true;
             col.radius = data.range;
         }
+        EnsureRangeDetector();
     }
+    private void EnsureRangeDetector()
+    {
+        if (!rangeDetectorRef)
+        {
+            // 자식에서 먼저 찾기
+            rangeDetectorRef = GetComponentInChildren<UnitRangeDetector>(true);
+            if (!rangeDetectorRef)
+            {
+                // 없으면 생성
+                var go = new GameObject("RangeDetector");
+                go.transform.SetParent(transform, false);
+                go.transform.localPosition = Vector3.zero;
 
+                rangeDetectorRef = go.AddComponent<UnitRangeDetector>();
+                rangeDetectorRef.unit = this;
+
+                // 필수 컴포넌트는 UnitRangeDetector가 Require로 자동 부착됨
+            }
+        }
+        // 반경 동기화
+        rangeDetectorRef.unit = this;
+        rangeDetectorRef.SyncRadius();
+    }
 
     private void Update()
     {
@@ -402,7 +428,7 @@ public class Unit : MonoBehaviour
 
     public void SetHighlight(bool active)
     {
-        if (unitSprite != null) unitSprite.color = active ? Color.yellow : Color.white;
+        if (canvasGroup != null) canvasGroup.alpha = active ? 0.7f : 1f;
     }
 
     // === 추가: 업그레이드 적용 본체 ===

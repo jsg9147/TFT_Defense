@@ -7,6 +7,11 @@ using System;
 [CreateAssetMenu(menuName = "Unit/UnitData")]
 public class UnitData : ScriptableObject
 {
+    [Header("프리팹 참조(필수 권장)")]
+#if ODIN_INSPECTOR
+    [InlineEditor(Expanded = true)]
+#endif
+    public GameObject unitPrefab;  // ← 유닛 고유 프리팹 (SPUM Export 결과 등)
     [Header("기본")]
     public string unitName;
     public Sprite icon;

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb2c9f7d71be99543a3a082ccef187e4, type: 3}
+  m_Name: Unit_2_Warrior
+  m_EditorClassIdentifier: 
+  unitPrefab: {fileID: 7461835846871970091, guid: 22386ca802d925945ab7466d62e48e58, type: 3}
+  unitName: Unit_2_Warrior
+  icon: {fileID: 2003643120, guid: 99c3bfc96fe7dd04b904c4b5a86f7a49, type: 3}
+  types: 17
+  jobs: 0
+  origins: 0
+  cost: 2
+  baseAttack: 10
+  attackSpeed: 1
+  range: 3
+  projectilePrefab: {fileID: 1143787252086882, guid: 465e835a8859cea4392495ac947e2b30, type: 3}
+  multishotCount: 3
+  areaRadius: 1.5
+  chainCount: 3
+  chainRange: 2.5
+  poisonDamagePerTick: 2
+  poisonTickInterval: 0.5
+  poisonTickCount: 6
+  buffValue: 0
+  debuffValue: 0
