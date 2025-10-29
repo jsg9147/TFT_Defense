@@ -1503,6 +1503,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccddc5b651207bd4fae6f8e1c8039a46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  unit: {fileID: -3350422545029235150}
+  monsterTag: Monster
+  detectorLayerName: UnitRange
 --- !u!1 &2216587954129374873
 GameObject:
   m_ObjectHideFlags: 0
@@ -2818,6 +2821,7 @@ GameObject:
   - component: {fileID: 8910159496488738481}
   - component: {fileID: 3033857075112171602}
   - component: {fileID: 5750664399884227795}
+  - component: {fileID: 2363145060711984598}
   m_Layer: 0
   m_Name: UnitRoot
   m_TagString: Untagged
@@ -2876,6 +2880,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2363145060711984598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4857473226284804527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e7e69d792c0582478ac4b0ba9bbbab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitAnimatorDriver
+  animator: {fileID: 5750664399884227795}
 --- !u!1 &5030860574446188772
 GameObject:
   m_ObjectHideFlags: 0
@@ -4215,9 +4232,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8910159496488738481}
   - {fileID: 6310886299363803281}
   - {fileID: 9086575280114907330}
-  - {fileID: 8910159496488738481}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -7828,6 +7845,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cc06657a65d53145b37e64cb7f88fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
+  rangeDetectorPrefab: {fileID: 0}
+  rangeDetectorRef: {fileID: 5900212113013225343}
+  animator: {fileID: 0}
   canvasGroup: {fileID: -2669878698814574488}
   firePoint: {fileID: 9086575280114907330}
   data: {fileID: 0}

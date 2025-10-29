@@ -11,6 +11,7 @@ public class Unit : MonoBehaviour
     [SerializeField] private UnitRangeDetector rangeDetectorRef;
 
     [Header("기본 구성")]
+    public Animator animator;
     public CanvasGroup canvasGroup;
     public Transform firePoint;
 
@@ -34,6 +35,8 @@ public class Unit : MonoBehaviour
     private float _atkMul = 1f;
     private float _aspdMul = 1f;
 
+    private UnitAnimatorDriver animDrv;
+
 #if UNITY_EDITOR
     private void Reset() { EnsureRangeDetector(); }
     private void OnValidate() { if (Application.isEditor && !Application.isPlaying) EnsureRangeDetector(); }
@@ -44,8 +47,12 @@ public class Unit : MonoBehaviour
         if (UpgradeManager.Instance != null)
             UpgradeManager.Instance.OnUpgradeChanged += HandleUpgradeChanged;
 
+        if (animDrv == null) 
+            animDrv = gameObject.AddComponent<UnitAnimatorDriver>();
         // 유닛이 활성화될 때도 한 번 적용 (data가 이미 세팅되어 있으면 바로 반영)
-        ApplyUpgradesNow();
+        CacheAnimatorIfNeeded();      // ★ 자동 캐싱
+        ApplyUpgradesNow();           // 기존
+        UpdateAnimatorSpeed();        // ★ 공속 연동(옵션)
     }
 
     private void OnDisable()
@@ -53,12 +60,28 @@ public class Unit : MonoBehaviour
         if (UpgradeManager.Instance != null)
             UpgradeManager.Instance.OnUpgradeChanged -= HandleUpgradeChanged;
     }
+    private void CacheAnimatorIfNeeded()
+    {
+        if (animator != null) return;
+        animator = GetComponentInChildren<Animator>(true);
+    }
+    private void OnTransformChildrenChanged() // 자식 갈아끼우면 자동 재탐색
+    {
+        CacheAnimatorIfNeeded();
+        UpdateAnimatorSpeed();
+    }
+    private void UpdateAnimatorSpeed()
+    {
+        if (animator == null || data == null) return;
+        float aps = Mathf.Min(data.attackSpeed * _aspdMul, 5f);
+        animator.speed = Mathf.Max(0.1f, aps / 1.0f);
+        animDrv?.SetMoveSpeed(aps); // SPUM Move 파라미터에도 연동(정지형이면 유지해도 무방)
+    }
 
     private void HandleUpgradeChanged()
     {
         ApplyUpgradesNow();
     }
-
 
     private void Start()
     {
@@ -149,14 +172,9 @@ public class Unit : MonoBehaviour
         var target = SelectPrimaryTarget();
         if (!target) return;
 
-        if (ShouldUseProjectile())
-        {
-            SpawnProjectile(target.transform);   // 즉시 데미지 X
-        }
-        else
-        {
-            ApplyHit(target);                    // 투사체 미사용(근접 등)일 때만 즉시 데미지
-        }
+        animDrv?.TriggerAttack();   // ★ 여기만 추가
+        if (ShouldUseProjectile()) SpawnProjectile(target.transform);
+        else ApplyHit(target);
     }
 
     private void FireMultiShot()
@@ -164,16 +182,9 @@ public class Unit : MonoBehaviour
         var targets = GetSortedTargetsByDistance().Take(Mathf.Max(1, data.multishotCount)).ToList();
         if (targets.Count == 0) return;
 
-        if (ShouldUseProjectile())
-        {
-            foreach (var t in targets)
-                SpawnProjectile(t.transform);    // 즉시 데미지 X
-        }
-        else
-        {
-            foreach (var t in targets)
-                ApplyHit(t);
-        }
+        animDrv?.TriggerAttack();   // ★ 동일
+        if (ShouldUseProjectile()) foreach (var t in targets) SpawnProjectile(t.transform);
+        else foreach (var t in targets) ApplyHit(t);
     }
 
     private void FireArea()
@@ -181,11 +192,8 @@ public class Unit : MonoBehaviour
         var center = SelectPrimaryTarget();
         if (!center) return;
 
-        if (ShouldUseProjectile())
-        {
-            // AOE는 탄이 명중한 지점에서 Bullet이 반경 타격 처리
-            SpawnProjectile(center.transform);
-        }
+        animDrv?.TriggerAttack();   // ★ 동일
+        if (ShouldUseProjectile()) SpawnProjectile(center.transform);
         else
         {
             var hits = Physics2D.OverlapCircleAll(center.transform.position, data.areaRadius)
@@ -194,17 +202,13 @@ public class Unit : MonoBehaviour
             foreach (var m in hits) ApplyHit(m);
         }
     }
-
     private void FireChain()
     {
         var first = SelectPrimaryTarget();
         if (!first) return;
 
-        if (ShouldUseProjectile())
-        {
-            // 체인은 첫 타겟으로 쏘고, 이후 바운스는 Bullet이 처리
-            SpawnProjectile(first.transform);
-        }
+        animDrv?.TriggerAttack();   // ★ 동일
+        if (ShouldUseProjectile()) SpawnProjectile(first.transform);
         else
         {
             var current = first;

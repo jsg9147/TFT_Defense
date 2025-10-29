@@ -1196,6 +1196,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccddc5b651207bd4fae6f8e1c8039a46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  unit: {fileID: 6352108487039038127}
+  monsterTag: Monster
+  detectorLayerName: UnitRange
 --- !u!1 &1910147043355458130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1628,6 +1631,7 @@ GameObject:
   - component: {fileID: 6299357132810920650}
   - component: {fileID: 2502179860350515248}
   - component: {fileID: 7298530571056642675}
+  - component: {fileID: 6456519624230222026}
   m_Layer: 0
   m_Name: UnitRoot
   m_TagString: Untagged
@@ -1686,6 +1690,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6456519624230222026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3474683518001768636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e7e69d792c0582478ac4b0ba9bbbab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitAnimatorDriver
+  animator: {fileID: 7298530571056642675}
 --- !u!1 &3533723526426445518
 GameObject:
   m_ObjectHideFlags: 0
@@ -3205,9 +3222,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6299357132810920650}
   - {fileID: 4983220732405104151}
   - {fileID: 144004881638493080}
-  - {fileID: 6299357132810920650}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -6868,6 +6885,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cc06657a65d53145b37e64cb7f88fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
+  rangeDetectorPrefab: {fileID: 0}
+  rangeDetectorRef: {fileID: 5751189274963732363}
+  animator: {fileID: 0}
   canvasGroup: {fileID: -9022197110817217090}
   firePoint: {fileID: 144004881638493080}
   data: {fileID: 0}

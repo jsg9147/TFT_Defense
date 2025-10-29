@@ -114,6 +114,7 @@ GameObject:
   - component: {fileID: 9118820324859903679}
   - component: {fileID: 3447183577954469952}
   - component: {fileID: 2695707647506646726}
+  - component: {fileID: 1679665024669780828}
   m_Layer: 0
   m_Name: UnitRoot
   m_TagString: Untagged
@@ -172,6 +173,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1679665024669780828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 479092970121939392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e7e69d792c0582478ac4b0ba9bbbab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitAnimatorDriver
+  animator: {fileID: 2695707647506646726}
 --- !u!1 &506290983642509573
 GameObject:
   m_ObjectHideFlags: 0
@@ -2997,6 +3011,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccddc5b651207bd4fae6f8e1c8039a46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  unit: {fileID: 191604025553085510}
+  monsterTag: Monster
+  detectorLayerName: UnitRange
 --- !u!1 &4428197573920235564
 GameObject:
   m_ObjectHideFlags: 0
@@ -3140,9 +3157,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 9118820324859903679}
   - {fileID: 6976498302039993600}
   - {fileID: 1338820835198553950}
-  - {fileID: 9118820324859903679}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -6763,6 +6780,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cc06657a65d53145b37e64cb7f88fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
+  rangeDetectorPrefab: {fileID: 0}
+  rangeDetectorRef: {fileID: 4949873434645919221}
+  animator: {fileID: 0}
   canvasGroup: {fileID: 2680610117850601492}
   firePoint: {fileID: 1338820835198553950}
   data: {fileID: 0}
