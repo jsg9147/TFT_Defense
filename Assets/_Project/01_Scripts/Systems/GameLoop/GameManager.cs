@@ -12,7 +12,7 @@ public class GameManager : MonoSingleton<GameManager>
     [Header("웨이브 설정")]
     public int currentWave = 0;
     public float prepareTime = 5f;
-    public float battleTime = 20f;   // ⬅️ 전투 타이머 추가
+    public float battleTime = 20f;   // 전투 타이머 추가
     public float shopTime = 10f;
 
     [Header("씬 종속 매니저")]
@@ -54,31 +54,46 @@ public class GameManager : MonoSingleton<GameManager>
         Debug.Log("[GameManager] 씬 매니저 바인딩 완료");
     }
 
-    // / <summary> 웨이브 루프: 준비 -> 전투 -> 상점 반복 </summary>
     private IEnumerator WaveLoop()
     {
         while (true)
         {
-            // 1) 준비 페이즈
+            // 1) 준비 페이즈 (⬅️ 복구)
             SetGameState(GameState.Prepare);
-            OnWaveChanged?.Invoke(currentWave); 
+            OnWaveChanged?.Invoke(currentWave);
             yield return StartCoroutine(RunTimer(prepareTime));
 
             // 2) 전투 페이즈
             SetGameState(GameState.Battle);
             monsterSpawner?.StartWave(currentWave);
 
-            // 전투는 '시간 종료'로 페이즈 이동 (필드는 정리하지 않음)
             yield return StartCoroutine(RunTimer(battleTime));
-            monsterSpawner?.StopSpawning(); // 해당 웨이브 추가 스폰만 중단
+            monsterSpawner?.StopSpawning(); // 추가 스폰 금지
 
-            // 3) 상점 페이즈
-            SetGameState(GameState.Shop);
-            yield return StartCoroutine(RunTimer(shopTime));
+            int alive = MonsterFieldManager.Instance ? MonsterFieldManager.Instance.CurrentCount : 0;
+            bool last = monsterSpawner != null && monsterSpawner.IsLastWave(currentWave);
 
-            currentWave++;
+            if (alive > 0)
+            {
+                SetGameState(GameState.Lose);
+                yield break;
+            }
+            else
+            {
+                if (last)
+                {
+                    SetGameState(GameState.Win);
+                    yield break;
+                }
+
+                // 상점 페이즈를 쓰려면 아래 3줄 주석 해제
+                //SetGameState(GameState.Shop);
+                //yield return StartCoroutine(RunTimer(shopTime));
+                currentWave++;
+            }
         }
     }
+
 
     /// <summary> duration 동안 매 프레임 OnTimerTick(남은, 전체) 발행. </summary>
     private IEnumerator RunTimer(float duration)
@@ -103,9 +118,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         switch (state)
         {
-            // GameManager.cs (SetGameState 내부)
             case GameState.Shop:
-                UIManager.Instance.ShowShopUI();
                 monsterSpawner?.StopSpawning();
                 break;
 

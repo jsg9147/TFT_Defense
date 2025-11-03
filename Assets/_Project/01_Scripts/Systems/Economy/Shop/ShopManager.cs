@@ -15,6 +15,14 @@ public class ShopManager : MonoBehaviour
     public int expCost = 4;    // 골드 소모량
     public int expPerBuy = 4;  // 구매 시 획득 경험치
 
+    [Header("도박(정수 / Essence)")]
+    public int lowGambleEssenceCost = 1;   // 하급 도박: 1 정수
+    public int highGambleEssenceCost = 5;  // 고급 도박: 5 정수
+
+    [Header("도박 성공 확률 (0~1)")]
+    [Range(0f, 1f)] public float lowGambleSuccessRate = 0.6f;   // 하급 성공 확률 (예시)
+    [Range(0f, 1f)] public float highGambleSuccessRate = 0.35f; // 고급 성공 확률 (예시)
+
     [Header("확률 UI")]
     public ShopProbabilityUI probabilityUI;
     public List<ShopProbabilityTable> probabilityTables;
@@ -32,73 +40,14 @@ public class ShopManager : MonoBehaviour
     private readonly HashSet<JobSynergy> selectedJobs = new();
     private readonly HashSet<OriginSynergy> selectedOrigins = new();
 
-    private List<ShopSlotUI> currentSlots = new List<ShopSlotUI>();
+    public event System.Action<bool> OnGambleLowResult;   // true=성공, false=실패
+    public event System.Action<bool> OnGambleHighResult;
 
-    void Start()
-    {
-        RefreshShop();
-    }
+    private SummonManager _summon;
 
-    /// <summary>
-    /// 상점 유닛 슬롯 새로 고침 (리롤 포함)
-    /// </summary>
-    public void RefreshShop()
-    {
-        ClearCurrentSlots();
-        UpdateProbabilityUI();
-
-        List<UnitData> selected = GetRandomUnitListWeighted(5);  // 가중치 기반으로 변경
-
-        foreach (var data in selected)
-        {
-            ShopSlotUI slot = UIManager.Instance.ShopSlotPool.GetSlot(slotParent);
-            slot.Init(data, OnBuyUnit);
-            currentSlots.Add(slot);
-        }
-    }
-    // 레벨 확률 기반 선택
-    List<UnitData> GetRandomUnitListWeighted(int count)
-    {
-        List<UnitData> result = new List<UnitData>();
-
-        if (allUnitDatas == null || allUnitDatas.Count == 0)
-        {
-            Debug.LogWarning("유닛 데이터가 없습니다.");
-            return result;
-        }
-
-        int level = PlayerLevelManager.Instance.Level;
-        int idx = Mathf.Clamp(level - 1, 0, probabilityTables.Count - 1); // ← 1-기반 레벨 보정
-        if (probabilityTables == null || probabilityTables.Count == 0)
-        {
-            Debug.LogWarning("확률 테이블이 없습니다. 균등 무작위로 뽑습니다.");
-            return GetRandomUnitList_Fallback(count);
-        }
-
-        var table = probabilityTables[idx];
-        table.Normalize();
-        float[] probs = table.GetProbabilities(); // 길이 5, 합=1
-
-        for (int i = 0; i < count; i++)
-        {
-            int targetCost = PickCostByWeight(probs); // 1~5
-            UnitData pick = PickUnitByCostWithFallback(targetCost);
-            if (pick != null) result.Add(pick);
-        }
-
-        return result;
-    }
-
-    // 완전 기존 방식(균등) 폴백
-    List<UnitData> GetRandomUnitList_Fallback(int count)
-    {
-        List<UnitData> result = new List<UnitData>();
-        for (int i = 0; i < count; i++)
-        {
-            int rand = Random.Range(0, allUnitDatas.Count);
-            result.Add(allUnitDatas[rand]);
-        }
-        return result;
+    void Awake() 
+    { 
+        _summon = SummonManager.Instance; 
     }
 
     int PickCostByWeight(float[] probs) // probs 길이 5, 합=1
@@ -111,27 +60,6 @@ public class ShopManager : MonoBehaviour
             if (roll <= acc) return i + 1; // 코스트=인덱스+1
         }
         return 1;
-    }
-
-    UnitData PickUnitByCostWithFallback(int cost)
-    {
-        // 1) 목표 코스트
-        var candidate = PickOneOfCost(cost);
-        if (candidate != null) return candidate;
-
-        // 2) 위로 폴백
-        for (int c = cost + 1; c <= 5; c++)
-        {
-            candidate = PickOneOfCost(c);
-            if (candidate != null) return candidate;
-        }
-        // 3) 아래로 폴백
-        for (int c = cost - 1; c >= 1; c--)
-        {
-            candidate = PickOneOfCost(c);
-            if (candidate != null) return candidate;
-        }
-        return null;
     }
 
     UnitData PickOneOfCost(int cost)
@@ -165,62 +93,6 @@ public class ShopManager : MonoBehaviour
         probabilityUI.UpdateRates(currentTable.GetProbabilities());
     }
 
-    void ClearCurrentSlots()
-    {
-        foreach (var slot in currentSlots)
-        {
-            if (slot != null)
-                UIManager.Instance.ShopSlotPool.ReturnSlot(slot); // 풀로 반환
-        }
-        currentSlots.Clear();
-    }
-
-
-    /// <summary>
-    /// 유닛 구매 시 실행
-    /// </summary>
-    void OnBuyUnit(UnitData data)
-    {
-        var gm = GridManager.Instance;
-        if (!gm.HasPlaceableCell())
-        {
-            //UIToast.Show("배치할 칸이 없습니다."); // 네 UI 체계에 맞게
-            return;
-        }
-
-        if (!CurrencyManager.Instance.SpendGold(data.cost))
-        {
-            //UIToast.Show("골드가 부족합니다.");
-            return;
-        }
-
-        // 구매 성공 → 배치 모드 진입 (보드 슬롯 클릭 시 스폰+배치)
-        UnitPlacementManager.Instance.SetSelectedUnit(data);
-        Debug.Log($"{data.unitName} 구매됨");
-    }
-
-    /// <summary>
-    /// 유닛 SO에서 5개 무작위 추출
-    /// </summary>
-    List<UnitData> GetRandomUnitList(int count)
-    {
-        List<UnitData> result = new List<UnitData>();
-
-        if (allUnitDatas == null || allUnitDatas.Count == 0)
-        {
-            Debug.LogWarning("유닛 데이터가 없습니다.");
-            return result;
-        }
-
-        for (int i = 0; i < count; i++)
-        {
-            int rand = Random.Range(0, allUnitDatas.Count);
-            result.Add(allUnitDatas[rand]);
-        }
-
-        return result;
-    }
-
     public void BuyExp()
     {
         if (probabilityTables.Count < PlayerLevelManager.Instance.Level)
@@ -237,5 +109,172 @@ public class ShopManager : MonoBehaviour
 
         PlayerLevelManager.Instance.AddExp(expPerBuy);
         UpdateProbabilityUI();
+    }
+    // === 도박 진입: 하급(1~3코스트) ===
+    public void GambleLow()
+    {
+        var gm = GridManager.Instance;
+        if (!gm.HasPlaceableCell())
+        {
+            Debug.Log("배치할 칸이 없습니다.");
+            OnGambleLowResult?.Invoke(false);
+            return;
+        }
+
+        if (!CurrencyManager.Instance.SpendEssence(lowGambleEssenceCost))
+        {
+            Debug.Log("정수가 부족합니다.");
+            OnGambleLowResult?.Invoke(false);
+            return;
+        }
+
+        // 성공/실패만 판정
+        if (!RollSuccess(lowGambleSuccessRate))
+        {
+            Debug.Log("[GambleLow] 실패 (정수 소모, 보상 없음)");
+            OnGambleLowResult?.Invoke(false);
+            return;
+        }
+
+        // 성공 → 실제 소환은 SummonManager가 담당 (1~3코)
+        bool ok = SummonManager.Instance.TrySummonFree_ByCostRange_AutoPlace(1, 3);
+        if (!ok)
+        {
+            // 배치/풀 문제 등으로 소환 실패 시 환불(선택)
+            CurrencyManager.Instance.AddEssence(lowGambleEssenceCost);
+            Debug.LogWarning("[GambleLow] 소환 실패 → 정수 환불");
+            OnGambleLowResult?.Invoke(false);
+            return;
+        }
+
+        Debug.Log("[GambleLow] 성공! 유닛 소환 완료");
+        OnGambleLowResult?.Invoke(true);
+    }
+    // === 도박 진입: 고급(4~5코스트) ===
+    public void GambleHigh()
+    {
+        var gm = GridManager.Instance;
+        if (!gm.HasPlaceableCell())
+        {
+            Debug.Log("배치할 칸이 없습니다.");
+            OnGambleHighResult?.Invoke(false);
+            return;
+        }
+
+        if (!CurrencyManager.Instance.SpendEssence(highGambleEssenceCost))
+        {
+            Debug.Log("정수가 부족합니다.");
+            OnGambleHighResult?.Invoke(false);
+            return;
+        }
+
+        // 성공/실패만 판정
+        if (!RollSuccess(highGambleSuccessRate))
+        {
+            Debug.Log("[GambleHigh] 실패 (정수 소모, 보상 없음)");
+            OnGambleHighResult?.Invoke(false);
+            return;
+        }
+
+        // 성공 → 실제 소환은 SummonManager가 담당 (4~5코)
+        bool ok = SummonManager.Instance.TrySummonFree_ByCostRange_AutoPlace(4, 5);
+        if (!ok)
+        {
+            CurrencyManager.Instance.AddEssence(highGambleEssenceCost);
+            Debug.LogWarning("[GambleHigh] 소환 실패 → 정수 환불");
+            OnGambleHighResult?.Invoke(false);
+            return;
+        }
+
+        Debug.Log("[GambleHigh] 성공! 유닛 소환 완료");
+        OnGambleHighResult?.Invoke(true);
+    }
+    // === 성공 판정 ===
+    private bool RollSuccess(float successRate01)
+    {
+        float r = Random.value; // [0,1)
+        return r <= Mathf.Clamp01(successRate01);
+    }
+
+    // === 코스트 범위에서 "현재 레벨 확률표"를 범위 내로 재정규화해서 코스트 선택 후 유닛 픽 ===
+    private UnitData PickUnitByCostRangeWeighted(int minCost, int maxCost)
+    {
+        // 1) 현재 레벨 확률(길이 5)을 가져오고 범위 밖은 0으로 만든 뒤 재정규화
+        float[] probs = GetCurrentLevelProbabilities(); // 정규화 보장(합=1) 또는 폴백 생성
+        if (probs == null || probs.Length != 5)
+        {
+            // 테이블이 없다면 균등 확률로 범위 내 코스트 선택
+            int costUniform = PickCostUniformInRange(minCost, maxCost);
+            return PickOneOfCost(costUniform) ?? PickUnitByCostRange(minCost, maxCost);
+        }
+
+        float sum = 0f;
+        for (int i = 0; i < probs.Length; i++)
+        {
+            int cost = i + 1;
+            if (cost < minCost || cost > maxCost) probs[i] = 0f;
+            sum += probs[i];
+        }
+
+        if (sum <= 0f)
+        {
+            // 범위 내 가중치가 모두 0이면 범위 내 균등
+            int costUniform = PickCostUniformInRange(minCost, maxCost);
+            return PickOneOfCost(costUniform) ?? PickUnitByCostRange(minCost, maxCost);
+        }
+
+        // 재정규화
+        for (int i = 0; i < probs.Length; i++) probs[i] /= sum;
+
+        // 2) 코스트 선택
+        int chosenCost = PickCostByWeight(probs);
+
+        // 3) 해당 코스트 유닛 중 1개 선택 (없으면 범위 전체 폴백)
+        return PickOneOfCost(chosenCost) ?? PickUnitByCostRange(minCost, maxCost);
+    }
+
+    private int PickCostUniformInRange(int minCost, int maxCost)
+    {
+        minCost = Mathf.Clamp(minCost, 1, 5);
+        maxCost = Mathf.Clamp(maxCost, 1, 5);
+        if (minCost > maxCost) (minCost, maxCost) = (maxCost, minCost);
+        return Random.Range(minCost, maxCost + 1); // max 포함
+    }
+
+    // 현재 레벨 확률 테이블에서 길이 5의 확률 벡터를 가져옴(합=1).
+    // 없으면 균등 확률 반환.
+    private float[] GetCurrentLevelProbabilities()
+    {
+        if (probabilityTables != null && probabilityTables.Count > 0)
+        {
+            int level = PlayerLevelManager.Instance.Level;
+            int idx = Mathf.Clamp(level - 1, 0, probabilityTables.Count - 1);
+            var table = probabilityTables[idx];
+            table.Normalize();
+            var p = table.GetProbabilities(); // 길이 5
+            if (p != null && p.Length == 5) return p;
+        }
+        // 폴백: 균등
+        return new float[] { 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
+    }
+
+    private UnitData PickUnitByCostRange(int minCost, int maxCost)
+    {
+        if (allUnitDatas == null || allUnitDatas.Count == 0) return null;
+
+        // 1) 범위 내 우선
+        var pool = allUnitDatas
+            .Where(u => u != null && u.cost >= minCost && u.cost <= maxCost)
+            .ToList();
+
+        if (pool.Count > 0)
+            return pool[Random.Range(0, pool.Count)];
+
+        // 2) 폴백: 전체에서 아무거나
+        var all = allUnitDatas.Where(u => u != null).ToList();
+        if (all.Count > 0)
+            return all[Random.Range(0, all.Count)];
+
+        return null;
     }
 }

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monsterName: Test-1
   sprite: {fileID: 21300000, guid: 4b03a0bb95c64fd448211b60ad77a0cc, type: 3}
-  maxHP: 100
+  maxHP: 30
   moveSpeed: 5
   defense: 0
   magicResistance: 0
-  goldReward: 0
+  goldReward: 1

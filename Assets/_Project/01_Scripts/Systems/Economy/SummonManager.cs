@@ -10,6 +10,9 @@ public class SummonManager : MonoBehaviour
     [Tooltip("소환 시 소모되는 골드")]
     public int summonCost = 2;
 
+    [Header("프리미엄 소환")]
+    public int premiumSummonEssenceCost = 1;  // 정수 기반 비용
+
     [Header("경험치 구매")]
     public int expCost = 4;
     public int expPerBuy = 4;
@@ -29,7 +32,7 @@ public class SummonManager : MonoBehaviour
     }
 
     public void SummonOnce() => SummonMultiple(1);
-
+    public void SummonPremiumOnce() => SummonPremiumMultiple(1);
     public void SummonMultiple(int count)
     {
         for (int i = 0; i < count; i++)
@@ -37,36 +40,35 @@ public class SummonManager : MonoBehaviour
             if (!TrySummonOne_AutoPlace()) break;
         }
     }
-
+    public void SummonPremiumMultiple(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (!TrySummonOnePremium_AutoPlace()) break;
+        }
+    }
     /// <summary>
     /// 자동 배치: 첫 번째 빈 칸을 찾아 즉시 생성/배치. 실패 시 환불.
     /// </summary>
     bool TrySummonOne_AutoPlace()
     {
         var gm = GridManager.Instance;
-        var upm = UnitPlacementManager.Instance;
 
-        if (gm == null || upm == null)
-        {
-            Debug.LogWarning("[Summon] GridManager/UnitPlacementManager 필요");
-            return false;
-        }
-
-        // 1) 배치할 칸 있는지 선확인
-        if (!gm.TryFindFirstPlaceable(out var cell))
+        // 1) 칸 확인
+        if (gm == null || !gm.HasPlaceableCell())
         {
             Debug.Log("배치할 칸이 없습니다.");
             return false;
         }
 
-        // 2) 골드 차감
+        // 2) 비용 차감
         if (!CurrencyManager.Instance.SpendGold(summonCost))
         {
             Debug.Log("골드 부족");
             return false;
         }
 
-        // 3) 유닛 선택
+        // 3) 유닛 결정
         UnitData pick = RollOneUnit();
         if (pick == null)
         {
@@ -75,20 +77,18 @@ public class SummonManager : MonoBehaviour
             return false;
         }
 
-        // 4) 선택 세팅 후 즉시 배치 시도
-        upm.SetSelectedUnit(pick);
-        if (upm.TryPlaceAtCell(cell))
+        // 4) 즉시 소환
+        if (TrySpawnUnitAtFirstFreeCell(pick, out var spawned))
         {
             OnSummonSuccess(pick);
             return true;
         }
 
-        // 5) 배치 실패: 환불 + 취소
+        // 실패 시 환불
         CurrencyManager.Instance.AddGold(summonCost);
-        upm.CancelPlacement();
-        Debug.Log("배치 실패로 환불");
         return false;
     }
+
 
     void OnSummonSuccess(UnitData data)
     {
@@ -172,4 +172,155 @@ public class SummonManager : MonoBehaviour
         table.Normalize();
         probabilityUI.UpdateRates(table.GetProbabilities());
     }
+
+    bool TrySummonOnePremium_AutoPlace()
+    {
+        var gm = GridManager.Instance;
+        if (gm == null || !gm.HasPlaceableCell()) return false;
+
+        if (!CurrencyManager.Instance.SpendEssence(premiumSummonEssenceCost))
+        {
+            Debug.Log("정수 부족");
+            return false;
+        }
+
+        UnitData pick = RollOneUnit(); // (필요하면 여기서 4~5코스트로 제한하는 Roll 구현으로 교체)
+
+        if (TrySpawnUnitAtFirstFreeCell(pick, out var spawned))
+        {
+            OnSummonSuccess(pick);
+            return true;
+        }
+
+        // 실패 시 환불
+        CurrencyManager.Instance.AddEssence(premiumSummonEssenceCost);
+        return false;
+    }
+
+
+    private bool TrySpawnUnitAtFirstFreeCell(UnitData data, out Unit spawned)
+    {
+        spawned = null;
+
+        if (data == null || data.unitPrefab == null)
+        {
+            Debug.LogWarning("[Spawn] UnitData 또는 unitPrefab 누락");
+            return false;
+        }
+        var gm = GridManager.Instance;
+        if (gm == null)
+        {
+            Debug.LogWarning("[Spawn] GridManager 없음");
+            return false;
+        }
+        if (!gm.TryFindFirstPlaceable(out var cell))
+        {
+            Debug.Log("[Spawn] 배치할 칸 없음");
+            return false;
+        }
+
+        // 1) 인스턴스 생성
+        var go = Instantiate(data.unitPrefab);
+        var unit = go.GetComponent<Unit>();
+        if (unit == null) unit = go.AddComponent<Unit>();
+        unit.Init(data);
+
+        // 2) Grid 배치 (실패 시 정리)
+        if (!gm.TryPlaceUnit(unit, cell))
+        {
+            Destroy(go);
+            Debug.Log("[Spawn] 배치 실패");
+            return false;
+        }
+
+        spawned = unit;
+        return true;
+    }
+
+    /// <summary>
+    /// 비용 차감 없이, 코스트 범위를 가중치로 재정규화해 1개 유닛을 자동 배치.
+    /// 성공 시 true, 실패 시 false (칸 없거나 풀 없음 등)
+    /// </summary>
+    public bool TrySummonFree_ByCostRange_AutoPlace(int minCost, int maxCost)
+    {
+        var gm = GridManager.Instance;
+        if (gm == null || !gm.HasPlaceableCell())
+        {
+            Debug.Log("[Summon] 칸 없음");
+            return false;
+        }
+
+        UnitData pick = RollOneUnit_ByCostRangeWeighted(minCost, maxCost);
+        if (pick == null)
+        {
+            // 풀 비어있을 때 폴백 (전체에서 균등)
+            pick = PickUniform(allUnitDatas);
+            if (pick == null)
+            {
+                Debug.LogWarning("[Summon] 풀 비어있음");
+                return false;
+            }
+        }
+
+        if (TrySpawnUnitAtFirstFreeCell(pick, out var spawned))
+        {
+            OnSummonSuccess(pick);
+            return true;
+        }
+        return false;
+    }
+
+    // === 확률표를 범위 내로 재정규화한 뒤 코스트 픽 → 유닛 픽
+    private UnitData RollOneUnit_ByCostRangeWeighted(int minCost, int maxCost)
+    {
+        if (allUnitDatas == null || allUnitDatas.Count == 0) return null;
+
+        float[] probs = GetCurrentLevelProbabilities(); // 길이 5, 합=1 (없으면 균등)
+        if (probs == null || probs.Length != 5)
+            return PickUnitByCostRange(minCost, maxCost);
+
+        // 범위 밖은 0으로 만들고 재정규화
+        float sum = 0f;
+        for (int i = 0; i < probs.Length; i++)
+        {
+            int cost = i + 1;
+            if (cost < minCost || cost > maxCost) probs[i] = 0f;
+            sum += probs[i];
+        }
+        if (sum <= 0f)
+            return PickUnitByCostRange(minCost, maxCost);
+
+        for (int i = 0; i < probs.Length; i++) probs[i] /= sum;
+
+        int chosenCost = PickCostByWeight(probs);
+        // 해당 코스트 없으면 범위 전체에서 폴백
+        var list = allUnitDatas.Where(u => u != null && u.cost == chosenCost).ToList();
+        if (list.Count == 0) return PickUnitByCostRange(minCost, maxCost);
+
+        return list[Random.Range(0, list.Count)];
+    }
+
+    private float[] GetCurrentLevelProbabilities()
+    {
+        if (probabilityTables != null && probabilityTables.Count > 0)
+        {
+            int level = PlayerLevelManager.Instance.Level;
+            int idx = Mathf.Clamp(level - 1, 0, probabilityTables.Count - 1);
+            var table = probabilityTables[idx];
+            table.Normalize();
+            var p = table.GetProbabilities();
+            if (p != null && p.Length == 5) return p;
+        }
+        // 폴백: 균등
+        return new float[] { 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
+    }
+
+    private UnitData PickUnitByCostRange(int minCost, int maxCost)
+    {
+        if (allUnitDatas == null || allUnitDatas.Count == 0) return null;
+        var pool = allUnitDatas.Where(u => u != null && u.cost >= minCost && u.cost <= maxCost).ToList();
+        if (pool.Count == 0) return null;
+        return pool[Random.Range(0, pool.Count)];
+    }
 }
+
