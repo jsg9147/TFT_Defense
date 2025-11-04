@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35d1fedb6f239484ea77db1efe4faf1b, type: 3}
+  m_Name: TierVisualConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TierVisualConfig
+  star2Scale: 1.3
+  auraStar3Prefab: {fileID: 1899250594192068, guid: 6561be0bdcabd634da8ca71c49c14153, type: 3}
+  auraStar4Prefab: {fileID: 1343425844583092, guid: 12779f4ab4369fa469e2c9090d6d5a47, type: 3}
+  localOffset: {x: 0, y: 0, z: 0}
+  inheritUnitScale: 0

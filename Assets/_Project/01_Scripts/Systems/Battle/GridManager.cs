@@ -70,6 +70,9 @@ public class GridManager : MonoBehaviour
 
         occupiedBy[cell] = unit;
         unit.transform.position = CellToWorldCenter(cell);
+
+        EvolutionManager.Instance.RegisterOnField(unit); // 진화 매니저에 알림
+
         return true;
     }
 
@@ -88,6 +91,8 @@ public class GridManager : MonoBehaviour
     {
         if (occupiedBy.TryGetValue(cell, out unit))
         {
+            EvolutionManager.Instance.UnregisterOnField(unit); // 진화 매니저에 알림
+
             occupiedBy.Remove(cell);
             return true;
         }

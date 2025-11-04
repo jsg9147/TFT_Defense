@@ -22,6 +22,13 @@ public class Unit : MonoBehaviour
     [Header("상태")]
     public int starLevel = 1;
 
+    // Unit.cs 상단 필드 근처에 추가
+    [Header("스타 비주얼")]
+    [SerializeField] private Transform visualRoot;       // 스케일 적용 대상(없으면 자동으로 transform)
+
+    private Vector3 _baseScale = Vector3.one;
+    private Coroutine _bumpCo;
+
     // === 디버그 토글 ===
     [Header("Debug")]
     [SerializeField] private bool logOnApply = false;     // 적용 한 줄 요약
@@ -41,25 +48,34 @@ public class Unit : MonoBehaviour
     private void Reset() { EnsureRangeDetector(); }
     private void OnValidate() { if (Application.isEditor && !Application.isPlaying) EnsureRangeDetector(); }
 #endif
-    // === 추가: 이벤트 구독/해제 ===
     private void OnEnable()
     {
         if (UpgradeManager.Instance != null)
             UpgradeManager.Instance.OnUpgradeChanged += HandleUpgradeChanged;
 
-        if (animDrv == null) 
+        if (animDrv == null)
             animDrv = gameObject.AddComponent<UnitAnimatorDriver>();
-        // 유닛이 활성화될 때도 한 번 적용 (data가 이미 세팅되어 있으면 바로 반영)
-        CacheAnimatorIfNeeded();      // ★ 자동 캐싱
-        ApplyUpgradesNow();           // 기존
-        UpdateAnimatorSpeed();        // ★ 공속 연동(옵션)
+
+        if (visualRoot == null) visualRoot = transform;
+        _baseScale = visualRoot.localScale;
+
+        CacheAnimatorIfNeeded();
+        ApplyUpgradesNow();
+        UpdateAnimatorSpeed();
+
+        // 현재 별 비주얼 즉시 반영
+        ApplyStarVisuals(false);
     }
 
     private void OnDisable()
     {
         if (UpgradeManager.Instance != null)
             UpgradeManager.Instance.OnUpgradeChanged -= HandleUpgradeChanged;
+
+        // 오오라 정리(전역 서비스)
+        AuraService.Instance?.Clear(this);
     }
+
     private void CacheAnimatorIfNeeded()
     {
         if (animator != null) return;
@@ -98,6 +114,26 @@ public class Unit : MonoBehaviour
             col.radius = data.range;
         }
     }
+    private void Update()
+    {
+        // 무효 타겟 정리
+        monstersInRange.RemoveAll(m => m == null || !m.gameObject.activeInHierarchy);
+        if (monstersInRange.Count == 0) return;
+
+        if (Time.time < lastAttackTime + attackCooldown) return;
+
+        // 패턴 결정
+        if (Has(data.types, UnitType.Area))
+            FireArea();
+        else if (Has(data.types, UnitType.MultiShot))
+            FireMultiShot();
+        else if (Has(data.types, UnitType.Chain))
+            FireChain();
+        else // 기본: 단일
+            FireSingleShot();
+
+        lastAttackTime = Time.time;
+    }
 
 
     public void Init(UnitData unitData)
@@ -116,6 +152,7 @@ public class Unit : MonoBehaviour
             col.radius = data.range;
         }
         EnsureRangeDetector();
+        ApplyStarVisuals(false);
     }
     private void EnsureRangeDetector()
     {
@@ -140,33 +177,74 @@ public class Unit : MonoBehaviour
         rangeDetectorRef.unit = this;
         rangeDetectorRef.SyncRadius();
     }
-
-    private void Update()
+    public void RefreshAfterStarChanged()
     {
-        // 무효 타겟 정리
-        monstersInRange.RemoveAll(m => m == null || !m.gameObject.activeInHierarchy);
-        if (monstersInRange.Count == 0) return;
-
-        if (Time.time < lastAttackTime + attackCooldown) return;
-
-        // 패턴 결정
-        if (Has(data.types, UnitType.Area))
-            FireArea();
-        else if (Has(data.types, UnitType.MultiShot))
-            FireMultiShot();
-        else if (Has(data.types, UnitType.Chain))
-            FireChain();
-        else // 기본: 단일
-            FireSingleShot();
-
-        lastAttackTime = Time.time;
+        ApplyStarVisuals(true);   // 펌프 연출 포함
+        ApplyUpgradesNow();
+        UpdateAnimatorSpeed();
+        AuraService.Instance?.Apply(this);   // 전역 오오라 갱신
     }
 
-    // ===== 패턴 구현 =====
+    private void ApplyStarVisuals(bool withBump)
+    {
+        if (visualRoot == null) visualRoot = transform;
+        if (_baseScale == Vector3.one && visualRoot != null)
+            _baseScale = visualRoot.localScale; // 안전망
 
-    // Unit.cs 변경 포인트만 발췌
+        // 2성 스케일: 전역 SO 값 사용(없으면 1.3f)
+        float star2Scale = AuraService.Instance?.config?.star2Scale ?? 1.3f;
+        float targetScale = (starLevel >= 2) ? star2Scale : 1f;
+        Vector3 to = _baseScale * targetScale;
 
-    // === 발사 로직 ===
+        if (withBump)
+        {
+            if (_bumpCo != null) StopCoroutine(_bumpCo);
+            _bumpCo = StartCoroutine(CoBumpScale(to));
+        }
+        else
+        {
+            visualRoot.localScale = to;
+        }
+
+        // 오오라 생성/갱신은 전역 서비스에 위임
+        AuraService.Instance?.Apply(this);
+    }
+
+
+    /// <summary> 간단한 튀어오르는 스케일 연출(0.12s 업, 0.10s 다운) </summary>
+    private System.Collections.IEnumerator CoBumpScale(Vector3 finalScale)
+    {
+        const float upTime = 0.12f;
+        const float downTime = 0.10f;
+
+        Vector3 start = visualRoot.localScale;
+        // 업: 7% 더 키웠다가
+        Vector3 peak = finalScale * 1.07f;
+
+        // 업 구간
+        float t = 0f;
+        while (t < upTime)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.Clamp01(t / upTime);
+            visualRoot.localScale = Vector3.Lerp(start, peak, k);
+            yield return null;
+        }
+
+        // 다운 구간(피크 -> 최종)
+        t = 0f;
+        while (t < downTime)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.Clamp01(t / downTime);
+            visualRoot.localScale = Vector3.Lerp(peak, finalScale, k);
+            yield return null;
+        }
+
+        visualRoot.localScale = finalScale;
+        _bumpCo = null;
+    }
+
     private void FireSingleShot()
     {
         var target = SelectPrimaryTarget();
@@ -494,6 +572,7 @@ public class Unit : MonoBehaviour
         }
 
     }
+
 
 #if UNITY_EDITOR
     private void LogCurvePresenceEditor()
