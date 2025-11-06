@@ -4,6 +4,7 @@ using TMPro;
 using System.Linq;
 using System.Reflection;
 
+[RequireComponent(typeof(UnitInspectable))]
 public class Unit : MonoBehaviour
 {
     [Header("Range Detector(자동 생성/연결)")]

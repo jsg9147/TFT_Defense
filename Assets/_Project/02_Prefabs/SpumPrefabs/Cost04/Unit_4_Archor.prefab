@@ -3113,6 +3113,7 @@ GameObject:
   - component: {fileID: -7994397911744343009}
   - component: {fileID: 8439106654871679514}
   - component: {fileID: -1759165553787007832}
+  - component: {fileID: -5970574012028047997}
   m_Layer: 5
   m_Name: Unit_4_Archor
   m_TagString: Untagged
@@ -6763,6 +6764,7 @@ MonoBehaviour:
   data: {fileID: 0}
   bulletPrefab: {fileID: 8809662167042238012, guid: 097199a3d8172d543b546ebe2e600960, type: 3}
   starLevel: 1
+  visualRoot: {fileID: 0}
   logOnApply: 0
   logBreakdown: 0
 --- !u!225 &8439106654871679514
@@ -6823,6 +6825,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &-5970574012028047997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4517870321244208415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd2e417cfc6b4ad49b87c616b48d4c50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitInspectable
 --- !u!1 &4606497228547754877
 GameObject:
   m_ObjectHideFlags: 0

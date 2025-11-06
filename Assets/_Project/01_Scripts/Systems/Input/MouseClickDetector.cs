@@ -31,8 +31,8 @@ public class MouseClickDetector : MonoBehaviour
             EndDragTryPlace();
 
         // --- 추가: 우클릭 판매 ---
-        if (rightClickSell && Mouse.current.rightButton.wasPressedThisFrame)
-            TrySellUnderCursor();
+        //if (rightClickSell && Mouse.current.rightButton.wasPressedThisFrame)
+        //    TrySellUnderCursor();
 
         // --- 추가: Delete 키로 '선택 유닛' 판매 ---
         if (deleteKeySellSelected && Keyboard.current.deleteKey.wasPressedThisFrame)
