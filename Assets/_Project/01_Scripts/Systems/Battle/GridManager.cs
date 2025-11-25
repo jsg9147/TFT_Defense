@@ -75,17 +75,36 @@ public class GridManager : MonoBehaviour
 
         return true;
     }
-
     public bool TryMoveUnit(Vector3Int from, Vector3Int to)
     {
-        if (!occupiedBy.TryGetValue(from, out var unit)) return false;
-        if (!IsPlaceable(to)) return false;
+        // 1) 출발 칸에 유닛 있는지
+        if (!occupiedBy.TryGetValue(from, out var unit))
+            return false;
 
+        // 2) to가 보드 범위 내인지
+        if (!IsInBounds(to))
+            return false;
+
+        // 3) 이동할 칸이 막힌 칸인지
+        if (IsBlocked(to))
+            return false;
+
+        // 4) 이동 칸이 비어있는지 (배치 락 무시!)
+        if (IsOccupied(to))
+            return false;
+
+        // 5) 기존 칸 비우기
         occupiedBy.Remove(from);
+
+        // 6) 새로운 칸 점유
         occupiedBy[to] = unit;
+
+        // 7) 유닛 이동
         unit.transform.position = CellToWorldCenter(to);
+
         return true;
     }
+
 
     public bool TryRemoveUnit(Vector3Int cell, out Unit unit)
     {

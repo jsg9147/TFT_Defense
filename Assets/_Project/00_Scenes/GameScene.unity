@@ -11472,7 +11472,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentWave: 0
-  prepareTime: 5
+  prepareTime: 10
   battleTime: 20
   shopTime: 10
   shopManager: {fileID: 0}

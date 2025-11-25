@@ -17,6 +17,10 @@ public class MouseClickDetector : MonoBehaviour
     private Vector3 originUnitPos;
     private BoardSlot lastHovered; // 슬롯 단위로 추적
 
+    private Vector3Int originCell;
+    private bool draggedFromBoard;
+
+
     void Update()
     {
         MouseOverSlot();
@@ -51,10 +55,26 @@ public class MouseClickDetector : MonoBehaviour
             if (unit == null) continue;
 
             originUnitPos = unit.transform.position;
+
+            var gm = GridManager.Instance;
+            var cell = gm.WorldToCell(originUnitPos);
+
+            // 이 유닛이 보드 위에 있는지 확인
+            if (gm.GetUnitAt(cell) == unit)
+            {
+                originCell = cell;
+                draggedFromBoard = true;
+            }
+            else
+            {
+                draggedFromBoard = false; // 벤치/상점 유닛 같은 경우
+            }
+
             UnitDragHandler.Instance.StartDragging(unit);
             return;
         }
     }
+
 
     // --- 드래그 중 이동(시각용) ---
     void UpdateDragFollow()
@@ -73,22 +93,40 @@ public class MouseClickDetector : MonoBehaviour
         var unit = UnitDragHandler.Instance.GetDraggingUnit();
         var world = GetMouseWorld();
         var gm = GridManager.Instance;
+        var targetCell = gm.WorldToCell(world);
 
-        var cell = gm.WorldToCell(world);
+        bool placed = false;
 
-        if (gm.IsPlaceable(cell))
+        if (draggedFromBoard)
         {
-            if (!gm.TryPlaceUnit(unit, cell))
-                unit.transform.position = originUnitPos;
+            // === 보드에서 보드로 이동 ===
+            // 같은 칸이면 그냥 원래 자리로 스냅만
+            if (targetCell == originCell)
+            {
+                unit.transform.position = gm.CellToWorldCenter(originCell);
+                placed = true;
+            }
             else
-                Debug.Log($"유닛 {unit.name} → Cell {cell}");
+            {
+                // 이동은 TryMoveUnit 사용 (IsPlaceable 말고 내부에서 체크)
+                placed = gm.TryMoveUnit(originCell, targetCell);
+            }
         }
         else
         {
+            // === 벤치/상점 유닛 → 보드 첫 배치 ===
+            if (gm.IsPlaceable(targetCell))
+                placed = gm.TryPlaceUnit(unit, targetCell);
+        }
+
+        if (!placed)
+        {
+            // 실패하면 원래 자리로 복귀
             unit.transform.position = originUnitPos;
         }
 
         UnitDragHandler.Instance.StopDragging();
+        draggedFromBoard = false;
     }
 
     // --- 슬롯 하이라이트 ---
@@ -105,8 +143,21 @@ public class MouseClickDetector : MonoBehaviour
             var slot = hit.GetComponent<BoardSlot>();
             if (slot != null)
             {
-                bool can = gm.IsPlaceable(slot.Cell);
+                bool can;
+                if (UnitDragHandler.Instance.IsDragging() && draggedFromBoard)
+                {
+                    var dragging = UnitDragHandler.Instance.GetDraggingUnit();
+                    if (slot.Cell == originCell)
+                        can = true; // 원래 자리로는 항상 가능
+                    else
+                        can = gm.IsInBounds(slot.Cell) && !gm.IsBlocked(slot.Cell) && !gm.IsOccupied(slot.Cell);
+                }
+                else
+                {
+                    can = gm.IsPlaceable(slot.Cell);
+                }
                 slot.SetHighlight(can);
+
                 lastHovered = slot;
                 return;
             }
