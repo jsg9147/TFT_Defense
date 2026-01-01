@@ -224,6 +224,9 @@ namespace CodeStage.Maintainer.Tools
 
 		public static bool IsValueMatchesAnyFilterOfKind(string value, IEnumerable<FilterItem> filters, FilterKind onlyThisKind)
 		{
+			if (filters == null)
+				return false;
+
 			var match = false;
 			var directory = string.Empty;
 			var filename = string.Empty;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;             // Dump용
 using UnityEngine;
 
-public class UpgradeManager : MonoSingleton<UpgradeManager>
+public class UpgradeManager : SceneSingleton<UpgradeManager>
 {
     [Header("설정")]
     [SerializeField] private UpgradeConfig config;

@@ -250,18 +250,22 @@ public partial class SPUM_PaginationManager : MonoBehaviour
                 && (ie.Structure == matchingElement.Structure) 
                 && ie.PartSubType == matchingElement.PartSubType
                 );
-                //Debug.Log(matchingTypeElement != null);
-                if (matchingTypeElement != null)
+                if (matchingTypeElement != null && !string.IsNullOrEmpty(matchingTypeElement.ItemPath))
                 {
-                    var LoadSprite = SPUM_Manager.LoadSpriteFromMultiple(matchingTypeElement.ItemPath , matchingTypeElement.Structure);
-                    isInvalidPath = LoadSprite == null;
-                    matchingElement.renderer.sprite = LoadSprite;
-                    matchingElement.renderer.maskInteraction = (SpriteMaskInteraction)matchingTypeElement.MaskIndex;
-                    matchingElement.renderer.color = matchingTypeElement.Color; 
-                    matchingElement.ItemPath = matchingTypeElement.ItemPath;
-                    matchingElement.MaskIndex = matchingTypeElement.MaskIndex;
-                    matchingElement.Color = matchingTypeElement.Color;
+                    matchingTypeElement.ItemPath = matchingTypeElement.ItemPath.Replace("/Unit/", "/0_Unit/");
                 }
+                //Debug.Log(matchingTypeElement != null);
+                    if (matchingTypeElement != null)
+                    {
+                        var LoadSprite = SPUM_Manager.LoadSpriteFromMultiple(matchingTypeElement.ItemPath, matchingTypeElement.Structure);
+                        isInvalidPath = LoadSprite == null;
+                        matchingElement.renderer.sprite = LoadSprite;
+                        matchingElement.renderer.maskInteraction = (SpriteMaskInteraction)matchingTypeElement.MaskIndex;
+                        matchingElement.renderer.color = matchingTypeElement.Color;
+                        matchingElement.ItemPath = matchingTypeElement.ItemPath;
+                        matchingElement.MaskIndex = matchingTypeElement.MaskIndex;
+                        matchingElement.Color = matchingTypeElement.Color;
+                    }
             }
             var ButtonPanel = PreviewElement.GetComponentInChildren<SPUM_LoadPrefabPanel>();
             ButtonPanel.UnitCodeText.text = SavedPrefab._code;
@@ -295,12 +299,42 @@ public partial class SPUM_PaginationManager : MonoBehaviour
             {
                 SPUM_Manager.EditPrefab = SavedPrefab;
                 SPUM_Manager.UIManager.LoadButtonSet(true);
-                SPUM_Manager.ItemLoadButtonActive(SavedPrefab.ImageElement);
                 SPUM_Manager.ItemResetAll();
+                SPUM_Manager.ItemLoadButtonActive(SavedPrefab.ImageElement);
                 SPUM_Manager.SetType(SavedPrefab.UnitType);
                 SPUM_Manager.SetSprite(SavedPrefab.ImageElement);
-                SPUM_Manager.PreviewPrefab.spumPackages = SavedPrefab.spumPackages;
                 
+                // 기존 모든 패키지를 깊은 복사
+                var allPackages = SPUM_Manager.GetSpumPackageData();
+                SPUM_Manager.PreviewPrefab.spumPackages = allPackages
+                    .Select(p => (SpumPackage)p.Clone())
+                    .ToList();
+                
+                for (int i = 0; i < SPUM_Manager.PreviewPrefab.spumPackages.Count; i++)
+                {
+                    var previewPackage = SPUM_Manager.PreviewPrefab.spumPackages[i];
+                    var savedPackage = SavedPrefab.spumPackages
+                        .FirstOrDefault(p => p.Name == previewPackage.Name);
+                    
+                    for (int j = 0; j < previewPackage.SpumAnimationData.Count; j++)
+                    {
+                        var previewAnimData = previewPackage.SpumAnimationData[j];
+                        var savedAnimData = savedPackage?.SpumAnimationData
+                            .FirstOrDefault(a => a.Name == previewAnimData.Name);
+                        
+                        if (savedAnimData != null)
+                        {
+                            SPUM_Manager.PreviewPrefab.spumPackages[i].SpumAnimationData[j].index = savedAnimData.index;
+                            SPUM_Manager.PreviewPrefab.spumPackages[i].SpumAnimationData[j].HasData = savedAnimData.HasData;
+                        }
+                        else
+                        {
+                            SPUM_Manager.PreviewPrefab.spumPackages[i].SpumAnimationData[j].index = -1;
+                            SPUM_Manager.PreviewPrefab.spumPackages[i].SpumAnimationData[j].HasData = false;
+                        }
+                    }
+                }
+
                 SPUM_Manager.PreviewPrefab._version = SavedPrefab._version;
                 SPUM_Manager.PreviewPrefab._code = SavedPrefab._code;
                 SPUM_Manager.UIManager._loadObjCanvas.SetActive(false);
@@ -312,18 +346,24 @@ public partial class SPUM_PaginationManager : MonoBehaviour
                 DeleteUnit(prefabIndex, SavedPrefab);
                 DisplayPage();
             });
-            bool isOldVersion =  SavedPrefab._version < SPUM_Manager._version;
+            bool isOldVersion = SavedPrefab._version < 170; // SavedPrefab._version < SPUM_Manager._version &&
             
             bool isInvalidClipPath = false;
             var ClipList = SavedPrefab.spumPackages.SelectMany(package => package.SpumAnimationData).ToList();
-            
+            ClipList.ForEach(clip =>
+            {
+                if (!string.IsNullOrEmpty(clip.ClipPath) && clip.ClipPath.Contains("/Unit/"))
+                {
+                    clip.ClipPath = clip.ClipPath.Replace("/Unit/", "/0_Unit/");
+                }
+            }); 
             foreach (var clip in ClipList)
             {
                 isInvalidClipPath = SPUM_Manager.ValidateAnimationClips(clip);
                 if(!isInvalidClipPath) break;
             }
 
-            bool IsActive = isOldVersion || isInvalidPath || !isInvalidClipPath;
+            bool IsActive = isOldVersion;// || isInvalidPath || !isInvalidClipPath;
             ButtonPanel.ConvertButton.transform.parent.gameObject.SetActive(IsActive);
             ButtonPanel.SelectButton.image.enabled = !IsActive;
 

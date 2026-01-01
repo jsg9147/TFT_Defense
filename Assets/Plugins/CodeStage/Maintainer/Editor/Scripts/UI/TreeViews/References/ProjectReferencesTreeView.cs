@@ -85,9 +85,29 @@ namespace CodeStage.Maintainer.UI
 			if (sortedColumns.Length == 0)
 				return;
 
-			var myTypes = rootItem.children.Cast<ProjectReferencesTreeViewItem<T>>();
+			SortChildrenRecursive(rootItem, sortedColumns);
+		}
+
+		private void SortChildrenRecursive(
+#if UNITY_6000_2_OR_NEWER
+			TreeViewItem<int>
+#else
+			TreeViewItem
+#endif
+			parent, IList<int> sortedColumns)
+		{
+			if (parent.children == null || parent.children.Count == 0)
+				return;
+
+			if (parent.children.Count == 1 && parent.children[0] == null)
+				return;
+
+			var myTypes = parent.children.OfType<ProjectReferencesTreeViewItem<T>>();
+			if (!myTypes.Any())
+				return;
+
 			var orderedQuery = InitialOrder(myTypes, sortedColumns);
-			for (var i = 1; i < sortedColumns.Length; i++)
+			for (var i = 1; i < sortedColumns.Count; i++)
 			{
 				var sortOption = sortOptions[sortedColumns[i]];
 				var ascending = multiColumnHeader.IsSortedAscending(sortedColumns[i]);
@@ -111,13 +131,21 @@ namespace CodeStage.Maintainer.UI
 				}
 			}
 
-			rootItem.children = orderedQuery.Cast<
+			parent.children = orderedQuery.Cast<
 #if UNITY_6000_2_OR_NEWER
 				TreeViewItem<int>
 #else
 				TreeViewItem
 #endif
 				>().ToList();
+
+			foreach (var child in parent.children)
+			{
+				if (child.hasChildren && child.children != null && child.children.Count > 0)
+				{
+					SortChildrenRecursive(child, sortedColumns);
+				}
+			}
 		}
 
 		private IOrderedEnumerable<ProjectReferencesTreeViewItem<T>> InitialOrder(IEnumerable<ProjectReferencesTreeViewItem<T>> myTypes, IList<int> history)

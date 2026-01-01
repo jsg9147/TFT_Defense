@@ -7,8 +7,8 @@
 namespace CodeStage.Maintainer
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
-	using System.Runtime.Serialization.Formatters.Binary;
 
 	using Cleaner;
 	using Core;
@@ -32,6 +32,10 @@ namespace CodeStage.Maintainer
 		private const string SceneReferencesResultsPath = Directory + "/MaintainerSceneReferencesResults.bin";
 		private const string SceneReferencesLastSearchedPath = Directory + "/MaintainerSceneReferencesLastSearched.bin";
 
+		private const int FormatVersion = 1;
+		private const int ProgressItemsThreshold = 40000;
+		private const long ProgressStreamLengthThreshold = 500000;
+
 		private static IssueRecord[] issuesSearchResults;
 		private static CleanerRecord[] cleanerSearchResults;
 
@@ -53,20 +57,26 @@ namespace CodeStage.Maintainer
 			CSFileTools.DeleteFile(SceneReferencesLastSearchedPath);
 		}
 
+		private static void EnsureDirectoryExists()
+		{
+			if (!System.IO.Directory.Exists(Directory))
+				System.IO.Directory.CreateDirectory(Directory);
+		}
+
 		public static IssueRecord[] IssuesSearchResults
 		{
 			get
 			{
 				if (issuesSearchResults == null)
 				{
-					issuesSearchResults = LoadItems<IssueRecord>(IssuesResultsPath);
+					issuesSearchResults = LoadPolymorphicItems<IssueRecord>(IssuesResultsPath);
 				}
 				return issuesSearchResults;
 			}
 			set
 			{
 				issuesSearchResults = value;
-				SaveItems(IssuesResultsPath, issuesSearchResults);
+				SavePolymorphicItems(IssuesResultsPath, issuesSearchResults);
 			}
 		}
 
@@ -76,14 +86,14 @@ namespace CodeStage.Maintainer
 			{
 				if (cleanerSearchResults == null)
 				{
-					cleanerSearchResults = LoadItems<CleanerRecord>(CleanerResultsPath);
+					cleanerSearchResults = LoadPolymorphicItems<CleanerRecord>(CleanerResultsPath);
 				}
 				return cleanerSearchResults;
 			}
 			set
 			{
 				cleanerSearchResults = value;
-				SaveItems(CleanerResultsPath, cleanerSearchResults);
+				SavePolymorphicItems(CleanerResultsPath, cleanerSearchResults);
 			}
 		}
 
@@ -125,14 +135,14 @@ namespace CodeStage.Maintainer
 			{
 				if (projectReferencesLastSearched == null)
 				{
-					projectReferencesLastSearched = LoadItems<FilterItem>(ProjectReferencesLastSearchedPath);
+					projectReferencesLastSearched = LoadItemsFromJson<FilterItem>(ProjectReferencesLastSearchedPath);
 				}
 				return projectReferencesLastSearched;
 			}
 			set
 			{
 				projectReferencesLastSearched = value;
-				SaveItems(ProjectReferencesLastSearchedPath, projectReferencesLastSearched);
+				SaveItemsToJson(ProjectReferencesLastSearchedPath, projectReferencesLastSearched);
 			}
 		}
 
@@ -142,151 +152,340 @@ namespace CodeStage.Maintainer
 			{
 				if (sceneReferencesLastSearched == null)
 				{
-					sceneReferencesLastSearched = LoadItems<int>(SceneReferencesLastSearchedPath);
+					sceneReferencesLastSearched = LoadIntArray(SceneReferencesLastSearchedPath);
 				}
 				return sceneReferencesLastSearched;
 			}
 			set
 			{
 				sceneReferencesLastSearched = value;
-				SaveItems(SceneReferencesLastSearchedPath, sceneReferencesLastSearched);
+				SaveIntArray(SceneReferencesLastSearchedPath, sceneReferencesLastSearched);
 			}
 		}
 
-		private static void SaveItems<T>(string path, T[] items)
+		private static void SavePolymorphicItems<T>(string path, T[] items) where T : class
 		{
 			if (items == null)
 			{
-				items = new T[0];
+				items = Array.Empty<T>();
 			}
 
-			if (!System.IO.Directory.Exists(Directory)) System.IO.Directory.CreateDirectory(Directory);
+			EnsureDirectoryExists();
 
-			if (items.Length > 40000)
+			var showProgress = items.Length > ProgressItemsThreshold;
+			if (showProgress)
 			{
 				EditorUtility.DisplayProgressBar("Maintainer", "Saving items, please wait...", 0.5f);
 			}
 
-			var bf = new BinaryFormatter();
-			var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-			bf.Serialize(stream, items);
-			stream.Close();
-
-			EditorUtility.ClearProgressBar();
-		}
-
-		private static T[] LoadItems<T>(string path)
-		{
-			T[] results = null;
-
-			if (File.Exists(path))
+			try
 			{
-				var bf = new BinaryFormatter();
-				var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+				using (var writer = new BinaryWriter(stream))
+				{
+					writer.Write(FormatVersion);
+					writer.Write(Maintainer.Version);
+					writer.Write(items.Length);
 
-				if (stream.Length > 500000)
-				{
-					EditorUtility.DisplayProgressBar("Maintainer", "Loading items, please wait...", 0.5f);
-				}
+					foreach (var item in items)
+					{
+						if (item == null)
+						{
+							writer.Write(string.Empty);
+							writer.Write(string.Empty);
+							continue;
+						}
 
-				try
-				{
-					results = bf.Deserialize(stream) as T[];
+						var itemType = item.GetType();
+						writer.Write(itemType.AssemblyQualifiedName ?? string.Empty);
+						writer.Write(JsonUtility.ToJson(item));
+					}
 				}
-				catch (Exception e)
+			}
+			finally
+			{
+				if (showProgress)
 				{
-					Debug.LogWarning(Maintainer.ConstructLog("Can't read search results from " + path + ".\n" +
-															 "They might be generated at different Maintainer version.\n" + e));
-				}
-				finally
-				{
-					stream.Close();
 					EditorUtility.ClearProgressBar();
 				}
+			}
+		}
 
-				if (results == null)
+		private static T[] LoadPolymorphicItems<T>(string path) where T : class
+		{
+			if (!File.Exists(path))
+				return Array.Empty<T>();
+
+			var showProgress = false;
+
+			try
+			{
+				var fileSize = new FileInfo(path).Length;
+				if (fileSize > ProgressStreamLengthThreshold)
 				{
-					results = new T[0];
-					CSFileTools.DeleteFile(path);
+					EditorUtility.DisplayProgressBar("Maintainer", "Loading items, please wait...", 0.5f);
+					showProgress = true;
+				}
+
+				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+				using (var reader = new BinaryReader(stream))
+				{
+					var formatVersion = reader.ReadInt32();
+					if (formatVersion != FormatVersion)
+					{
+						CSFileTools.DeleteFile(path);
+						return Array.Empty<T>();
+					}
+
+					var maintainerVersion = reader.ReadString();
+					if (maintainerVersion != Maintainer.Version)
+					{
+						CSFileTools.DeleteFile(path);
+						return Array.Empty<T>();
+					}
+
+					var count = reader.ReadInt32();
+					var results = new List<T>(count);
+
+					for (var i = 0; i < count; i++)
+					{
+						var typeName = reader.ReadString();
+						var json = reader.ReadString();
+
+						if (string.IsNullOrEmpty(typeName) || string.IsNullOrEmpty(json))
+							continue;
+
+						var itemType = Type.GetType(typeName, false);
+						if (itemType == null)
+							continue;
+
+						if (!typeof(T).IsAssignableFrom(itemType))
+						{
+							Debug.LogWarning(Maintainer.ConstructLog($"Skipping incompatible type {itemType.Name} when loading {typeof(T).Name} from {path}"));
+							continue;
+						}
+
+						var item = JsonUtility.FromJson(json, itemType) as T;
+						if (item != null)
+						{
+							results.Add(item);
+						}
+					}
+
+					return results.ToArray();
 				}
 			}
-			else
+			catch (Exception e)
 			{
-				results = new T[0];
+				Debug.LogWarning(Maintainer.ConstructLog("Can't read search results from " + path + ".\n" +
+														 "They might be generated at different Maintainer version.\n" + e));
+				CSFileTools.DeleteFile(path);
+				return Array.Empty<T>();
+			}
+			finally
+			{
+				if (showProgress)
+				{
+					EditorUtility.ClearProgressBar();
+				}
+			}
+		}
+
+		private static void SaveIntArray(string path, int[] items)
+		{
+			if (items == null)
+			{
+				items = Array.Empty<int>();
 			}
 
-			return results;
+			EnsureDirectoryExists();
+
+			var showProgress = items.Length > ProgressItemsThreshold;
+			if (showProgress)
+			{
+				EditorUtility.DisplayProgressBar("Maintainer", "Saving int array, please wait...", 0.5f);
+			}
+
+			try
+			{
+				using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+				using (var writer = new BinaryWriter(stream))
+				{
+					writer.Write(FormatVersion);
+					writer.Write(Maintainer.Version);
+					writer.Write(items.Length);
+
+					foreach (var item in items)
+					{
+						writer.Write(item);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning(Maintainer.ConstructLog($"Failed to save int array: {e.Message}"));
+			}
+			finally
+			{
+				if (showProgress)
+				{
+					EditorUtility.ClearProgressBar();
+				}
+			}
+		}
+
+		private static int[] LoadIntArray(string path)
+		{
+			if (!File.Exists(path))
+				return Array.Empty<int>();
+
+			var showProgress = false;
+
+			try
+			{
+				var fileSize = new FileInfo(path).Length;
+				if (fileSize > ProgressStreamLengthThreshold)
+				{
+					EditorUtility.DisplayProgressBar("Maintainer", "Loading int array, please wait...", 0.5f);
+					showProgress = true;
+				}
+
+				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+				using (var reader = new BinaryReader(stream))
+				{
+					var formatVersion = reader.ReadInt32();
+					if (formatVersion != FormatVersion)
+					{
+						CSFileTools.DeleteFile(path);
+						return Array.Empty<int>();
+					}
+
+					var maintainerVersion = reader.ReadString();
+					if (maintainerVersion != Maintainer.Version)
+					{
+						CSFileTools.DeleteFile(path);
+						return Array.Empty<int>();
+					}
+
+					var count = reader.ReadInt32();
+					var results = new int[count];
+
+					for (var i = 0; i < count; i++)
+					{
+						results[i] = reader.ReadInt32();
+					}
+
+					return results;
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning(Maintainer.ConstructLog("Can't read int array from " + path + ".\n" +
+														 "They might be generated at different Maintainer version.\n" + e));
+				CSFileTools.DeleteFile(path);
+				return Array.Empty<int>();
+			}
+			finally
+			{
+				if (showProgress)
+				{
+					EditorUtility.ClearProgressBar();
+				}
+			}
 		}
 
 		private static void SaveItemsToJson<T>(string path, T[] items)
 		{
 			if (items == null)
 			{
-				items = new T[0];
+				items = Array.Empty<T>();
 			}
 
-			if (!System.IO.Directory.Exists(Directory)) System.IO.Directory.CreateDirectory(Directory);
+			EnsureDirectoryExists();
 
-			if (items.Length > 40000)
+			var shouldShowProgress = items.Length > ProgressItemsThreshold;
+			if (shouldShowProgress)
 			{
 				EditorUtility.DisplayProgressBar("Maintainer", "Saving items, please wait...", 0.5f);
 			}
 
-			var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-			var streamWriter = new StreamWriter(stream);
+			try
+			{
+				var wrapper = new ItemsWrapper<T> { items = items };
+				var toWrite = JsonUtility.ToJson(wrapper);
 
-			var wrapper = new ItemsWrapper<T> {items = items};
-
-			var toWrite = JsonUtility.ToJson(wrapper);
-			streamWriter.Write(toWrite);
-			streamWriter.Flush();
-			stream.Close();
-
-			EditorUtility.ClearProgressBar();
+				using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+				using (var streamWriter = new StreamWriter(stream))
+				{
+					streamWriter.Write(toWrite);
+				}
+			}
+			finally
+			{
+				if (shouldShowProgress)
+				{
+					EditorUtility.ClearProgressBar();
+				}
+			}
 		}
 
 		private static T[] LoadItemsFromJson<T>(string path)
 		{
-			T[] results = null;
+			if (!File.Exists(path))
+				return Array.Empty<T>();
 
-			if (File.Exists(path))
+			var progressShown = false;
+			try
 			{
-				var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+				{
+					if (stream.Length > ProgressStreamLengthThreshold)
+					{
+						EditorUtility.DisplayProgressBar("Maintainer", "Loading items, please wait...", 0.5f);
+						progressShown = true;
+					}
 
-				if (stream.Length > 500000)
-				{
-					EditorUtility.DisplayProgressBar("Maintainer", "Loading items, please wait...", 0.5f);
-				}
+					using (var streamReader = new StreamReader(stream))
+					{
+						var wrapper = JsonUtility.FromJson<ItemsWrapper<T>>(streamReader.ReadToEnd());
+						var items = wrapper?.items;
+						if (items == null || items.Length == 0)
+							return Array.Empty<T>();
 
-				try
-				{
-					var streamReader = new StreamReader(stream);
-					var wrapper = JsonUtility.FromJson<ItemsWrapper<T>>(streamReader.ReadToEnd());
-					results = wrapper.items;
+						var hasNullItem = false;
+						for (var i = 0; i < items.Length; i++)
+						{
+							if (items[i] != null) continue;
+
+							hasNullItem = true;
+							break;
+						}
+
+						if (hasNullItem)
+						{
+							Debug.LogWarning(Maintainer.ConstructLog("Cached search results contained null items and were cleared: " + path));
+							CSFileTools.DeleteFile(path);
+							return Array.Empty<T>();
+						}
+
+						return items;
+					}
 				}
-				catch (Exception e)
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning(Maintainer.ConstructLog("Can't read search results from " + path + ".\n" +
+														 "They might be generated at different Maintainer version.\n" + e));
+				CSFileTools.DeleteFile(path);
+				return Array.Empty<T>();
+			}
+			finally
+			{
+				if (progressShown)
 				{
-					Debug.LogWarning(Maintainer.ConstructLog("Can't read search results from " + path + ".\n" +
-															 "They might be generated at different Maintainer version.\n" + e));
-				}
-				finally
-				{
-					stream.Close();
 					EditorUtility.ClearProgressBar();
 				}
-
-				if (results == null)
-				{
-					results = new T[0];
-					CSFileTools.DeleteFile(path);
-				}
 			}
-			else
-			{
-				results = new T[0];
-			}
-
-			return results;
 		}
 
 		[Serializable]

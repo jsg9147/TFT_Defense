@@ -2069,49 +2069,29 @@ public class SPUM_ImprovedTagManager : MonoBehaviour
         }
         else
         {
-            // OR mode: Check only filters that apply to this part
-            bool passesAnyFilter = false;
-            
-            // Theme filter applies to all parts
+            // OR 모드 수정: 적용 가능한 필터들은 AND로 결합
+            // Theme은 항상 체크, Race는 Body에만, Gender는 Hair/FaceHair에만
+
+            // Theme 필터가 활성화되어 있으면 반드시 통과해야 함
             if (selectedThemes != null && selectedThemes.Count > 0)
             {
-                passesAnyFilter |= CheckThemeMatch(item, selectedThemes, themeFilterUseAND);
+                if (!themeMatch) return false;
             }
-            
-            // Race filter only applies to Body parts
+
+            // Race 필터가 활성화되어 있고 Body 파츠면 반드시 통과해야 함
             if (selectedRaces != null && selectedRaces.Count > 0 && item.Part == "Body")
             {
-                passesAnyFilter |= CheckRaceMatch(item, selectedRaces, raceFilterUseAND);
+                if (!raceMatch) return false;
             }
-            
-            // Gender filter only applies to Hair and FaceHair parts
-            if (selectedGenders != null && selectedGenders.Count > 0 && (item.Part == "Hair" || item.Part == "FaceHair"))
+
+            // Gender 필터가 활성화되어 있고 Hair/FaceHair 파츠면 반드시 통과해야 함
+            if (selectedGenders != null && selectedGenders.Count > 0 &&
+                (item.Part == "Hair" || item.Part == "FaceHair"))
             {
-                passesAnyFilter |= CheckGenderMatch(item, selectedGenders, genderFilterUseAND);
+                if (!genderMatch) return false;
             }
-            
-            // If no applicable filters are active, use default select modes
-            if (!passesAnyFilter)
-            {
-                bool hasApplicableFilter = false;
-                
-                if (selectedThemes != null && selectedThemes.Count > 0) hasApplicableFilter = true;
-                if (selectedRaces != null && selectedRaces.Count > 0 && item.Part == "Body") hasApplicableFilter = true;
-                if (selectedGenders != null && selectedGenders.Count > 0 && (item.Part == "Hair" || item.Part == "FaceHair")) hasApplicableFilter = true;
-                
-                if (!hasApplicableFilter)
-                {
-                    // No filters apply to this part, so check default modes
-                    if (item.Part == "Body")
-                        return raceDefaultSelectAll;
-                    else if (item.Part == "Hair" || item.Part == "FaceHair")
-                        return genderDefaultSelectAll;
-                    else
-                        return themeDefaultSelectAll;
-                }
-            }
-            
-            return passesAnyFilter;
+
+            return true;
         }
     }
     

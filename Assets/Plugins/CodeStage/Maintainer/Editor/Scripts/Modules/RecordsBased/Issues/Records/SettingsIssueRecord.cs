@@ -18,8 +18,8 @@ namespace CodeStage.Maintainer.Issues
 	[Serializable]
 	public class SettingsIssueRecord : AssetIssueRecord, IShowableRecord
 	{
-		public string PropertyPath { get; private set; }
-		internal AssetSettingsKind SettingsKind { get; private set; }
+		[field: SerializeField] public string PropertyPath { get; private set; }
+		[field: SerializeField] internal AssetSettingsKind SettingsKind { get; private set; }
 
 		public override bool IsFixable
 		{

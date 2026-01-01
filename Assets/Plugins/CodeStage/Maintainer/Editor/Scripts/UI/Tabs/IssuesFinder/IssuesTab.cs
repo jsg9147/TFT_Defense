@@ -414,7 +414,8 @@ namespace CodeStage.Maintainer.UI
 					result = CSEditorIcons.Info;
 					break;
 				default:
-					throw new ArgumentOutOfRangeException();
+					result = CSEditorIcons.Error;
+					break;
 			}
 
 			return result;

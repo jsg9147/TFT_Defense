@@ -1,4 +1,4 @@
-// Assets/Scripts/Editor/CreateUnitDataWindow.cs
+ï»¿// Assets/Scripts/Editor/CreateUnitDataWindow.cs
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
@@ -6,18 +6,18 @@ using System.IO;
 
 public class CreateUnitDataWindow : EditorWindow
 {
-    // ÀúÀå
-    private DefaultAsset saveFolder;       // Project Ã¢¿¡¼­ Æú´õ drag&drop
-    private bool useCostSubFolder = true;  // CostXX ÇÏÀ§ Æú´õ ÀÚµ¿ ºĞ·ù
-    private int cost = 1;                  // Æú´õ¸í/ÆÄÀÏ¸í¿¡ ¾²ÀÏ ÄÚ½ºÆ®(¼±ÅÃ »çÇ×)
+    // ì €ì¥
+    private DefaultAsset saveFolder;       // Project ì°½ì—ì„œ í´ë” drag&drop
+    private bool useCostSubFolder = true;  // CostXX í•˜ìœ„ í´ë” ìë™ ë¶„ë¥˜
+    private int cost = 1;                  // í´ë”ëª…/íŒŒì¼ëª…ì— ì“°ì¼ ì½”ìŠ¤íŠ¸(ì„ íƒ ì‚¬í•­)
 
-    // ÆÄÀÏ/ÀÌ¸§
+    // íŒŒì¼/ì´ë¦„
     private string baseFileName = "Unit";  // ex) Unit
-    private int createCount = 1;           // ÇÑ¹ø¿¡ »ı¼ºÇÒ °³¼ö
-    private bool addIndexSuffix = true;    // _001, _002 ºÙÀÏÁö
-    private bool allowStarChar = true;     // ÆÄÀÏ¸í¿¡ '¡Ú' Çã¿ë (Windows NTFSµµ OK)
+    private int createCount = 1;           // í•œë²ˆì— ìƒì„±í•  ê°œìˆ˜
+    private bool addIndexSuffix = true;    // _001, _002 ë¶™ì¼ì§€
+    private bool allowStarChar = true;     // íŒŒì¼ëª…ì— 'â˜…' í—ˆìš© (Windows NTFSë„ OK)
 
-    // µ¥ÀÌÅÍ ÇÊµå
+    // ë°ì´í„° í•„ë“œ 
     private string unitDisplayName = "New Unit";
     private Sprite icon;
     private UnitType types = UnitType.SingleShot | UnitType.Physical;
@@ -52,7 +52,7 @@ public class CreateUnitDataWindow : EditorWindow
     {
         EditorGUILayout.LabelField("Save", EditorStyles.boldLabel);
         saveFolder = (DefaultAsset)EditorGUILayout.ObjectField("Folder", saveFolder, typeof(DefaultAsset), false);
-        useCostSubFolder = EditorGUILayout.Toggle(new GUIContent("Use Cost SubFolder", "CostXX ÇÏÀ§ Æú´õ ÀÚµ¿ ºĞ·ù"), useCostSubFolder);
+        useCostSubFolder = EditorGUILayout.Toggle(new GUIContent("Use Cost SubFolder", "CostXX í•˜ìœ„ í´ë” ìë™ ë¶„ë¥˜"), useCostSubFolder);
         using (new EditorGUI.DisabledScope(!useCostSubFolder))
         {
             cost = Mathf.Clamp(EditorGUILayout.IntField("Cost", cost), 0, 99);
@@ -62,8 +62,8 @@ public class CreateUnitDataWindow : EditorWindow
         EditorGUILayout.LabelField("File Name", EditorStyles.boldLabel);
         baseFileName = EditorGUILayout.TextField("Base", baseFileName);
         createCount = Mathf.Max(1, EditorGUILayout.IntField("Count", createCount));
-        addIndexSuffix = EditorGUILayout.Toggle(new GUIContent("Add Index Suffix", "_001 Á¢¹Ì»ç"), addIndexSuffix);
-        allowStarChar = EditorGUILayout.Toggle(new GUIContent("Allow '¡Ú' in Name", "ÆÄÀÏ¸í Çã¿ë ¹®ÀÚ. ¹®Á¦½Ã ÀÚµ¿ Ä¡È¯"), allowStarChar);
+        addIndexSuffix = EditorGUILayout.Toggle(new GUIContent("Add Index Suffix", "_001 ì ‘ë¯¸ì‚¬"), addIndexSuffix);
+        allowStarChar = EditorGUILayout.Toggle(new GUIContent("Allow 'â˜…' in Name", "íŒŒì¼ëª… í—ˆìš© ë¬¸ì. ë¬¸ì œì‹œ ìë™ ì¹˜í™˜"), allowStarChar);
 
         EditorGUILayout.Space(8);
         EditorGUILayout.LabelField("Unit Data", EditorStyles.boldLabel);
@@ -123,18 +123,18 @@ public class CreateUnitDataWindow : EditorWindow
     {
         if (saveFolder == null)
         {
-            reason = "ÀúÀå Æú´õ¸¦ ÁöÁ¤ÇÏ¼¼¿ä.";
+            reason = "ì €ì¥ í´ë”ë¥¼ ì§€ì •í•˜ì„¸ìš”.";
             return false;
         }
         var path = AssetDatabase.GetAssetPath(saveFolder);
         if (string.IsNullOrEmpty(path) || !AssetDatabase.IsValidFolder(path))
         {
-            reason = "À¯È¿ÇÑ Æú´õ°¡ ¾Æ´Õ´Ï´Ù.";
+            reason = "ìœ íš¨í•œ í´ë”ê°€ ì•„ë‹™ë‹ˆë‹¤.";
             return false;
         }
         if (string.IsNullOrWhiteSpace(baseFileName))
         {
-            reason = "Base ÆÄÀÏ¸íÀ» ÀÔ·ÂÇÏ¼¼¿ä.";
+            reason = "Base íŒŒì¼ëª…ì„ ì…ë ¥í•˜ì„¸ìš”.";
             return false;
         }
         reason = null;
@@ -166,7 +166,7 @@ public class CreateUnitDataWindow : EditorWindow
             if (addIndexSuffix && createCount > 1)
                 fileName += $"_{i + 1:000}";
 
-            // '¡Ú' Çã¿ë/Ä¡È¯
+            // 'â˜…' í—ˆìš©/ì¹˜í™˜
             fileName = SanitizeFileName(fileName, allowStarChar);
 
             string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{targetFolder}/{fileName}.asset");
@@ -196,7 +196,7 @@ public class CreateUnitDataWindow : EditorWindow
             AssetDatabase.CreateAsset(data, assetPath);
             Undo.RegisterCreatedObjectUndo(data, "Create UnitData");
 
-            // ¾ÆÀÌÄÜ ½æ³×ÀÏ °­Á¶¸¦ À§ÇØ ÀúÀå Á÷ÈÄ ¼±ÅÃ
+            // ì•„ì´ì½˜ ì¸ë„¤ì¼ ê°•ì¡°ë¥¼ ìœ„í•´ ì €ì¥ ì§í›„ ì„ íƒ
             Selection.activeObject = data;
         }
 
@@ -205,35 +205,35 @@ public class CreateUnitDataWindow : EditorWindow
 
         Undo.CollapseUndoOperations(undoGroup);
 
-        EditorUtility.DisplayDialog("Create UnitData", $"»ı¼º ¿Ï·á: {createCount}°³", "OK");
+        EditorUtility.DisplayDialog("Create UnitData", $"ìƒì„± ì™„ë£Œ: {createCount}ê°œ", "OK");
     }
 
-    // Windows/macOS ¸ğµÎ ¾ÈÀüÇÑ ÆÄÀÏ¸íÀ¸·Î ±³Á¤ (¿øÇÏ¸é ¡Ú Çã¿ë)
+    // Windows/macOS ëª¨ë‘ ì•ˆì „í•œ íŒŒì¼ëª…ìœ¼ë¡œ êµì • (ì›í•˜ë©´ â˜… í—ˆìš©)
     private static string SanitizeFileName(string name, bool allowStar)
     {
-        // ½Ã½ºÅÛ ±İÁö ¹®ÀÚ: \ / : * ? " < > | (Windows)
-        // Unity/OS °øÅëÀ¸·Î ¹®Á¦µÉ ¼ö ÀÖ´Â ¹®ÀÚ Á¦°Å/Ä¡È¯
+        // ì‹œìŠ¤í…œ ê¸ˆì§€ ë¬¸ì: \ / : * ? " < > | (Windows)
+        // Unity/OS ê³µí†µìœ¼ë¡œ ë¬¸ì œë  ìˆ˜ ìˆëŠ” ë¬¸ì ì œê±°/ì¹˜í™˜
         string safe = name;
 
         char[] invalid = Path.GetInvalidFileNameChars();
         foreach (char c in invalid)
         {
-            // º°Àº ¼±ÅÃ Çã¿ë
-            if (allowStar && c == '¡Ú') continue;
+            // ë³„ì€ ì„ íƒ í—ˆìš©
+            if (allowStar && c == 'â˜…') continue;
             safe = safe.Replace(c.ToString(), "_");
         }
 
-        // Ãß°¡·Î Á¦¾î¹®ÀÚ/ÅÇ µî Á¦°Å
+        // ì¶”ê°€ë¡œ ì œì–´ë¬¸ì/íƒ­ ë“± ì œê±°
         foreach (char c in safe)
         {
             if (char.IsControl(c))
                 safe = safe.Replace(c.ToString(), "");
         }
 
-        // °ø¹é Æ®¸²
+        // ê³µë°± íŠ¸ë¦¼
         safe = safe.Trim();
 
-        // ºó ¹®ÀÚ¿­ ¹æÁö
+        // ë¹ˆ ë¬¸ìì—´ ë°©ì§€
         if (string.IsNullOrEmpty(safe)) safe = "Unit";
 
         return safe;

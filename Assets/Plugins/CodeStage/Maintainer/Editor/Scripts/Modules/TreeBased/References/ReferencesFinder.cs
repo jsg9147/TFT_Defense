@@ -99,9 +99,19 @@ namespace CodeStage.Maintainer.References
 		{
 			if (!UserSettings.References.fullProjectScanWarningShown)
 			{
-				if (!EditorUtility.DisplayDialog(ModuleName,
+				var shouldProceed = false;
+				if (Maintainer.SuppressDialogs)
+				{
+					shouldProceed = true;
+				}
+				else if (EditorUtility.DisplayDialog(ModuleName,
 					"Full project scan may take significant amount of time if your project is very big.\nAre you sure you wish to make a full project scan?\nThis message shows only before first full scan.",
 					"Yes", "Nope"))
+				{
+					shouldProceed = true;
+				}
+
+				if (!shouldProceed)
 				{
 					return null;
 				}

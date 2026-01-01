@@ -2,7 +2,7 @@
     "Name": "Legacy",
     "Path": "Assets/SPUM/Resources/Addons",
     "Version": "",
-    "CreationDate": "2025-08-02 21:14:43",
+    "CreationDate": "2025-12-04 16:09:49",
     "SpumAnimationData": [
         {
             "index": 0,
@@ -2199,6 +2199,86 @@
             "SubType": "Tail",
             "PartSubType": "",
             "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/Horse2"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "Acc",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "BodyBack",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "BodyFront",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "FootBackBottom",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "FootBackTop",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "FootFrontBottom",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "FootFrontTop",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "Head",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "Neck",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
+        },
+        {
+            "Name": "RedHorse",
+            "UnitType": "Horse",
+            "PartType": "Body",
+            "SubType": "Tail",
+            "PartSubType": "",
+            "Path": "Addons/Legacy/1_Horse/0_Sprite/0_Body/RedHorse"
         }
     ]
 }

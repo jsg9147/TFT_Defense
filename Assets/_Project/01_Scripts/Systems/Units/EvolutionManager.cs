@@ -1,24 +1,22 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class EvolutionManager : MonoSingleton<EvolutionManager>
 {
-    [Header("¼³Á¤")]
-    [Tooltip("º¥Ä¡±îÁö Æ÷ÇÔÇÒÁö ¿©ºÎ (±âº»: ²¨Áü, 'ÇÊµå¸¸' Ä«¿îÆ®)")]
-    [SerializeField] private bool includeBench = false;
-    [Tooltip("ÃÖ´ë ¼º±Ş (¼³°è: ÃÖ´ë 5¼º)")]
+    [Header("ì„¤ì •")]
+    [Tooltip("ìµœëŒ€ ì„±ê¸‰ (ì„¤ê³„: ìµœëŒ€ 5ì„±)")]
     [SerializeField] private int maxStar = 5;
-    [Tooltip("¿¬¼â ÁøÈ­ Çã¿ë (3°³ ¡æ 2¼º, ¶Ç 3°³ ¸ğÀÌ¸é °è¼Ó)")]
+    [Tooltip("ì—°ì‡„ ì§„í™” í—ˆìš© (3ê°œ â†’ 2ì„±, ë˜ 3ê°œ ëª¨ì´ë©´ ê³„ì†)")]
     [SerializeField] private bool allowChain = true;
 
-    // dataº°, ¼º±Şº° ¹öÅ¶
-    // buckets[data][star] = ÇØ´ç ½ºÅ¸ À¯´Ö ¸®½ºÆ®(ÇÊµå¿¡ Á¸ÀçÇÏ´Â °Í¸¸)
+    // dataë³„, ì„±ê¸‰ë³„ ë²„í‚·
+    // buckets[data][star] = í•´ë‹¹ ìŠ¤íƒ€ ìœ ë‹› ë¦¬ìŠ¤íŠ¸(í•„ë“œì— ì¡´ì¬í•˜ëŠ” ê²ƒë§Œ)
     private readonly Dictionary<UnitData, Dictionary<int, List<Unit>>> buckets = new();
-    // Á¤·Ä¿ë Å¸ÀÓ½ºÅÆÇÁ(ÃÖ±Ù ¹èÄ¡ ¿ì¼± ¾÷±×·¹ÀÌµå µî Á¤Ã¥¿¡ »ç¿ë)
+    // ì •ë ¬ìš© íƒ€ì„ìŠ¤íƒ¬í”„(ìµœê·¼ ë°°ì¹˜ ìš°ì„  ì—…ê·¸ë ˆì´ë“œ ë“± ì •ì±…ì— ì‚¬ìš©) 
     private readonly Dictionary<Unit, float> placedAt = new();
 
-    // === ¿ÜºÎ¿¡¼­ È£Ãâ: ÇÊµå¿¡ ¿Ã¶ó¿ÔÀ» ¶§ ===
+    // === ì™¸ë¶€ì—ì„œ í˜¸ì¶œ: í•„ë“œì— ì˜¬ë¼ì™”ì„ ë•Œ ===
     public void RegisterOnField(Unit u)
     {
         if (!u || !u.data) return;
@@ -39,7 +37,7 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
         TryEvolve(u.data, u.starLevel);
     }
 
-    // === ¿ÜºÎ¿¡¼­ È£Ãâ: ÇÊµå¿¡¼­ ³»·Á°¬À» ¶§(ÆÄ±«/º¥Ä¡ ÀÌµ¿/ºñÈ°¼ºÈ­ µî) ===
+    // === ì™¸ë¶€ì—ì„œ í˜¸ì¶œ: í•„ë“œì—ì„œ ë‚´ë ¤ê°”ì„ ë•Œ(íŒŒê´´/ë²¤ì¹˜ ì´ë™/ë¹„í™œì„±í™” ë“±) ===
     public void UnregisterOnField(Unit u)
     {
         if (!u || !u.data) return;
@@ -54,7 +52,7 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
         placedAt.Remove(u);
     }
 
-    // === ÇÙ½É: °°Àº data + °°Àº star °¡ 3°³ ¸ğ¿´À¸¸é ¾÷±×·¹ÀÌµå ===
+    // === í•µì‹¬: ê°™ì€ data + ê°™ì€ star ê°€ 3ê°œ ëª¨ì˜€ìœ¼ë©´ ì—…ê·¸ë ˆì´ë“œ ===
     private void TryEvolve(UnitData data, int star)
     {
         if (!buckets.TryGetValue(data, out var byStar)) return;
@@ -63,19 +61,19 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
 
         while (list.Count >= 3)
         {
-            // 1°³´Â ¾÷±×·¹ÀÌµå Å¸°Ù, 2°³´Â ¼Ò¸ğ
+            // 1ê°œëŠ” ì—…ê·¸ë ˆì´ë“œ íƒ€ê²Ÿ, 2ê°œëŠ” ì†Œëª¨
             Unit target = PickUpgradeTarget(list);
             var toConsume = PickConsumeTwo(list, target);
 
-            // ½ÇÁ¦ Àû¿ë
+            // ì‹¤ì œ ì ìš©
             DoEvolve(target, toConsume);
 
-            // ¹öÅ¶ °»½Å: ±âÁ¸ star ¸®½ºÆ®¿¡¼­ Á¦°Å
+            // ë²„í‚· ê°±ì‹ : ê¸°ì¡´ star ë¦¬ìŠ¤íŠ¸ì—ì„œ ì œê±°
             list.Remove(target);
             foreach (var c in toConsume) list.Remove(c);
             if (list.Count == 0) byStar.Remove(star);
 
-            // ¾÷±×·¹ÀÌµåµÈ À¯´ÖÀ» »õ ¼º±Ş ¹öÅ¶¿¡ Ãß°¡
+            // ì—…ê·¸ë ˆì´ë“œëœ ìœ ë‹›ì„ ìƒˆ ì„±ê¸‰ ë²„í‚·ì— ì¶”ê°€
             int newStar = Mathf.Min(maxStar, star + 1);
             if (!byStar.TryGetValue(newStar, out var higher))
             {
@@ -84,14 +82,14 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
             }
             higher.Add(target);
 
-            // ¿¬¼â ÁøÈ­ Çã¿ë ½Ã °è¼Ó
+            // ì—°ì‡„ ì§„í™” í—ˆìš© ì‹œ ê³„ì†
             if (!allowChain) break;
             if (newStar >= maxStar) break;
-            // »õ ¼º±Ş ¹öÅ¶¿¡ 3°³°¡ ½×¿´À» ¼öµµ ÀÖÀ¸¹Ç·Î ·çÇÁ¸¦ ¹İº¹
-            // (´Ü, target 1°³¸¸À¸·Î´Â ºÒ°¡ÇÏ´Ï ÀÏ¹İÀûÀ¸·Î ´Ù¸¥ µ¿ÀÏ ¼º±ŞÀÌ ´õ ÀÖ¾î¾ß ÇÔ)
+            // ìƒˆ ì„±ê¸‰ ë²„í‚·ì— 3ê°œê°€ ìŒ“ì˜€ì„ ìˆ˜ë„ ìˆìœ¼ë¯€ë¡œ ë£¨í”„ë¥¼ ë°˜ë³µ
+            // (ë‹¨, target 1ê°œë§Œìœ¼ë¡œëŠ” ë¶ˆê°€í•˜ë‹ˆ ì¼ë°˜ì ìœ¼ë¡œ ë‹¤ë¥¸ ë™ì¼ ì„±ê¸‰ì´ ë” ìˆì–´ì•¼ í•¨)
             if (!byStar.TryGetValue(newStar, out var maybeNext) || maybeNext.Count < 3) break;
 
-            // ´ÙÀ½ ´Ü°è ½Ãµµ
+            // ë‹¤ìŒ ë‹¨ê³„ ì‹œë„
             data = target.data;
             star = newStar;
             list = maybeNext;
@@ -100,7 +98,7 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
 
     private Unit PickUpgradeTarget(List<Unit> sameStarList)
     {
-        // Á¤Ã¥: °¡Àå ÃÖ±Ù¿¡ ¹èÄ¡ÇÑ À¯´Ö(½Ã°¢ÀûÀ¸·Î º¯È­°¡ ¹æ±İ »ı°Ü¼­ ÇÇµå¹éÀÌ ÁÁÀ½)
+        // ì •ì±…: ê°€ì¥ ìµœê·¼ì— ë°°ì¹˜í•œ ìœ ë‹›(ì‹œê°ì ìœ¼ë¡œ ë³€í™”ê°€ ë°©ê¸ˆ ìƒê²¨ì„œ í”¼ë“œë°±ì´ ì¢‹ìŒ)
         return sameStarList
             .OrderByDescending(u => placedAt.TryGetValue(u, out var t) ? t : 0f)
             .First();
@@ -108,7 +106,7 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
 
     private List<Unit> PickConsumeTwo(List<Unit> sameStarList, Unit exclude)
     {
-        // targetÀ» Á¦¿ÜÇÏ°í °¡Àå ¿À·¡µÈ 2°³¸¦ ¼Ò¸ğ
+        // targetì„ ì œì™¸í•˜ê³  ê°€ì¥ ì˜¤ë˜ëœ 2ê°œë¥¼ ì†Œëª¨
         return sameStarList
             .Where(u => u != exclude)
             .OrderBy(u => placedAt.TryGetValue(u, out var t) ? t : 0f)
@@ -118,46 +116,46 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
 
     private void DoEvolve(Unit target, List<Unit> consume)
     {
-        // 1) ¼Ò¸ğ À¯´Ö ¾ğ·¹Áö½ºÅÍ + ÆÄ±«
+        // 1) ì†Œëª¨ ìœ ë‹› ì–¸ë ˆì§€ìŠ¤í„° + íŒŒê´´
         foreach (var c in consume)
         {
-            SynergyManager.Instance?.UnregisterUnit(c); // ÀÖÀ¸¸é Á¤ÇÕ¼º À¯Áö
+            SynergyManager.Instance?.UnregisterUnit(c); // ìˆìœ¼ë©´ ì •í•©ì„± ìœ ì§€
             UnregisterOnField(c);
             PlayConsumeVFX(c.transform.position);
             Destroy(c.gameObject);
         }
 
-        // 2) Å¸°Ù ¼º±Ş Áõ°¡
+        // 2) íƒ€ê²Ÿ ì„±ê¸‰ ì¦ê°€
         target.starLevel = Mathf.Min(maxStar, target.starLevel + 1);
 
-        // (¼±ÅÃ) ¼º±Ş¿¡ µû¸¥ ºñÁÖ¾ó/½ºÅÈ °»½Å: µ¥¹ÌÁö´Â ÀÌ¹Ì starLevelÀ» ÂüÁ¶
-        // °ø°İ¼Óµµ/»ç°Å¸®µµ ¼º±Ş ¹İ¿µÇÏ°í ½Í´Ù¸é Unit¿¡ public ¸Ş¼­µå ÇÏ³ª Ãß°¡ ±ÇÀå
+        // (ì„ íƒ) ì„±ê¸‰ì— ë”°ë¥¸ ë¹„ì£¼ì–¼/ìŠ¤íƒ¯ ê°±ì‹ : ë°ë¯¸ì§€ëŠ” ì´ë¯¸ starLevelì„ ì°¸ì¡°
+        // ê³µê²©ì†ë„/ì‚¬ê±°ë¦¬ë„ ì„±ê¸‰ ë°˜ì˜í•˜ê³  ì‹¶ë‹¤ë©´ Unitì— public ë©”ì„œë“œ í•˜ë‚˜ ì¶”ê°€ ê¶Œì¥
         PlayEvolveVFX(target.transform.position);
         target.RefreshAfterStarChanged();
-        // ½Ã³ÊÁö ÀçÁı°è´Â À¯Áö(°°Àº UnitData¶ó¸é º¸Åë º¯È­ ¾øÀ½). ÇÊ¿ä ½Ã ¾Ë¸²:
+        // ì‹œë„ˆì§€ ì¬ì§‘ê³„ëŠ” ìœ ì§€(ê°™ì€ UnitDataë¼ë©´ ë³´í†µ ë³€í™” ì—†ìŒ). í•„ìš” ì‹œ ì•Œë¦¼:
         // SynergyManager.Instance?.OnSynergyChanged?.Invoke();
     }
 
     private void PlayConsumeVFX(Vector3 pos)
     {
-        // TODO: ÆÄÆ¼Å¬/»ç¿îµå ÈÅ (ºñ¾îÀÖ¾îµµ ¹«¹æ)
+        // TODO: íŒŒí‹°í´/ì‚¬ìš´ë“œ í›… (ë¹„ì–´ìˆì–´ë„ ë¬´ë°©)
         // e.g., VFXManager.Instance.Play("consume", pos);
     }
 
     private void PlayEvolveVFX(Vector3 pos)
     {
-        // TODO: ÆÄÆ¼Å¬/»ç¿îµå ÈÅ
+        // TODO: íŒŒí‹°í´/ì‚¬ìš´ë“œ í›…
         // e.g., VFXManager.Instance.Play("evolve", pos);
     }
 
-    // µğ¹ö±×¿ë: ÇöÀç ¹öÅ¶ ´ıÇÁ
+    // ë””ë²„ê·¸ìš©: í˜„ì¬ ë²„í‚· ë¤í”„
     [ContextMenu("Dump Buckets")]
     private void Dump()
     {
         foreach (var kv in buckets)
         {
             string d = kv.Key ? kv.Key.unitName : "NULL";
-            string lines = string.Join(", ", kv.Value.Select(v => $"{v.Key}¡Úx{v.Value.Count}"));
+            string lines = string.Join(", ", kv.Value.Select(v => $"{v.Key}â˜…x{v.Value.Count}"));
             Debug.Log($"[Evolution] {d}: {lines}");
         }
     }

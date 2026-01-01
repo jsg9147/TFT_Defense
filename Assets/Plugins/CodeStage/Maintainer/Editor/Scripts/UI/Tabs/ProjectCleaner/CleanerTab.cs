@@ -329,7 +329,7 @@ namespace CodeStage.Maintainer.UI
 				if (!UserSettings.Cleaner.deletionPromptShown)
 				{
 					UserSettings.Cleaner.deletionPromptShown = true;
-					if (!EditorUtility.DisplayDialog(
+					if (!Maintainer.SuppressDialogs && !EditorUtility.DisplayDialog(
 						ProjectCleaner.ModuleName,
 						"Please note, this action will physically remove asset file from the project! Are you sure you wish to do this?\n" +
 						"Author is not responsible for any damage made due to the module usage!\n" +

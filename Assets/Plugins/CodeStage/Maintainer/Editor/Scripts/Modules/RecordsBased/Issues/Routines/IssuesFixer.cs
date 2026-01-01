@@ -215,7 +215,11 @@ namespace CodeStage.Maintainer.Issues
 									}
 								}
 
+#if UNITY_6000_3_OR_NEWER
+								Selection.entityIds = new []{ (EntityId)instanceId };
+#else
 								Selection.instanceIDs = new []{ instanceId };
+#endif
 								touched |= FixMissingComponents(issue, go, true);
 							}
 						}

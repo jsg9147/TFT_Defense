@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // -------------------------------------------------------
 // Copyright (C) Dmitry Yuhanov [https://codestage.net]
 // -------------------------------------------------------
@@ -100,9 +100,11 @@ namespace CodeStage.Maintainer.Cleaner
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
+			System.Diagnostics.Stopwatch sw = null;
+
 			try
 			{
-				var sw = System.Diagnostics.Stopwatch.StartNew();
+				sw = System.Diagnostics.Stopwatch.StartNew();
 
 				CSEditorTools.lastRevealSceneOpenResult = null;
 
@@ -117,8 +119,6 @@ namespace CodeStage.Maintainer.Cleaner
 				}
 
 				sw.Stop();
-
-				EditorUtility.ClearProgressBar();
 
 				if (!searchCanceled)
 				{
@@ -138,6 +138,9 @@ namespace CodeStage.Maintainer.Cleaner
 			catch (Exception e)
 			{
 				Maintainer.PrintExceptionForSupport("Something went wrong while looking for garbage.", ModuleName, e);
+			}
+			finally
+			{
 				EditorUtility.ClearProgressBar();
 			}
 
@@ -174,56 +177,80 @@ namespace CodeStage.Maintainer.Cleaner
 
 			if (itemsToClean == 0)
 			{
-				EditorUtility.DisplayDialog(ModuleName, "Please select items to clean up!", "Ok");
+				if (!Maintainer.SuppressDialogs)
+				{
+					EditorUtility.DisplayDialog(ModuleName, "Please select items to clean up!", "Ok");
+				}
 				return null;
 			}
 
-			if (!showConfirmation || itemsToClean == 1 || EditorUtility.DisplayDialog("Confirmation",
+			var shouldProceed = false;
+			if (Maintainer.SuppressDialogs)
+			{
+				shouldProceed = true;
+			}
+			else if (!showConfirmation || itemsToClean == 1 || EditorUtility.DisplayDialog("Confirmation",
 					"Do you really wish to delete " + itemsToClean + " items?\n" + Maintainer.DataLossWarning,
 					"Go for it!", "Cancel"))
 			{
-				var sw = System.Diagnostics.Stopwatch.StartNew();
+				shouldProceed = true;
+			}
 
-				var cleanCanceled = CleanRecords(records);
-
-				var cleanedRecords = new List<CleanerRecord>(records.Length);
-				var notCleanedRecords = new List<CleanerRecord>(records.Length);
-
-				foreach (var record in records)
+			if (shouldProceed)
+			{
+				System.Diagnostics.Stopwatch sw = null;
+				try
 				{
-					if (record.cleaned)
+					sw = System.Diagnostics.Stopwatch.StartNew();
+
+					var cleanCanceled = CleanRecords(records);
+
+					var cleanedRecords = new List<CleanerRecord>(records.Length);
+					var notCleanedRecords = new List<CleanerRecord>(records.Length);
+
+					foreach (var record in records)
 					{
-						cleanedRecords.Add(record);
+						if (record.cleaned)
+						{
+							cleanedRecords.Add(record);
+						}
+						else
+						{
+							notCleanedRecords.Add(record);
+						}
+					}
+
+					records = notCleanedRecords.ToArray();
+
+					sw.Stop();
+
+					if (!cleanCanceled)
+					{
+						Debug.Log(Maintainer.ConstructLog("Results: " + cleanedRecords.Count +
+														  " items (" + CSEditorTools.FormatBytes(cleanedBytes) +
+														  " in size) cleaned in " +
+														  sw.Elapsed.TotalSeconds.ToString("0.000") +
+														  " seconds.", ModuleName));
 					}
 					else
 					{
-						notCleanedRecords.Add(record);
+						Debug.Log(Maintainer.ConstructLog("Deletion was canceled by user!", ModuleName));
 					}
+
+					SearchResultsStorage.CleanerSearchResults = records;
+					if (showResults) MaintainerWindow.ShowCleaner();
+
+					return cleanedRecords.ToArray();
 				}
-
-				records = notCleanedRecords.ToArray();
-
-				sw.Stop();
-
-				EditorUtility.ClearProgressBar();
-
-				if (!cleanCanceled)
+				finally
 				{
-					Debug.Log(Maintainer.ConstructLog("Results: " + cleanedRecords.Count +
-													  " items (" + CSEditorTools.FormatBytes(cleanedBytes) +
-													  " in size) cleaned in " +
-													  sw.Elapsed.TotalSeconds.ToString("0.000") +
-													  " seconds.", ModuleName));
-				}
-				else
-				{
-					Debug.Log(Maintainer.ConstructLog("Deletion was canceled by user!", ModuleName));
-				}
+					if (sw != null && sw.IsRunning)
+					{
+						sw.Stop();
+					}
 
-				SearchResultsStorage.CleanerSearchResults = records;
-				if (showResults) MaintainerWindow.ShowCleaner();
-
-				return cleanedRecords.ToArray();
+					EditorUtility.ClearProgressBar();
+				}
 			}
 
 			return null;
@@ -240,9 +267,17 @@ namespace CodeStage.Maintainer.Cleaner
 
 			if (results.Count > 0)
 			{
-				var result = EditorUtility.DisplayDialogComplex("Maintainer",
-					ModuleName + " found " + results.Count + " empty folders. Do you wish to remove them?\n" +
-					Maintainer.DataLossWarning, "Yes", "No", "Show in Maintainer");
+				int result;
+				if (Maintainer.SuppressDialogs)
+				{
+					result = 1;
+				}
+				else
+				{
+					result = EditorUtility.DisplayDialogComplex("Maintainer",
+						ModuleName + " found " + results.Count + " empty folders. Do you wish to remove them?\n" +
+						Maintainer.DataLossWarning, "Yes", "No", "Show in Maintainer");
+				}
 				if (result == 0)
 				{
 					var records = results.ToArray();
@@ -323,12 +358,20 @@ namespace CodeStage.Maintainer.Cleaner
 			{
 				if (!UserSettings.Cleaner.muteNoIgnoredScenesWarning)
 				{
-					var dialogResult = EditorUtility.DisplayDialogComplex(
-						"No ignored scenes!",
-						"No scenes were added to the build settings or to the Filters > Scenes Ignores.\n" +
-						"All not ignored scenes are treated as unused if not referenced somewhere in other ignored assets.", 
-						"Proceed anyway",
-						"Proceed and never show again", "Cancel");
+					int dialogResult;
+					if (Maintainer.SuppressDialogs)
+					{
+						dialogResult = 0;
+					}
+					else
+					{
+						dialogResult = EditorUtility.DisplayDialogComplex(
+							"No ignored scenes!",
+							"No scenes were added to the build settings or to the Filters > Scenes Ignores.\n" +
+							"All not ignored scenes are treated as unused if not referenced somewhere in other ignored assets.", 
+							"Proceed anyway",
+							"Proceed and never show again", "Cancel");
+					}
 					
 					if (dialogResult == 1)
 					{
@@ -362,6 +405,7 @@ namespace CodeStage.Maintainer.Cleaner
 			var allAssetsInProject = map.assets;
 			var count = allAssetsInProject.Count;
 			var referencedAssets = new HashSet<AssetInfo>();
+			var referencesBuffer = new List<AssetInfo>();
 			
 			if (ProjectSettings.Cleaner.ignoreEditorAssets)
 			{
@@ -418,7 +462,7 @@ namespace CodeStage.Maintainer.Cleaner
 				// Process Settings assets to include their dependencies as referenced
 				if (asset.Origin == AssetOrigin.Settings)
 				{
-					AddReferencedAsset(referencedAssets, asset);
+					AddReferencedAsset(referencedAssets, asset, referencesBuffer);
 					continue;
 				}
 
@@ -427,17 +471,17 @@ namespace CodeStage.Maintainer.Cleaner
 				
 				if (AssetInIgnores(asset, ignoredScenes))
 				{
-					AddReferencedAsset(referencedAssets, asset);
+					AddReferencedAsset(referencedAssets, asset, referencesBuffer);
 				}
 				
 				if (BuildReportAnalyzer.IsFileInBuildReport(asset.GUID))
 				{
-					AddReferencedAsset(referencedAssets, asset);
+					AddReferencedAsset(referencedAssets, asset, referencesBuffer);
 				}
 
 				if (AssetInIgnoresSecondPass(asset, referencedAssets))
 				{
-					AddReferencedAsset(referencedAssets, asset);
+					AddReferencedAsset(referencedAssets, asset, referencesBuffer);
 				}
 			}
 
@@ -499,11 +543,12 @@ namespace CodeStage.Maintainer.Cleaner
 			return false;
 		}
 
-		private static void AddReferencedAsset(HashSet<AssetInfo> referencedAssets, AssetInfo asset)
+		private static void AddReferencedAsset(HashSet<AssetInfo> referencedAssets, AssetInfo asset, List<AssetInfo> reusableBuffer)
 		{
 			referencedAssets.Add(asset);
-			var references = asset.GetReferencesRecursive();
-			foreach (var reference in references)
+			reusableBuffer.Clear();
+			asset.GetReferencesRecursive(reusableBuffer);
+			foreach (var reference in reusableBuffer)
 			{
 				referencedAssets.Add(reference);
 			}
@@ -607,7 +652,7 @@ namespace CodeStage.Maintainer.Cleaner
 
 		private static bool AssetInIgnoresSecondPass(AssetInfo asset, HashSet<AssetInfo> referencedAssets)
 		{
-			if (asset.Type != CSReflectionTools.spriteAtlasType || asset.assetReferencesInfo.Length <= 0) return false;
+			if (asset.Type != CSReflectionTools.spriteAtlasType || asset.assetReferencesInfo.Count <= 0) return false;
 
 			var spriteAtlasHasReferencedItems = false;
 			foreach (var reference in asset.assetReferencesInfo)
@@ -646,14 +691,19 @@ namespace CodeStage.Maintainer.Cleaner
 			for (var i = emptyFolders.Count - 1; i >= 0; i--)
 			{
 				var folder = emptyFolders[i];
+				var emptyFolder = CSPathTools.GetProjectRelativePath(folder);
 				
 				if (CSFilterTools.HasEnabledFilters(ProjectSettings.Cleaner.pathIncludesFilters))
 				{
-					var emptyFolder = CSPathTools.GetProjectRelativePath(folder);
 					if (!CSFilterTools.IsValueMatchesAnyFilter(emptyFolder, ProjectSettings.Cleaner.pathIncludesFilters))
 					{
 						continue;
 					}
+				}
+				
+				if (CSFilterTools.IsValueMatchesAnyFilter(emptyFolder, ProjectSettings.Cleaner.pathIgnoresFilters))
+				{
+					continue;
 				}
 				
 				if (!CSArrayTools.IsItemContainsAnyStringFromArray(folder, emptyFoldersFiltered))
@@ -688,7 +738,8 @@ namespace CodeStage.Maintainer.Cleaner
 					break;
 				}
 
-				if (CSFilterTools.IsValueMatchesAnyFilter(folder, ProjectSettings.Cleaner.pathIgnoresFilters))
+				var folderProjectPath = CSPathTools.GetProjectRelativePath(folder);
+				if (CSFilterTools.IsValueMatchesAnyFilter(folderProjectPath, ProjectSettings.Cleaner.pathIgnoresFilters))
 				{
 					emptySubFolders = false;
 					continue;

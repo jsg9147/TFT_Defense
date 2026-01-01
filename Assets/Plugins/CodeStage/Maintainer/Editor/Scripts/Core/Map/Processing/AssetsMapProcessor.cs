@@ -9,6 +9,7 @@ namespace CodeStage.Maintainer.Core.Map.Processing
     using System;
     using UnityEngine;
     using Progress;
+    using ChangeTracking;
 
     internal class AssetsMapProcessor
     {
@@ -27,6 +28,21 @@ namespace CodeStage.Maintainer.Core.Map.Processing
         {
             try
             {
+                // Fast path: skip processing if no changes detected and map is already populated
+                // Don't skip on first-ever run (isDirty new map), when map is empty, when baseline is missing, or when change tracker index is empty
+                var hasBaseline = AssetsChangeTracker.HasBaseline();
+                var hasChanges = AssetsChangeTracker.HasChanges();
+                var pathsUnchanged = AssetsChangeTracker.PathsCountUnchanged();
+                var indexEmpty = AssetsChangeTracker.IsIndexEmpty();
+                var fastPathTaken = !map.isDirty && hasBaseline && !hasChanges && pathsUnchanged && !indexEmpty;
+                if (fastPathTaken)
+                {
+                    // Clear any accumulated changes even when fast path is taken
+                    // This ensures subsequent searches can also use the fast path
+                    AssetsChangeTracker.TakeSnapshot();
+                    return true;
+                }
+
                 if (!ProcessExistingAssets(map))
                     return false;
 
@@ -35,6 +51,8 @@ namespace CodeStage.Maintainer.Core.Map.Processing
 
                 if (!ProcessReferences(map))
                     return false;
+
+                AssetsChangeTracker.TakeSnapshot();
 
                 return true;
             }

@@ -9,6 +9,8 @@ namespace CodeStage.Maintainer.UI
 	using System.Diagnostics;
 	using System.Globalization;
 	using Core;
+	using Core.Map.Session;
+	using Core.Map.ChangeTracking;
 	using EditorCommon.Tools;
 	using Settings;
 	using Tools;
@@ -230,6 +232,22 @@ namespace CodeStage.Maintainer.UI
 				if (GUILayout.Button("Reload settings"))
 				{
 					ProjectSettings.Reload();
+				}
+				
+				GUILayout.Space(5);
+				GUILayout.Label("Session Cache & Change Tracking:");
+				
+				if (GUILayout.Button("Clear Session Map Cache"))
+				{
+					AssetsMapSessionCache.ClearSessionCache();
+					AssetsChangeTracker.ClearChanges();
+					Debug.Log(Maintainer.ConstructLog("Session cache and change tracker cleared"));
+				}
+				
+				if (GUILayout.Button("Show Change Tracker State"))
+				{
+					var info = AssetsChangeTracker.GetDiagnosticInfo();
+					Debug.Log(Maintainer.ConstructLog(info));
 				}
 			}
 		}

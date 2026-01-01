@@ -28,8 +28,8 @@ namespace CodeStage.Maintainer.Cleaner
 		[field: NonSerialized] // required to exclude backing field from BinaryFormatter serialization
 		internal Texture CachedIcon { get; set; }
 
-		internal RecordType type;
-		internal bool cleaned;
+		[SerializeField] internal RecordType type;
+		[SerializeField] internal bool cleaned;
 
 		/// <summary>
 		/// Call to try cleaning item (it will be removed according to the current settings).

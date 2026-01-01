@@ -10,6 +10,7 @@ namespace CodeStage.Maintainer.Issues
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Globalization;
+	using System.Linq;
 	using Routines;
 	using UnityEditor;
 	using Debug = UnityEngine.Debug;
@@ -52,6 +53,122 @@ namespace CodeStage.Maintainer.Issues
 			ProjectSettings.Issues.lookInProjectSettings = false;
 			
 			return StartSearch(showResults);
+		}
+		
+		/// <summary>
+		/// Starts issues search in the specified path only (file or folder).
+		/// </summary>
+		/// <param name="path">The path to scan (e.g., "Assets/MyFolder", "Assets/MyScript.cs", or "Packages/com.test.package")</param>
+		/// <param name="showResults">Shows results in the Maintainer window if true.</param>
+		/// <param name="includeSubfolders">If true, scans subfolders; if false, only scans direct children (default: true). Only applies to folder paths.</param>
+		/// <returns>Array of IssueRecords in case you wish to manually iterate over them and make custom report.</returns>
+		/// <remarks>
+		/// Changes issues search settings to scan only the specified path and calls StartSearch() after that.
+		/// Automatically detects whether the path is a file or folder and applies appropriate filtering.
+		/// For folders, includes scenes in the specified path but excludes build scenes.
+		/// All original settings are restored after the scan completes.
+		/// </remarks>
+		public static IssueRecord[] StartSearchInPath(string path, bool showResults, bool includeSubfolders = true)
+		{
+			if (string.IsNullOrEmpty(path))
+			{
+				MaintainerWindow.ShowNotification("Path cannot be empty!");
+				return null;
+			}
+			
+			return StartSearchInPaths(new[] { path }, showResults, includeSubfolders);
+		}
+		
+		/// <summary>
+		/// Starts issues search in the specified paths only (files or folders).
+		/// </summary>
+		/// <param name="paths">The paths to scan (e.g., ["Assets/MyFolder", "Assets/MyScript.cs", "Packages/com.test.package"])</param>
+		/// <param name="showResults">Shows results in the Maintainer window if true.</param>
+		/// <param name="includeSubfolders">If true, scans subfolders; if false, only scans direct children (default: true). Only applies to folder paths.</param>
+		/// <returns>Array of IssueRecords in case you wish to manually iterate over them and make custom report.</returns>
+		/// <remarks>
+		/// Changes issues search settings to scan only the specified paths and calls StartSearch() after that.
+		/// Automatically detects whether each path is a file or folder and applies appropriate filtering.
+		/// For folders, includes scenes in the specified paths but excludes build scenes.
+		/// All original settings are restored after the scan completes.
+		/// More efficient than calling StartSearchInPath multiple times as it performs a single scan operation.
+		/// </remarks>
+		public static IssueRecord[] StartSearchInPaths(string[] paths, bool showResults, bool includeSubfolders = true)
+		{
+			if (paths == null || paths.Length == 0)
+			{
+				MaintainerWindow.ShowNotification("Paths array cannot be null or empty!");
+				return null;
+			}
+			
+			// Filter out null, empty, or whitespace-only paths
+			var validPaths = paths.Where(p => !string.IsNullOrWhiteSpace(p)).Select(p => p.Trim()).ToArray();
+			if (validPaths.Length == 0)
+			{
+				MaintainerWindow.ShowNotification("No valid paths provided!");
+				return null;
+			}
+			
+			// Save original settings
+			var originalPathIncludesFilters = ProjectSettings.Issues.pathIncludesFilters;
+			var originalSceneIncludesFilters = ProjectSettings.Issues.sceneIncludesFilters;
+			var originalLookInAssets = ProjectSettings.Issues.lookInAssets;
+			var originalLookInScenes = ProjectSettings.Issues.lookInScenes;
+			var originalLookInProjectSettings = ProjectSettings.Issues.lookInProjectSettings;
+			var originalScanGameObjects = ProjectSettings.Issues.scanGameObjects;
+			var originalScenesSelection = ProjectSettings.Issues.scenesSelection;
+			var originalIncludeScenesInBuild = ProjectSettings.Issues.includeScenesInBuild;
+			
+			try
+			{
+				// Configure settings for path-specific scan
+				ProjectSettings.Issues.lookInAssets = true;
+				ProjectSettings.Issues.lookInScenes = true; // Include scenes in the specified paths
+				ProjectSettings.Issues.lookInProjectSettings = false;
+				ProjectSettings.Issues.scanGameObjects = true;
+				ProjectSettings.Issues.scenesSelection = IssuesFinderSettings.ScenesSelection.IncludedOnly; // Only scan included scenes
+				ProjectSettings.Issues.includeScenesInBuild = false; // Exclude build scenes
+				
+				// Create filters for all paths
+				var pathFilters = new List<Core.FilterItem>();
+				var sceneFilters = new List<Core.FilterItem>();
+				foreach (var path in validPaths)
+				{
+					Core.FilterItem pathFilter;
+					Core.FilterItem sceneFilter;
+					if (System.IO.Directory.Exists(path))
+					{
+						// It's a folder - use Directory filter
+						pathFilter = Core.FilterItem.Create(path, Core.FilterKind.Directory, false, !includeSubfolders);
+						sceneFilter = Core.FilterItem.Create(path, Core.FilterKind.Directory, false, !includeSubfolders);
+					}
+					else
+					{
+						// It's a file - use Path filter for exact match
+						pathFilter = Core.FilterItem.Create(path, Core.FilterKind.Path, false, true);
+						sceneFilter = Core.FilterItem.Create(path, Core.FilterKind.Path, false, true);
+					}
+					pathFilters.Add(pathFilter);
+					sceneFilters.Add(sceneFilter);
+				}
+				
+				ProjectSettings.Issues.pathIncludesFilters = pathFilters.ToArray();
+				ProjectSettings.Issues.sceneIncludesFilters = sceneFilters.ToArray();
+				
+				return StartSearch(showResults);
+			}
+			finally
+			{
+				// Restore original settings
+				ProjectSettings.Issues.pathIncludesFilters = originalPathIncludesFilters;
+				ProjectSettings.Issues.sceneIncludesFilters = originalSceneIncludesFilters;
+				ProjectSettings.Issues.lookInAssets = originalLookInAssets;
+				ProjectSettings.Issues.lookInScenes = originalLookInScenes;
+				ProjectSettings.Issues.lookInProjectSettings = originalLookInProjectSettings;
+				ProjectSettings.Issues.scanGameObjects = originalScanGameObjects;
+				ProjectSettings.Issues.scenesSelection = originalScenesSelection;
+				ProjectSettings.Issues.includeScenesInBuild = originalIncludeScenesInBuild;
+			}
 		}
 		
 		/// <summary>
@@ -174,7 +291,10 @@ namespace CodeStage.Maintainer.Issues
 
 			if (recordsToFixCount == 0)
 			{
-				EditorUtility.DisplayDialog(ModuleName, "Please select issues to fix!", "Ok");
+				if (!Maintainer.SuppressDialogs)
+				{
+					EditorUtility.DisplayDialog(ModuleName, "Please select issues to fix!", "Ok");
+				}
 				return null;
 			}
 
@@ -184,11 +304,24 @@ namespace CodeStage.Maintainer.Issues
 				return null;
 			}
 
-			if (showConfirmation && !EditorUtility.DisplayDialog("Confirmation",
-					"Do you really wish to let Maintainer automatically fix " + recordsToFixCount + " issues?\n" +
-					Maintainer.DataLossWarning, "Go for it!", "Cancel"))
+			if (showConfirmation)
 			{
-				return null;
+				var shouldProceed = false;
+				if (Maintainer.SuppressDialogs)
+				{
+					shouldProceed = true;
+				}
+				else if (EditorUtility.DisplayDialog("Confirmation",
+						"Do you really wish to let Maintainer automatically fix " + recordsToFixCount + " issues?\n" +
+						Maintainer.DataLossWarning, "Go for it!", "Cancel"))
+				{
+					shouldProceed = true;
+				}
+
+				if (!shouldProceed)
+				{
+					return null;
+				}
 			}
 
 			try
@@ -281,15 +414,5 @@ namespace CodeStage.Maintainer.Issues
 			CSEditorTools.lastRevealSceneOpenResult = null;
 			operationCanceled = false;
 		}
-
-		#region fixer
-
-		/////////////////////////////////////////////////////////////////////////
-		// fixer
-		/////////////////////////////////////////////////////////////////////////
-
-
-
-		#endregion
 	}
 }

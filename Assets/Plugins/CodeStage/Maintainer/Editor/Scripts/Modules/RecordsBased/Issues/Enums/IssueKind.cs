@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // -------------------------------------------------------
 // Copyright (C) Dmitry Yuhanov [https://codestage.net]
 // -------------------------------------------------------
@@ -28,6 +28,7 @@ namespace CodeStage.Maintainer.Issues
 		/* project settings issues */
 
 		DuplicateLayers = 3010,
+		DeletedBuildScene = 3020,
 		Error = 5000,
 		Other = 100000
 	}

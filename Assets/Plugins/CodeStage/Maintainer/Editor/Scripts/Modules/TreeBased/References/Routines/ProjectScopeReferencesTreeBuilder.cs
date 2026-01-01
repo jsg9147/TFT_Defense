@@ -42,7 +42,7 @@ namespace CodeStage.Maintainer.References.Routines
 				assetSizeFormatted = CSEditorTools.FormatBytes(referencedAsset.Size),
 				assetIsTexture = assetType != null && (assetType.BaseType == CSReflectionTools.textureType),
 				assetSettingsKind = referencedAsset.SettingsKind,
-				isReferenced = referencedAsset.referencedAtInfoList != null && referencedAsset.referencedAtInfoList.Length > 0,
+				isReferenced = referencedAsset.referencedAtInfoList != null && referencedAsset.referencedAtInfoList.Count > 0,
 				depth = depth
 			};
 			results.Add(element);
@@ -56,7 +56,7 @@ namespace CodeStage.Maintainer.References.Routines
 				return element;
 			}
 
-			if (referencedAsset.referencedAtInfoList != null && referencedAsset.referencedAtInfoList.Length > 0)
+			if (referencedAsset.referencedAtInfoList != null && referencedAsset.referencedAtInfoList.Count > 0)
 			{
 				foreach (var referencedAtInfo in referencedAsset.referencedAtInfoList)
 				{
@@ -121,7 +121,7 @@ namespace CodeStage.Maintainer.References.Routines
 		private static bool AssetIsFilteredOut(AssetInfo referencedAsset, int depth)
 		{
 			if (UserSettings.References.showAssetsWithoutReferences || depth != 0) return false;
-			if (referencedAsset.referencedAtInfoList.Length == 0) return true;
+			if (referencedAsset.referencedAtInfoList == null || referencedAsset.referencedAtInfoList.Count == 0) return true;
 
 			var allIgnored = true;
 			foreach (var referencedAtInfo in referencedAsset.referencedAtInfoList)

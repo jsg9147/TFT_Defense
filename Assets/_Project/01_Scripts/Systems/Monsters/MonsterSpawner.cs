@@ -1,39 +1,39 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
 {
-    [Header("¿şÀÌºê ¼³Á¤")]
+    [Header("ì›¨ì´ë¸Œ ì„¤ì •")]
     [SerializeField] private WaveSet waveSet;
-    [SerializeField] private Transform[] spawnPoints; // pathId¿Í ¸ÅÄª
+    [SerializeField] private Transform[] spawnPoints; // pathIdì™€ ë§¤ì¹­ 
 
-    [Header("Ç®¸µ")]
-    [SerializeField] private Monster prefab;   // ±âº» ÇÁ¸®ÆÕ (µ¥¸ğ¿ë)
+    [Header("í’€ë§")]
+    [SerializeField] private Monster prefab;   // ê¸°ë³¸ í”„ë¦¬íŒ¹ (ë°ëª¨ìš©)
     [SerializeField] private Transform poolParent;
     private MonsterPool pool;
 
     private IMonsterFieldService field;
 
-    // »óÅÂ
+    // ìƒíƒœ
     private Coroutine spawnCo;
     private readonly List<Monster> aliveMonsters = new();
-    private int plannedThisWave;   // ÀÌ¹ø ¿şÀÌºê¿¡ ½ºÆù ¿¹Á¤ ÃÑÇÕ
-    private int spawnedThisWave;   // ½ÇÁ¦ ½ºÆùµÈ ¼ö
+    private int plannedThisWave;   // ì´ë²ˆ ì›¨ì´ë¸Œì— ìŠ¤í° ì˜ˆì • ì´í•©
+    private int spawnedThisWave;   // ì‹¤ì œ ìŠ¤í°ëœ ìˆ˜
 
     public int AliveCount => aliveMonsters.Count;
     public bool AllPlannedSpawned => spawnedThisWave >= plannedThisWave;
 
     private void Start()
     {
-        pool = new MonsterPool(prefab, 32, poolParent); // ÃÊ±âÄ¡ ÀÓÀÇ
+        pool = new MonsterPool(prefab, 32, poolParent); // ì´ˆê¸°ì¹˜ ì„ì˜
         field = MonsterFieldManager.Instance;
     }
 
     public bool IsLastWave(int waveIndex)
         => waveSet != null && waveSet.waves != null && waveIndex >= waveSet.waves.Length - 1;
 
-    /// <summary>¿şÀÌºê ½ÃÀÛ</summary>
+    /// <summary>ì›¨ì´ë¸Œ ì‹œì‘</summary>
     public void StartWave(int waveIndex)
     {
         StopSpawning();
@@ -43,10 +43,10 @@ public class MonsterSpawner : MonoBehaviour
         plannedThisWave = CountPlanned(waveIndex);
 
         spawnCo = StartCoroutine(CoSpawnWave(waveIndex));
-        Debug.Log($"[Spawner] ¿şÀÌºê {waveIndex} ½ÃÀÛ | planned={plannedThisWave}");
+        Debug.Log($"[Spawner] ì›¨ì´ë¸Œ {waveIndex} ì‹œì‘ | planned={plannedThisWave}");
     }
 
-    /// <summary>¿şÀÌºê Áß´Ü(Ãß°¡ ½ºÆù¸¸ Áß´Ü, ÀÌ¹Ì ³ª¿Â ¸ó½ºÅÍ´Â °ÔÀÓ¸Å´ÏÀú ±ÔÄ¢¿¡ µû¸§)</summary>
+    /// <summary>ì›¨ì´ë¸Œ ì¤‘ë‹¨(ì¶”ê°€ ìŠ¤í°ë§Œ ì¤‘ë‹¨, ì´ë¯¸ ë‚˜ì˜¨ ëª¬ìŠ¤í„°ëŠ” ê²Œì„ë§¤ë‹ˆì € ê·œì¹™ì— ë”°ë¦„)</summary>
     public void StopSpawning()
     {
         if (spawnCo != null)
@@ -56,7 +56,7 @@ public class MonsterSpawner : MonoBehaviour
         }
     }
 
-    /// <summary>ÀÌ¹ø ¿şÀÌºê¿¡ °èÈ¹µÈ ¸ó½ºÅÍ ¼ö ÇÕ°è</summary>
+    /// <summary>ì´ë²ˆ ì›¨ì´ë¸Œì— ê³„íšëœ ëª¬ìŠ¤í„° ìˆ˜ í•©ê³„</summary>
     private int CountPlanned(int waveIndex)
     {
         if (waveSet == null || waveSet.waves == null) return 0;
@@ -79,7 +79,7 @@ public class MonsterSpawner : MonoBehaviour
         {
             for (int i = 0; i < g.count; i++)
             {
-                // ÇÊµå ÇÑµµ Ã¼Å©: ³ÑÄ¡¸é Àá±ñ ´ë±â
+                // í•„ë“œ í•œë„ ì²´í¬: ë„˜ì¹˜ë©´ ì ê¹ ëŒ€ê¸°
                 while (field != null && field.CurrentCount >= field.FieldLimit)
                     yield return null;
 
@@ -89,12 +89,12 @@ public class MonsterSpawner : MonoBehaviour
                 if (g.spawnInterval > 0f)
                     yield return new WaitForSeconds(g.spawnInterval);
                 else
-                    yield return null; // ÇÑ ÇÁ·¹ÀÓ ÅÒ
+                    yield return null; // í•œ í”„ë ˆì„ í…€
             }
         }
 
-        // ¸ğµç °èÈ¹ ½ºÆù ¿Ï·á
-        Debug.Log($"[Spawner] ¿şÀÌºê {waveIndex} °èÈ¹ ½ºÆù ¿Ï·á (spawned={spawnedThisWave}/{plannedThisWave})");
+        // ëª¨ë“  ê³„íš ìŠ¤í° ì™„ë£Œ
+        Debug.Log($"[Spawner] ì›¨ì´ë¸Œ {waveIndex} ê³„íš ìŠ¤í° ì™„ë£Œ (spawned={spawnedThisWave}/{plannedThisWave})");
         spawnCo = null;
     }
 
@@ -105,7 +105,7 @@ public class MonsterSpawner : MonoBehaviour
         m.data = data;
         m.Init();
 
-        // µî·Ï + »ıÁ¸ ¸®½ºÆ®
+        // ë“±ë¡ + ìƒì¡´ ë¦¬ìŠ¤íŠ¸
         field?.Register(m);
         m.OnMonsterDie += OnMonsterDie;
         aliveMonsters.Add(m);
@@ -116,13 +116,13 @@ public class MonsterSpawner : MonoBehaviour
         m.OnMonsterDie -= OnMonsterDie;
         CurrencyManager.Instance.AddGold(m.data.goldReward);
 
-        // ÇÊµå ÇØÁ¦
+        // í•„ë“œ í•´ì œ
         field?.Unregister(m);
 
-        // »ıÁ¸ ¸®½ºÆ®¿¡¼­ Á¦°Å
+        // ìƒì¡´ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì œê±°
         aliveMonsters.Remove(m);
 
-        // Ç® ¹İ³³
+        // í’€ ë°˜ë‚©
         pool.Return(m);
     }
 

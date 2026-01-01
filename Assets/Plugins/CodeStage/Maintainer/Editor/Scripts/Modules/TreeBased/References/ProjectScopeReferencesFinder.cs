@@ -152,7 +152,12 @@ namespace CodeStage.Maintainer.References
 
 		public static string[] GetSelectedAssets()
 		{
-			var selectedIDs = Selection.instanceIDs;
+			var selectedIDs = 
+#if UNITY_6000_3_OR_NEWER
+				Array.ConvertAll(Selection.entityIds, id => (int)id);
+#else
+				Selection.instanceIDs;
+#endif
 			return GetAssetsFromInstances(selectedIDs);
 		}
 
@@ -162,8 +167,14 @@ namespace CodeStage.Maintainer.References
 
 			foreach (var id in instanceIDs)
 			{
+#if UNITY_6000_3_OR_NEWER
+				var entityId = (EntityId)id;
+				if (AssetDatabase.IsSubAsset(entityId)) continue;
+				var path = AssetDatabase.GetAssetPath(entityId);
+#else
 				if (AssetDatabase.IsSubAsset(id)) continue;
 				var path = AssetDatabase.GetAssetPath(id);
+#endif
 				path = CSPathTools.EnforceSlashes(path);
 				if (!File.Exists(path) && !Directory.Exists(path)) continue;
 				paths.Add(path);

@@ -31,11 +31,13 @@ namespace CodeStage.Maintainer.UI
 						GUILayout.Space(6);
 						if (GUILayout.Button(CSEditorIcons.Help, UIHelpers.BuiltinIconButtonStyle))
 						{
-							// TODO: update
-							EditorUtility.DisplayDialog(ReferencesFinder.ModuleName + " scopes help",
-								"Use " + projectTab.Caption.text + " scope to figure out where any specific asset is referenced in whole project.\n\n" +
-								"Use " + hierarchyTab.Caption.text + " scope to figure out where any specific Game Object or component is referenced in active scene or opened prefab.",
-								"OK");
+							if (!Maintainer.SuppressDialogs)
+							{
+								EditorUtility.DisplayDialog(ReferencesFinder.ModuleName + " scopes help",
+									"Use " + projectTab.Caption.text + " scope to figure out where any specific asset is referenced in whole project.\n\n" +
+									"Use " + hierarchyTab.Caption.text + " scope to figure out where any specific Game Object or component is referenced in active scene or opened prefab.",
+									"OK");
+							}
 						}
 					}
 				}

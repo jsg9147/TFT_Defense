@@ -2,17 +2,17 @@ using UnityEngine;
 
 public class PlayerLevelManager : MonoSingleton<PlayerLevelManager>
 {
-    [Header("·¹º§ UI")]
+    [Header("ë ˆë²¨ì—… UI")]
     [SerializeField] private LevelUpUI levelUpUI;
 
-    [Header("·¹º§ / °æÇèÄ¡")]
+    [Header("ë ˆë²¨ / ê²½í—˜ì¹˜")]
     [SerializeField] private int level = 1;
     [SerializeField] private int currentExp = 0;
 
-    [Tooltip("°¢ ·¹º§¾÷¿¡ ÇÊ¿äÇÑ °æÇèÄ¡ (ÇØ´ç ·¹º§¡æ´ÙÀ½ ·¹º§±îÁö ÇÊ¿ä °æÇèÄ¡)")]
+    [Tooltip("ê° ë ˆë²¨ì—…ì— í•„ìš”í•œ ê²½í—˜ì¹˜ (í•´ë‹¹ ë ˆë²¨ë¡œ ì˜¬ë¼ê°€ê¸° ìœ„í•´ í•„ìš”í•œ ì´ ê²½í—˜ì¹˜)")]
     public int[] expThresholds;
-    // ¿¹: [4, 6, 10] => 
-    // 1¡æ2:4, 2¡æ3:6, 3¡æ4:10
+    // ì˜ˆ: [4, 6, 10] => 
+    // 1â†’2:4, 2â†’3:6, 3â†’4:10
 
     public int Level => level;
     public int CurrentExp => currentExp;
@@ -26,23 +26,23 @@ public class PlayerLevelManager : MonoSingleton<PlayerLevelManager>
         levelUpUI.UpdateExperience(GetExpInLevel(), GetExpForCurrentLevel());
     }
 
-    /// <summary> °æÇèÄ¡ Ãß°¡ </summary>
+    /// <summary> ê²½í—˜ì¹˜ ì¶”ê°€ </summary>
     public void AddExp(int amount)
     {
         currentExp += amount;
-        Debug.Log($"°æÇèÄ¡ {amount} Ãß°¡ ¡æ ÇöÀç ´©Àû {currentExp}");
+        Debug.Log($"ê²½í—˜ì¹˜ {amount} ì¶”ê°€ í›„ í˜„ì¬ ì´ ê²½í—˜ì¹˜ {currentExp}");
 
         CheckLevelUp();
     }
 
-    /// <summary> ÇöÀç ·¹º§¿¡¼­ ´ÙÀ½ ·¹º§±îÁö ÇÊ¿äÇÑ °æÇèÄ¡ </summary>
+    /// <summary> í˜„ì¬ ë ˆë²¨ì—ì„œ ë‹¤ìŒ ë ˆë²¨ë¡œ ì˜¬ë¼ê°€ê¸° ìœ„í•´ í•„ìš”í•œ ê²½í—˜ì¹˜ </summary>
     private int GetExpForCurrentLevel()
     {
-        if (level > expThresholds.Length) return 0; // ÃÖ´ë ·¹º§ÀÌ¸é 0
+        if (level > expThresholds.Length) return 0; // ìµœëŒ€ ë ˆë²¨ì´ë©´ 0
         return expThresholds[level - 1];
     }
 
-    /// <summary> ÇöÀç ·¹º§ ±¸°£¿¡¼­ È¹µæÇÑ °æÇèÄ¡ </summary>
+    /// <summary> í˜„ì¬ ë ˆë²¨ì—ì„œ íšë“í•œ ê²½í—˜ì¹˜ (í˜„ì¬ ë ˆë²¨ ë‚´ì—ì„œì˜ ê²½í—˜ì¹˜) </summary>
     private int GetExpInLevel()
     {
         int prevSum = 0;
@@ -52,13 +52,13 @@ public class PlayerLevelManager : MonoSingleton<PlayerLevelManager>
         return currentExp - prevSum;
     }
 
-    /// <summary> ·¹º§¾÷ Ã¼Å© </summary>
+    /// <summary> ë ˆë²¨ì—… ì²´í¬ </summary>
     private void CheckLevelUp()
     {
         while (level <= expThresholds.Length && GetExpInLevel() >= GetExpForCurrentLevel())
         {
             level++;
-            Debug.Log($"ÇÃ·¹ÀÌ¾î ·¹º§¾÷! ÇöÀç ·¹º§ {level}");
+            Debug.Log($"í”Œë ˆì´ì–´ ë ˆë²¨ì—…! í˜„ì¬ ë ˆë²¨ {level}");
             OnLevelUp?.Invoke(level);
         }
 
@@ -66,12 +66,24 @@ public class PlayerLevelManager : MonoSingleton<PlayerLevelManager>
         levelUpUI.UpdateExperience(GetExpInLevel(), GetExpForCurrentLevel());
     }
 
-    /// <summary> ÇöÀç ·¹º§¿¡¼­ÀÇ °æÇèÄ¡ ºñÀ² (UI¿ë) </summary>
+    /// <summary> í˜„ì¬ ë ˆë²¨ì—ì„œì˜ ê²½í—˜ì¹˜ ë¹„ìœ¨ (UIìš©) </summary>
     public float GetExpRatio()
     {
         int maxExp = GetExpForCurrentLevel();
-        if (maxExp <= 0) return 1f; // ÃÖ´ë ·¹º§
+        if (maxExp <= 0) return 1f; // ìµœëŒ€ ë ˆë²¨
 
         return Mathf.Clamp01((float)GetExpInLevel() / maxExp);
+    }
+
+    /// <summary>ê²Œì„ ì¬ì‹œì‘ ì‹œ ì´ˆê¸°í™”</summary>
+    public void Reset()
+    {
+        level = 1;
+        currentExp = 0;
+        if (levelUpUI != null)
+        {
+            levelUpUI.UpdateLevel(level);
+            levelUpUI.UpdateExperience(GetExpInLevel(), GetExpForCurrentLevel());
+        }
     }
 }

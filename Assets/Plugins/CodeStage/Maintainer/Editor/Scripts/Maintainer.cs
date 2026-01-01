@@ -19,12 +19,18 @@ namespace CodeStage.Maintainer
 		/// <summary>
 		/// Current version in X.Y.Z format (using Semantic Versioning 2.0 scheme).
 		/// </summary>
-		public const string Version = "2.0.0";
+		public const string Version = "2.2.0";
 
 		internal const string LogPrefix = "<b>[Maintainer]</b> ";
 		internal const string HomePage = "https://codestage.net/uas/maintainer";
 		internal const string SupportContact = "https://codestage.net/contacts";
 		internal const string DataLossWarning = "Make sure you've made a backup of your project before proceeding.\nAuthor is not responsible for any data loss due to use of the Maintainer!";
+
+		/// <summary>
+		/// When set to true, suppresses all user dialogs across all Maintainer modules (useful for automated tests).
+		/// Progress bars are not affected by this setting.
+		/// </summary>
+		internal static bool SuppressDialogs { get; set; }
 
 		private static string directory;
 

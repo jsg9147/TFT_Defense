@@ -1,7 +1,9 @@
-# Changelog  
+# Changelog
+
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-#### Types of changes  
+#### Types of changes
+
 - **Added** for new features.
 - **Changed** for changes in existing functionality.
 - **Deprecated** for soon-to-be removed features.
@@ -11,9 +13,58 @@ Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.
 
 _Please, always remove previous plugin version before updating!_
 
+## [2.2.0] - 2025-12-30 🎅 HO-HO-HO 🎄
+
+### Added
+
+- Issues Finder: detect deleted scenes referenced in Build Settings
+
+### Changed
+
+- Add progress bar support to SaveIntArray and LoadIntArray methods
+- Reduce memory usage in some scenarios
+- Improve exception handling in assets map serialization
+
+### Fixed
+
+- Fix UI briefly breaks when clicking Reveal button in any module
+- Prevent NullReferenceException when checking asset references list
+- Add type compatibility validation before deserialization to prevent silent data loss
+- Batch GUID cache invalidation to improve performance when processing many assets
+- Fix UI lists breaking with errors after code recompilation
+- Fix script icon references not detected in Unity 6
+- Fix revealing in prefabs with UI didn't work correctly in some edge cases
+
+## [2.1.1] - 2025-12-05
+
+### Changed
+
+- Improve Unity 6.3 compatibility
+
+## [2.1.0] - 2025-12-04
+
+### Added
+
+- Issues Finder:
+  - Add `StartSearchInPath()` API for scanning specific files or folders
+  - Add `StartSearchInPaths()` API for scanning multiple files/folders efficiently
+  - Add **🐛 Find Issues** context menu item for project assets and folders
+
+### Changed
+
+- Implement incremental Asset Map caching, making repeated Maintainer scans ~90% faster on average (up to 95% faster).
+- References Finder: apply sorting to nested items when expanding assets
+
+## [2.0.1] - 2025-10-10
+
+### Fixed
+
+- Fix Issues Finder now properly scans embedded packages
+
 ## [2.0.0] - 2025-08-22
 
 ### Added
+
 - Issues Finder: 
   - Add extension API allowing custom issues detection, see docs for details 
   - Add **Invalid Sorting Layer** issue detection 
@@ -25,6 +76,7 @@ _Please, always remove previous plugin version before updating!_
 - UX: Add collapse / expand left panel feature
 
 ### Changed
+
 - Improve Assets Map creation performance dramatically (one phase got 400x speedup with 40% mem usage reduction)
 - Improve Assets Map update performance
 - Improve Unity 6 / 6.1 / 6.2 compatibility
@@ -33,9 +85,11 @@ _Please, always remove previous plugin version before updating!_
 - Skip hidden components when revealing a reference
 
 ### Removed
+
 - Remove legacy .NET 3.5 support
 
 ### Fixed
+
 - Fix Inspector might not show up while navigating results in some scenarios
 - Fix Discord icons might not show up in some scenarios
 - Fix deleted prefab / scene reveal might break UI (thx Paul Dyatlov)

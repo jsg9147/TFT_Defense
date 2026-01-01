@@ -25,13 +25,23 @@ namespace CodeStage.Maintainer.Tools
 		public static bool RevealAndSelectFileAsset(string assetPath)
 		{
 			var instanceId = CSAssetTools.GetMainAssetInstanceID(assetPath);
-			if (AssetDatabase.Contains(instanceId))
+			if (
+#if UNITY_6000_3_OR_NEWER
+				AssetDatabase.Contains((EntityId)instanceId)
+#else
+				AssetDatabase.Contains(instanceId)
+#endif
+				)
 			{
 				Selection.activeObject = null;
 				EditorApplication.delayCall += () =>
 				{
 					CSEditorTools.GetInspectorWindow();
+#if UNITY_6000_3_OR_NEWER
+					Selection.activeEntityId = (EntityId)instanceId;
+#else
 					Selection.activeInstanceID = instanceId;
+#endif
 				};
 				
 				return true;
@@ -55,7 +65,11 @@ namespace CodeStage.Maintainer.Tools
 				if (assetId != objectId) continue;
 
 				CSEditorTools.GetInspectorWindow();
+#if UNITY_6000_3_OR_NEWER
+				Selection.activeEntityId = (EntityId)targetAsset.GetInstanceID();
+#else
 				Selection.activeInstanceID = targetAsset.GetInstanceID();
+#endif
 				return true;
 			}
 
@@ -324,15 +338,13 @@ namespace CodeStage.Maintainer.Tools
 
 		private static bool RevealAndSelectGameObjectInPrefab(string path, string transformPath, long objectId, long componentId)
 		{
-			/*Debug.Log("LOOKING FOR objectId " + objectId);
-			Debug.Log("path " + path);*/
-
 			bool prefabStageOpened;
 			var prefabRoot = CSPrefabTools.OpenPrefabAndReturnRoot(path, out prefabStageOpened);
 			if (prefabRoot == null)
 				return false;
-			
-			var target = CSObjectTools.FindChildGameObjectRecursive(prefabRoot.transform, objectId, prefabRoot.transform.name, transformPath);
+
+			var rootPath = prefabRoot.transform.name; // assuming root path is the same as the prefab root name
+			var target = CSObjectTools.FindChildGameObjectRecursive(prefabRoot.transform, objectId, rootPath, transformPath);
 
 			EditorApplication.delayCall += () =>
 			{

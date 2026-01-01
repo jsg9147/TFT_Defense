@@ -18,7 +18,7 @@ namespace CodeStage.Maintainer.Tools
 	using UnityEngine.Rendering;
 	using Object = UnityEngine.Object;
 
-	internal static class CSReflectionTools
+	public static class CSReflectionTools
 	{
 		private static readonly Type EditorWindowType = typeof(EditorWindow);
 		

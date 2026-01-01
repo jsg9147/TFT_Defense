@@ -52,7 +52,10 @@ namespace CodeStage.Maintainer.UI.Filters
 
 			if (!found)
 			{
-				EditorUtility.DisplayDialog("Can't find specified Component", "Specified component " + newItem + " wasn't found in usual places. Make sure you've entered valid name.", "Cool, thanks!");
+				if (!Maintainer.SuppressDialogs)
+				{
+					EditorUtility.DisplayDialog("Can't find specified Component", "Specified component " + newItem + " wasn't found in usual places. Make sure you've entered valid name.", "Cool, thanks!");
+				}
 			}
 
 			return found;

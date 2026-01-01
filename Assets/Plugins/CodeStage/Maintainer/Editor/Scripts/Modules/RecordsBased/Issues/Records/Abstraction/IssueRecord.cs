@@ -10,6 +10,7 @@ namespace CodeStage.Maintainer.Issues
 	using System.Text;
 	using Core.Scan;
 	using Detectors;
+	using UnityEngine;
 
 	/// <summary>
 	/// Result of the issue fix operation.
@@ -20,11 +21,13 @@ namespace CodeStage.Maintainer.Issues
 		/// <summary>
 		/// Returns true if fix was successful and confirmed, false otherwise.
 		/// </summary>
+		[field: SerializeField]
 		public bool Success { get; private set; }
 
 		/// <summary>
 		/// Contains error text in case fix was not successful. May be empty if fail cause is not known.
 		/// </summary>
+		[field: SerializeField]
 		public string ErrorText { get; private set; }
 
 		internal FixResult(bool success, string errorText = null)
@@ -53,15 +56,19 @@ namespace CodeStage.Maintainer.Issues
 		/// <summary>
 		/// Describes found issue's kind.
 		/// </summary>
+		[field: SerializeField]
 		public IssueKind Kind { get; private set; }
 
 		/// <summary>
 		/// Describes found issue's severity.
 		/// </summary>
+		[field: SerializeField]
 		public IssueSeverity Severity { get; private set; }
-		
+
+		[field: SerializeField]
 		internal string Header { get; set; }
 		
+		[SerializeField]
 		internal FixResult fixResult;
 
 		/// <summary>

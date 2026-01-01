@@ -261,9 +261,6 @@ namespace CodeStage.Maintainer.Tools
 			var so = new SerializedObject(traverseInfo.TraverseTarget);
 			var iterator = so.GetIterator();
 			
-			if (traverseInfo.TraverseTarget.name.Contains("IAPSettings"))
-				Debug.Log("IAPSettings");
-
 #if UNITY_2021_2_OR_NEWER
 			ManagedDuplicatesDetector managedDuplicates = null;
 #endif

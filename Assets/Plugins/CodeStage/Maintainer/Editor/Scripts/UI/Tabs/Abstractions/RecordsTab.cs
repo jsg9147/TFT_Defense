@@ -77,7 +77,6 @@ namespace CodeStage.Maintainer.UI
 					gotoRecord?.Show();
 					gotoRecord = null;
 				};
-				GUIUtility.ExitGUI();
 			}
 		}
 

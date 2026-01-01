@@ -25,19 +25,45 @@ namespace CodeStage.Maintainer.Cleaner
 	public class AssetRecord : CleanerRecord, IShowableRecord
 	{
 		/// <summary>
-		/// Asset path.
+		/// Project-relative asset path (e.g., "Assets/..." or "Packages/...").
 		/// </summary>
 		public string AssetPath
 		{
-			get { return path; }
+			get { return assetDatabasePath; }
 		}
 
-		internal string path;
-		internal long size; // in bytes
-		internal string beautyPath;
-		internal string assetDatabasePath;
-		internal Type assetType;
-		internal bool isTexture;
+		[SerializeField] internal string path;
+		[SerializeField] internal long size; // in bytes
+		[SerializeField] internal string beautyPath;
+		[SerializeField] internal string assetDatabasePath;
+		[SerializeField] internal string assetTypeName;
+		[SerializeField] internal bool isTexture;
+
+		[NonSerialized] private Type cachedAssetType;
+		[NonSerialized] private bool assetTypeResolved;
+
+		internal Type assetType
+		{
+			get
+			{
+				if (!assetTypeResolved)
+				{
+					assetTypeResolved = true;
+					if (!string.IsNullOrEmpty(assetTypeName))
+					{
+						try
+						{
+							cachedAssetType = System.Type.GetType(assetTypeName, false);
+						}
+						catch (Exception)
+						{
+							cachedAssetType = null;
+						}
+					}
+				}
+				return cachedAssetType;
+			}
+		}
 
 		void IShowableRecord.Show()
 		{
@@ -100,11 +126,17 @@ namespace CodeStage.Maintainer.Cleaner
 
 			assetDatabasePath = CSPathTools.GetProjectRelativePath(path);
 			beautyPath = CSPathTools.NicifyAssetPath(assetDatabasePath);
-			assetType = assetInfo.Type;
 
-			if (assetType != null && assetType.BaseType == CSReflectionTools.textureType)
+			if (assetInfo.Type != null)
 			{
-				isTexture = true;
+				assetTypeName = assetInfo.Type.AssemblyQualifiedName;
+				cachedAssetType = assetInfo.Type;
+				assetTypeResolved = true;
+
+				if (assetInfo.Type.BaseType == CSReflectionTools.textureType)
+				{
+					isTexture = true;
+				}
 			}
 
 			if (type == RecordType.UnreferencedAsset)

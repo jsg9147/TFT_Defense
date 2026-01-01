@@ -10,6 +10,7 @@ namespace CodeStage.Maintainer.Core.Dependencies
 	using System.Collections.Generic;
 	using Tools;
 	using UnityEditor;
+	using UnityEngine;
 
 	// ReSharper disable once UnusedType.Global since it's used from TypeCache
 	internal class SettingsParser : DependenciesParser
@@ -59,7 +60,11 @@ namespace CodeStage.Maintainer.Core.Dependencies
 						var instanceId = sp.objectReferenceInstanceIDValue;
 						if (instanceId != 0)
 						{
+#if UNITY_6000_3_OR_NEWER
+							var referencePath = CSPathTools.EnforceSlashes(AssetDatabase.GetAssetPath((EntityId)instanceId));
+#else
 							var referencePath = CSPathTools.EnforceSlashes(AssetDatabase.GetAssetPath(instanceId));
+#endif
 							if (!string.IsNullOrEmpty(referencePath) && referencePath.StartsWith("Assets"))
 							{
 								var guid = AssetDatabase.AssetPathToGUID(referencePath);

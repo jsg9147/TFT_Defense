@@ -61,12 +61,15 @@ namespace CodeStage.Maintainer.Core
 		[field:NonSerialized]
 		public bool IsUntitledScene { get; private set; }
 
-		internal string[] dependenciesGUIDs = Array.Empty<string>();
-		internal AssetReferenceInfo[] assetReferencesInfo = Array.Empty<AssetReferenceInfo>();
-		internal ReferencedAtAssetInfo[] referencedAtInfoList = Array.Empty<ReferencedAtAssetInfo>();
+		internal List<string> dependenciesGUIDs = new List<string>();
+		internal List<AssetReferenceInfo> assetReferencesInfo = new List<AssetReferenceInfo>();
+		internal List<ReferencedAtAssetInfo> referencedAtInfoList = new List<ReferencedAtAssetInfo>();
 
-		private int lastHash;
 		internal bool needToRebuildReferences = true;
+
+		[OptionalField] private string lastDependenciesHashSerialized;
+		[NonSerialized] private Hash128 lastDependenciesHash;
+		[NonSerialized] private bool lastDependenciesHashInitialized;
 
 		[NonSerialized] private int[] allAssetObjects;
 
@@ -104,6 +107,30 @@ namespace CodeStage.Maintainer.Core
 			};
 		}
 
+		internal static AssetInfo CreateForDeserialization(string guid, string path, AssetOrigin origin, 
+			AssetSettingsKind settingsKind, Type type)
+		{
+			return new AssetInfo
+			{
+				GUID = guid,
+				Path = path,
+				Origin = origin,
+				SettingsKind = settingsKind,
+				Type = type
+			};
+		}
+
+		internal string GetLastDependenciesHashSerializedForStorage()
+		{
+			return lastDependenciesHashSerialized;
+		}
+
+		internal void SetLastDependenciesHashSerializedForStorage(string value)
+		{
+			lastDependenciesHashSerialized = value;
+			lastDependenciesHashInitialized = false;
+		}
+
 		private AssetInfo() { }
 
 		internal bool Exists(bool actualizePath = true)
@@ -132,12 +159,14 @@ namespace CodeStage.Maintainer.Core
 				return false;
 			}
 
-			var currentHash = AssetDatabase.GetAssetDependencyHash(Path).GetHashCode();
-			if (lastHash == currentHash)
+			var currentHash = AssetDatabase.GetAssetDependencyHash(Path);
+			var storedHash = GetStoredDependenciesHash();
+			var hashesMatch = currentHash == storedHash;
+			if (hashesMatch)
 			{
 				var dirty = false;
 
-				for (var i = dependenciesGUIDs.Length - 1; i > -1; i--)
+				for (var i = dependenciesGUIDs.Count - 1; i > -1; i--)
 				{
 					var guid = dependenciesGUIDs[i];
 					var path = AssetDatabase.GUIDToAssetPath(guid);
@@ -147,13 +176,15 @@ namespace CodeStage.Maintainer.Core
 
 					dirty = true;
 
-					ArrayUtility.RemoveAt(ref dependenciesGUIDs, i);
-					foreach (var referenceInfo in assetReferencesInfo)
+					dependenciesGUIDs.RemoveAt(i);
+
+					for (var referenceIndex = assetReferencesInfo.Count - 1; referenceIndex >= 0; referenceIndex--)
 					{
+						var referenceInfo = assetReferencesInfo[referenceIndex];
 						if (referenceInfo.assetInfo.GUID != guid) 
 							continue;
 
-						ArrayUtility.Remove(ref assetReferencesInfo, referenceInfo);
+						assetReferencesInfo.RemoveAt(referenceIndex);
 						break;
 					}
 				}
@@ -167,20 +198,24 @@ namespace CodeStage.Maintainer.Core
 
 			foreach (var referenceInfo in assetReferencesInfo)
 			{
-				foreach (var info in referenceInfo.assetInfo.referencedAtInfoList)
+				var referencedAtList = referenceInfo.assetInfo.referencedAtInfoList;
+				for (var i = referencedAtList.Count - 1; i >= 0; i--)
 				{
-					if (!info.assetInfo.Equals(this)) continue;
+					var info = referencedAtList[i];
+					if (!info.assetInfo.Equals(this)) 
+						continue;
 
-					ArrayUtility.Remove(ref referenceInfo.assetInfo.referencedAtInfoList, info);
+					referencedAtList.RemoveAt(i);
 					break;
 				}
 			}
 			
-			lastHash = currentHash;
+			SetStoredDependenciesHash(currentHash);
 			needToRebuildReferences = true;
 
-			assetReferencesInfo = Array.Empty<AssetReferenceInfo>();
-			dependenciesGUIDs = AssetDependenciesSearcher.FindDependencies(this);
+			assetReferencesInfo.Clear();
+			dependenciesGUIDs.Clear();
+			dependenciesGUIDs.AddRange(AssetDependenciesSearcher.FindDependencies(this));
 			
 			return true;
 		}
@@ -188,41 +223,52 @@ namespace CodeStage.Maintainer.Core
 		internal List<AssetInfo> GetReferencesRecursive()
 		{
 			var result = new List<AssetInfo>();
-
-			WalkReferencesRecursive(result, assetReferencesInfo);
-
+			GetReferencesRecursive(result);
 			return result;
+		}
+
+		internal void GetReferencesRecursive(ICollection<AssetInfo> result)
+		{
+			WalkReferencesRecursive(result, assetReferencesInfo);
 		}
 
 		internal List<AssetInfo> GetReferencedAtRecursive()
 		{
 			var result = new List<AssetInfo>();
-
-			WalkReferencedAtRecursive(result, referencedAtInfoList);
-
+			GetReferencedAtRecursive(result);
 			return result;
+		}
+
+		internal void GetReferencedAtRecursive(ICollection<AssetInfo> result)
+		{
+			WalkReferencedAtRecursive(result, referencedAtInfoList);
 		}
 
 		internal void Clean()
 		{
 			foreach (var referenceInfo in assetReferencesInfo)
 			{
-				foreach (var info in referenceInfo.assetInfo.referencedAtInfoList)
+				var referencedAtList = referenceInfo.assetInfo.referencedAtInfoList;
+				for (var i = referencedAtList.Count - 1; i >= 0; i--)
 				{
+					var info = referencedAtList[i];
 					if (!info.assetInfo.Equals(this)) 
 						continue;
-					ArrayUtility.Remove(ref referenceInfo.assetInfo.referencedAtInfoList, info);
+
+					referencedAtList.RemoveAt(i);
 					break;
 				}
 			}
 
 			foreach (var referencedAtInfo in referencedAtInfoList)
 			{
-				foreach (var info in referencedAtInfo.assetInfo.assetReferencesInfo)
+				var referencesList = referencedAtInfo.assetInfo.assetReferencesInfo;
+				for (var i = referencesList.Count - 1; i >= 0; i--)
 				{
+					var info = referencesList[i];
 					if (!info.assetInfo.Equals(this)) 
 						continue;
-					ArrayUtility.Remove(ref referencedAtInfo.assetInfo.assetReferencesInfo, info);
+					referencesList.RemoveAt(i);
 					referencedAtInfo.assetInfo.needToRebuildReferences = true;
 					break;
 				}
@@ -258,8 +304,13 @@ namespace CodeStage.Maintainer.Core
 					{
 						var isComponent = loadedObject is Component;
 						if (!isComponent && 
+#if UNITY_6000_3_OR_NEWER
+							!AssetDatabase.IsSubAsset((EntityId)instance) && 
+							!AssetDatabase.IsMainAsset((EntityId)instance)) continue;
+#else
 							!AssetDatabase.IsSubAsset(instance) && 
 							!AssetDatabase.IsMainAsset(instance)) continue;
+#endif
 					}
 
 					referencedObjectsCandidatesList.Add(instance);
@@ -278,11 +329,43 @@ namespace CodeStage.Maintainer.Core
 			return allAssetObjects;
 		}
 
-		private void WalkReferencesRecursive(List<AssetInfo> result, AssetReferenceInfo[] assetReferenceInfos)
+		private Hash128 GetStoredDependenciesHash()
+		{
+			if (!lastDependenciesHashInitialized)
+			{
+				lastDependenciesHashInitialized = true;
+				if (!string.IsNullOrEmpty(lastDependenciesHashSerialized))
+				{
+					try
+					{
+						lastDependenciesHash = Hash128.Parse(lastDependenciesHashSerialized);
+					}
+					catch (Exception)
+					{
+						lastDependenciesHash = default;
+					}
+				}
+				else
+				{
+					lastDependenciesHash = default;
+				}
+			}
+
+			return lastDependenciesHash;
+		}
+
+		private void SetStoredDependenciesHash(Hash128 hash)
+		{
+			lastDependenciesHash = hash;
+			lastDependenciesHashSerialized = hash.ToString();
+			lastDependenciesHashInitialized = true;
+		}
+
+		private void WalkReferencesRecursive(ICollection<AssetInfo> result, IList<AssetReferenceInfo> assetReferenceInfos)
 		{
 			foreach (var referenceInfo in assetReferenceInfos)
 			{
-				if (result.IndexOf(referenceInfo.assetInfo) == -1)
+				if (!result.Contains(referenceInfo.assetInfo))
 				{
 					result.Add(referenceInfo.assetInfo);
 					WalkReferencesRecursive(result, referenceInfo.assetInfo.assetReferencesInfo);
@@ -290,11 +373,11 @@ namespace CodeStage.Maintainer.Core
 			}
 		}
 
-		private void WalkReferencedAtRecursive(List<AssetInfo> result, ReferencedAtAssetInfo[] referencedAtInfos)
+		private void WalkReferencedAtRecursive(ICollection<AssetInfo> result, IList<ReferencedAtAssetInfo> referencedAtInfos)
 		{
 			foreach (var referencedAtInfo in referencedAtInfos)
 			{
-				if (result.IndexOf(referencedAtInfo.assetInfo) == -1)
+				if (!result.Contains(referencedAtInfo.assetInfo))
 				{
 					result.Add(referencedAtInfo.assetInfo);
 					WalkReferencedAtRecursive(result, referencedAtInfo.assetInfo.referencedAtInfoList);
@@ -362,6 +445,8 @@ namespace CodeStage.Maintainer.Core
 			// Reset size to -1 after deserialization since it's [NonSerialized]
 			// This ensures Size property will recalculate the file size correctly
 			size = -1;
+			lastDependenciesHashInitialized = false;
+			lastDependenciesHash = default;
 		}
 	}
 }

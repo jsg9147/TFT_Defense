@@ -94,7 +94,10 @@ namespace CodeStage.Maintainer.UI
 						{
 							if (!ProjectSettings.Cleaner.useTrashBin && !UserSettings.Cleaner.trashBinWarningShown)
 							{
-								EditorUtility.DisplayDialog(ProjectCleaner.ModuleName, "Please note, in case of not using Trash Bin, files will be removed permanently, without possibility to recover them in case of mistake.\nAuthor is not responsible for any damage made due to the module usage!\nThis message shows only once.", "Dismiss");
+								if (!Maintainer.SuppressDialogs)
+								{
+									EditorUtility.DisplayDialog(ProjectCleaner.ModuleName, "Please note, in case of not using Trash Bin, files will be removed permanently, without possibility to recover them in case of mistake.\nAuthor is not responsible for any damage made due to the module usage!\nThis message shows only once.", "Dismiss");
+								}
 								UserSettings.Cleaner.trashBinWarningShown = true;
 							}
 						}
@@ -123,8 +126,10 @@ namespace CodeStage.Maintainer.UI
 							ProjectSettings.Cleaner.findEmptyFoldersAutomatically = EditorGUILayout.ToggleLeft(new GUIContent("Autoclean", "Perform empty folders clean automatically on every scripts reload."), ProjectSettings.Cleaner.findEmptyFoldersAutomatically, GUILayout.Width(100));
 							if (EditorGUI.EndChangeCheck())
 							{
-								if (ProjectSettings.Cleaner.findEmptyFoldersAutomatically)
+								if (ProjectSettings.Cleaner.findEmptyFoldersAutomatically && !Maintainer.SuppressDialogs)
+								{
 									EditorUtility.DisplayDialog(ProjectCleaner.ModuleName, "In case you're having thousands of folders in your project this may hang Unity for few additional secs on every scripts reload.\n" + Maintainer.DataLossWarning, "Understood");
+								}
 							}
 							GUI.enabled = true;
 						}

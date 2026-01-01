@@ -25,6 +25,8 @@ public class GameManager : MonoSingleton<GameManager>
     public event Action<float, float> OnTimerTick;          // (remain, total)
     public event Action OnTimerEnd;                         // 타이머 종료 시
 
+    private Coroutine waveLoopCoroutine;
+
     protected override void Awake()
     {
         base.Awake();
@@ -33,19 +35,73 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Start()
     {
-        BindSceneManagers();
-        SetGameState(GameState.Prepare);
-        StartCoroutine(WaveLoop());
-
-        // 한도 도달시 패배
-        var field = (IMonsterFieldService)MonsterFieldManager.Instance;
-        field.OnLimitReached += () => SetGameState(GameState.Lose);
+        InitializeGame();
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => BindSceneManagers();
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 씬이 다시 로딩되었을 때 게임 초기화
+        InitializeGame();
+    }
+
+    /// <summary>게임 초기화 (씬 로딩 시 호출)</summary>
+    private void InitializeGame()
+    {
+        // 1. 웨이브 초기화
+        currentWave = 0;
+        CurrentState = GameState.Prepare;
+
+        // 2. 실행 중인 코루틴 중지
+        if (waveLoopCoroutine != null)
+        {
+            StopCoroutine(waveLoopCoroutine);
+            waveLoopCoroutine = null;
+        }
+
+        // 3. 씬 매니저 바인딩
+        BindSceneManagers();
+
+        // 4. 다른 매니저들 초기화
+        ResetAllManagers();
+
+        // 5. 게임 상태 설정 및 웨이브 루프 시작
+        SetGameState(GameState.Prepare);
+        
+        // 한도 도달시 패배 이벤트 재구독
+        var field = (IMonsterFieldService)MonsterFieldManager.Instance;
+        field.OnLimitReached -= () => SetGameState(GameState.Lose);
+        field.OnLimitReached += () => SetGameState(GameState.Lose);
+
+        // 6. 웨이브 루프 시작
+        waveLoopCoroutine = StartCoroutine(WaveLoop());
+        
+        Debug.Log("[GameManager] 게임 초기화 완료");
+    }
+
+    /// <summary>모든 매니저 초기화</summary>
+    private void ResetAllManagers()
+    {
+        // MonsterFieldManager 초기화
+        if (MonsterFieldManager.Instance != null)
+        {
+            MonsterFieldManager.Instance.ResetCount();
+        }
+
+        // CurrencyManager 초기화
+        if (CurrencyManager.Instance != null)
+        {
+            CurrencyManager.Instance.Reset();
+        }
+
+        // PlayerLevelManager 초기화
+        if (PlayerLevelManager.Instance != null)
+        {
+            PlayerLevelManager.Instance.Reset();
+        }
+    }
 
     public void BindSceneManagers()
     {

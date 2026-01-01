@@ -4,6 +4,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
+#if UNITY_6000_0_OR_NEWER
+using UnityEngine.InputSystem;
+#endif
+
 public class SPUM_UIManager : MonoBehaviour
 {
     [Header("▼ Version")] [Space(5)]
@@ -89,7 +94,9 @@ public class SPUM_UIManager : MonoBehaviour
     }   
     void Start()
     {
-        
+        #if UNITY_6000_0_OR_NEWER
+        CheckInputSystemUIModule();
+        #endif
         NewMakeButton.onClick.AddListener(()=>{  spumManager.NewMake();  });
         DataLoadButton.onClick.AddListener(()=>{   spumManager.OpenLoadData();  });
         EditButton.onClick.AddListener(()=>{   spumManager.EditPrefabs();  });
@@ -345,10 +352,12 @@ public class SPUM_UIManager : MonoBehaviour
 
     IEnumerator CaptureTempArea() {
         yield return new WaitForEndOfFrame();
-        #if ENABLE_INPUT_SYSTEM
-        Vector2 pos =  UnityEngine.InputSystem.Mouse.current.position.ReadValue();
-        #elif ENABLE_LEGACY_INPUT_MANAGER
-        Vector2 pos = EventSystem.current.currentInputModule.input.mousePosition;
+        
+        Vector2 pos;
+        #if UNITY_6000_0_OR_NEWER
+        pos = Mouse.current.position.ReadValue();
+        #else
+        pos = Input.mousePosition;
         #endif
 
         tex.ReadPixels(new Rect(pos.x, pos.y, 1, 1), 0, 0);
@@ -358,7 +367,7 @@ public class SPUM_UIManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.1f);
 
         _nowColorShow.color = NowColor;
-        _hexColorText.text = ColorUtility.ToHtmlStringRGB(NowColor);//ColorToStr(_nowColor);
+        _hexColorText.text = ColorUtility.ToHtmlStringRGB(NowColor);
         NowSelectedButton.PartSpriteColor = NowColor;
     }
     public void CloseColorPick()
@@ -372,4 +381,57 @@ public class SPUM_UIManager : MonoBehaviour
         ToastOn("Copied Color Code");
     }
     #endregion
+
+    #if UNITY_6000_0_OR_NEWER
+    void CheckInputSystemUIModule()
+    {
+        if (EventSystem.current == null)
+        {
+            Debug.LogWarning("[SPUM] EventSystem not found in scene");
+            return;
+        }
+
+        var currentModule = EventSystem.current.currentInputModule;
+        
+        // StandaloneInputModule Remove and InputSystemUIInputModule Add
+        if (currentModule == null || currentModule.GetType().Name != "InputSystemUIInputModule")
+        {
+            // StandaloneInputModule Remove
+            var standaloneModule = EventSystem.current.GetComponent<StandaloneInputModule>();
+            if (standaloneModule != null)
+            {
+                DestroyImmediate(standaloneModule);
+                Debug.Log("[SPUM] StandaloneInputModule removed");
+            }
+
+            // Other InputModules Remove
+            if (currentModule != null && currentModule != standaloneModule)
+            {
+                DestroyImmediate(currentModule);
+            }
+
+            // InputSystemUIInputModule Add
+            try
+            {
+                var inputSystemModule = EventSystem.current.gameObject.AddComponent(System.Type.GetType("UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem"));
+                Debug.Log("[SPUM] InputSystemUIInputModule added to EventSystem for Unity 6+ compatibility");
+                ToastOn("Input System UI Module added");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[SPUM] Failed to add InputSystemUIInputModule: {e.Message}");
+                ToastOn("Input System package required for Unity 6+");
+                
+                // 실패 시 StandaloneInputModule 복원
+                EventSystem.current.gameObject.AddComponent<StandaloneInputModule>();
+                Debug.Log("[SPUM] StandaloneInputModule restored as fallback");
+            }
+        }
+        else
+        {
+            Debug.Log("[SPUM] InputSystemUIInputModule already configured");
+        }
+    }
+    #endif
+
 }

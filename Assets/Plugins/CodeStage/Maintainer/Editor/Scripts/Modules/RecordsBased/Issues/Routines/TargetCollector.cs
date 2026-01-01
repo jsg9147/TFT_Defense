@@ -30,7 +30,7 @@ namespace CodeStage.Maintainer.Issues.Routines
 
 			EditorUtility.DisplayProgressBar(IssuesFinder.ModuleName, "Collecting input data...", 0);
 
-			var supportedKinds = new List<AssetOrigin> {AssetOrigin.AssetsFolder, AssetOrigin.Settings};
+			var supportedKinds = new List<AssetOrigin> {AssetOrigin.AssetsFolder, AssetOrigin.Settings, AssetOrigin.EmbeddedPackage};
 			var assets = CSFilterTools.GetAssetInfosWithKinds(map.assets, supportedKinds);
 			
 			var result = new HashSet<AssetInfo>();
@@ -105,7 +105,7 @@ namespace CodeStage.Maintainer.Issues.Routines
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e);
+				Debug.LogError(Maintainer.ConstructLog($"Error collecting target assets: {e.Message}"));
 				throw;
 			}
 

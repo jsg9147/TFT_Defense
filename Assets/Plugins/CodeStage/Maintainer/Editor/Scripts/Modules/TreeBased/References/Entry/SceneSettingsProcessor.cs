@@ -56,7 +56,11 @@ namespace CodeStage.Maintainer.References.Entry
 
 				foreach (var candidateInstanceId in referencedAssetObjects)
 				{
+#if UNITY_6000_3_OR_NEWER
+					var candidate = EditorUtility.EntityIdToObject((EntityId)candidateInstanceId);
+#else
 					var candidate = EditorUtility.InstanceIDToObject(candidateInstanceId);
+#endif
 
 					if (candidate is LightingDataAsset)
 					{

@@ -29,7 +29,11 @@ namespace CodeStage.Maintainer.UI
 				return;
 			}
 			
+#if UNITY_6000_3_OR_NEWER
+			var objectInstance = EditorUtility.EntityIdToObject((EntityId)data.reference.objectInstanceId);
+#else
 			var objectInstance = EditorUtility.InstanceIDToObject(data.reference.objectInstanceId);
+#endif
 			if (objectInstance == null)
 			{
 				icon = (Texture2D)CSEditorIcons.WarnSmall;

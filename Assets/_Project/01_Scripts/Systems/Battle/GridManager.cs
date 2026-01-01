@@ -1,5 +1,5 @@
-using UnityEngine;
-using System.Collections.Generic;
+ï»¿using UnityEngine;
+using System.Collections.Generic; 
 
 public class GridManager : MonoBehaviour
 {
@@ -11,14 +11,14 @@ public class GridManager : MonoBehaviour
     [Header("Board Bounds")]
     public int width = 8;
     public int height = 5;
-    public Vector3Int origin = Vector3Int.zero; // ÁÂ»ó´Ü ±âÁØÀÌ¸é y´Â -·Î ³»·Á°¨
+    public Vector3Int origin = Vector3Int.zero; // ì¢Œìƒë‹¨ ê¸°ì¤€ì´ë©´ yëŠ” -ë¡œ ë‚´ë ¤ê°
 
     [Header("Rules")]
     public bool lockPlacementDuringBattle = true;
 
-    // Á¡À¯: ¾î¶² À¯´ÖÀÌ ¾î´À Ä­À» ¾²´ÂÁö
+    // ì ìœ : ì–´ë–¤ ìœ ë‹›ì´ ì–´ëŠ ì¹¸ì„ ì“°ëŠ”ì§€
     private readonly Dictionary<Vector3Int, Unit> occupiedBy = new();
-    // ±İÁö Ä­(ÁöÇü/¸·ÈùÄ­)
+    // ê¸ˆì§€ ì¹¸(ì§€í˜•/ë§‰íŒì¹¸)
     private readonly HashSet<Vector3Int> blocked = new();
 
     void Awake()
@@ -28,16 +28,16 @@ public class GridManager : MonoBehaviour
 
     bool _placementLocked;
 
-    // === ÁÂÇ¥ º¯È¯ ===
+    // === ì¢Œí‘œ ë³€í™˜ ===
     public Vector3Int WorldToCell(Vector3 world) => grid.WorldToCell(world);
     public Vector3 CellToWorldCenter(Vector3Int cell)
     {
         var worldMin = grid.CellToWorld(cell);
-        var cellSize = grid.cellSize; // Grid ÄÄÆ÷³ÍÆ® ±âÁØ
+        var cellSize = grid.cellSize; // Grid ì»´í¬ë„ŒíŠ¸ ê¸°ì¤€
         return new Vector3(worldMin.x + cellSize.x * 0.5f, worldMin.y + cellSize.y * 0.5f, 0f);
     }
 
-    // === ±ÔÄ¢ ===
+    // === ê·œì¹™ ===
     public bool IsInBounds(Vector3Int cell)
     {
         return cell.x >= origin.x && cell.x < origin.x + width
@@ -62,7 +62,7 @@ public class GridManager : MonoBehaviour
         return true;
     }
 
-    // === ¹èÄ¡/ÀÌµ¿/ÇØÁ¦ ===
+    // === ë°°ì¹˜/ì´ë™/í•´ì œ ===
     public bool TryPlaceUnit(Unit unit, Vector3Int cell)
     {
         if (unit == null) return false;
@@ -71,35 +71,35 @@ public class GridManager : MonoBehaviour
         occupiedBy[cell] = unit;
         unit.transform.position = CellToWorldCenter(cell);
 
-        EvolutionManager.Instance.RegisterOnField(unit); // ÁøÈ­ ¸Å´ÏÀú¿¡ ¾Ë¸²
+        EvolutionManager.Instance.RegisterOnField(unit); // ì§„í™” ë§¤ë‹ˆì €ì— ì•Œë¦¼
 
         return true;
     }
     public bool TryMoveUnit(Vector3Int from, Vector3Int to)
     {
-        // 1) Ãâ¹ß Ä­¿¡ À¯´Ö ÀÖ´ÂÁö
+        // 1) ì¶œë°œ ì¹¸ì— ìœ ë‹› ìˆëŠ”ì§€
         if (!occupiedBy.TryGetValue(from, out var unit))
             return false;
 
-        // 2) to°¡ º¸µå ¹üÀ§ ³»ÀÎÁö
+        // 2) toê°€ ë³´ë“œ ë²”ìœ„ ë‚´ì¸ì§€
         if (!IsInBounds(to))
             return false;
 
-        // 3) ÀÌµ¿ÇÒ Ä­ÀÌ ¸·Èù Ä­ÀÎÁö
+        // 3) ì´ë™í•  ì¹¸ì´ ë§‰íŒ ì¹¸ì¸ì§€
         if (IsBlocked(to))
             return false;
 
-        // 4) ÀÌµ¿ Ä­ÀÌ ºñ¾îÀÖ´ÂÁö (¹èÄ¡ ¶ô ¹«½Ã!)
+        // 4) ì´ë™ ì¹¸ì´ ë¹„ì–´ìˆëŠ”ì§€ (ë°°ì¹˜ ë½ ë¬´ì‹œ!)
         if (IsOccupied(to))
             return false;
 
-        // 5) ±âÁ¸ Ä­ ºñ¿ì±â
+        // 5) ê¸°ì¡´ ì¹¸ ë¹„ìš°ê¸°
         occupiedBy.Remove(from);
 
-        // 6) »õ·Î¿î Ä­ Á¡À¯
+        // 6) ìƒˆë¡œìš´ ì¹¸ ì ìœ 
         occupiedBy[to] = unit;
 
-        // 7) À¯´Ö ÀÌµ¿
+        // 7) ìœ ë‹› ì´ë™
         unit.transform.position = CellToWorldCenter(to);
 
         return true;
@@ -110,7 +110,7 @@ public class GridManager : MonoBehaviour
     {
         if (occupiedBy.TryGetValue(cell, out unit))
         {
-            EvolutionManager.Instance.UnregisterOnField(unit); // ÁøÈ­ ¸Å´ÏÀú¿¡ ¾Ë¸²
+            EvolutionManager.Instance.UnregisterOnField(unit); // ì§„í™” ë§¤ë‹ˆì €ì— ì•Œë¦¼
 
             occupiedBy.Remove(cell);
             return true;
@@ -122,7 +122,7 @@ public class GridManager : MonoBehaviour
     public Unit GetUnitAt(Vector3Int cell)
         => occupiedBy.TryGetValue(cell, out var u) ? u : null;
 
-    // º¥Ä¡ ¡æ º¸µå µå·Ó¿ë ÇïÆÛ: ½ºÅ©¸°/¿ùµå Æ÷Áö¼Ç¿¡¼­ Áï½Ã ¹èÄ¡ ½Ãµµ
+    // ë²¤ì¹˜ â†’ ë³´ë“œ ë“œë¡­ìš© í—¬í¼: ìŠ¤í¬ë¦°/ì›”ë“œ í¬ì§€ì…˜ì—ì„œ ì¦‰ì‹œ ë°°ì¹˜ ì‹œë„
     public bool TryPlaceAtWorld(Unit unit, Vector3 world, out Vector3Int cell)
     {
         cell = WorldToCell(world);

@@ -6,6 +6,7 @@
 
 namespace CodeStage.Maintainer.UI
 {
+	using System.Collections.Generic;
 	using System.IO;
 	using Cleaner;
 	using Issues;
@@ -24,8 +25,9 @@ namespace CodeStage.Maintainer.UI
 		private const string CodeStage = "Code Stage/";
 		private const string SearchMaintainer = "🔍 Maintainer";
 
-		private const string ReferencesFinderMenuName = "🔍 Find References";
-		private const string DependenciesReferencesFinderMenuName = "🔍 Find Dependencies References";
+		private const string ReferencesFinderMenuName = "🔗 Find References";
+		private const string DependenciesReferencesFinderMenuName = "🔗 Find Dependencies References";
+		private const string IssuesFinderMenuName = "🐛 Find Issues";
 		private const string ContextComponentMenu = ContextMenu + "Component/";
 		private const string ScriptReferencesContextMenuName = SearchMaintainer + ": Script File References";
 		private const string ComponentContextSceneReferencesMenuName = SearchMaintainer + ": References In Scene";
@@ -42,6 +44,8 @@ namespace CodeStage.Maintainer.UI
 		private const string ProjectBrowserContextReferencesFinderNoHotKey = ProjectBrowserContextStart + ProjectBrowserContextReferencesFinderName;
 		private const string ProjectBrowserContextReferencesFinder = ProjectBrowserContextReferencesFinderNoHotKey + " %#&s";
 		private const string ProjectBrowserContextDependenciesReferencesFinder = ProjectBrowserContextStart + MenuSection + "/" + DependenciesReferencesFinderMenuName;
+		private const string ProjectBrowserContextIssuesFinderName = MenuSection + "/" + IssuesFinderMenuName;
+		private const string ProjectBrowserContextIssuesFinder = ProjectBrowserContextStart + ProjectBrowserContextIssuesFinderName;
 		private const string MainMenu = "Tools/" + CodeStage + MenuSection + "/";
 
 		private static float lastMenuCallTimestamp;
@@ -117,6 +121,27 @@ namespace CodeStage.Maintainer.UI
 			}
 			
 			ReferencesFinder.FindAssetsReferences(dependencies);
+		}
+
+		[MenuItem(ProjectBrowserContextIssuesFinder, true, 60)]
+		public static bool ValidateFindIssues()
+		{
+			return ProjectScopeReferencesFinder.GetSelectedAssets().Length > 0;
+		}
+
+		[MenuItem(ProjectBrowserContextIssuesFinder, false, 60)]
+		public static void FindIssues()
+		{
+			var selectedAssets = ProjectScopeReferencesFinder.GetSelectedAssets();
+			
+			if (selectedAssets.Length == 0)
+			{
+				MaintainerWindow.ShowNotification("No assets selected!");
+				return;
+			}
+			
+			// Use the new StartSearchInPaths API for efficient multi-path scanning
+			IssuesFinder.StartSearchInPaths(selectedAssets, true);
 		}
 
 		[MenuItem(ScriptReferencesContextMenu, true, 144445)]

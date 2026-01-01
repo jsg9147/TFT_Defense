@@ -215,7 +215,11 @@ namespace CodeStage.Maintainer.Tools
 			var objects = new List<Object>(objectInstanceIDs.Length);
 			foreach (var id in objectInstanceIDs)
 			{
+#if UNITY_6000_3_OR_NEWER
+				var o = EditorUtility.EntityIdToObject((EntityId)id);
+#else
 				var o = EditorUtility.InstanceIDToObject(id);
+#endif
 				if (o != null)
 				{
 					objects.Add(o);

@@ -1,4 +1,4 @@
-// InspectPanelManager.cs
+ï»¿// InspectPanelManager.cs
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -7,15 +7,15 @@ public class InspectPanelManager : MonoSingleton<InspectPanelManager>
 {
     [Header("Refs")]
     [SerializeField] private Canvas rootCanvas;
-    [SerializeField] private RectTransform panel;      // ÀüÃ¼ ÆĞ³Î
+    [SerializeField] private RectTransform panel;      // ì „ì²´ íŒ¨ë„
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI title;
-    [SerializeField] private TextMeshProUGUI subtitle; // ÅÂ±×/ÄÚ½ºÆ®/¼º±Ş
-    [SerializeField] private TextMeshProUGUI stats;    // ATK/APS/Range/HP µî
-    [SerializeField] private TextMeshProUGUI synergy;  // ½Ã³ÊÁö ¿ä¾à
-    [SerializeField] private TextMeshProUGUI upgrades; // ¾÷±×·¹ÀÌµå »ó¼¼
+    [SerializeField] private TextMeshProUGUI subtitle; // íƒœê·¸/ì½”ìŠ¤íŠ¸/ì„±ê¸‰
+    [SerializeField] private TextMeshProUGUI stats;    // ATK/APS/Range/HP ë“±
+    [SerializeField] private TextMeshProUGUI synergy;  // ì‹œë„ˆì§€ ìš”ì•½
+    [SerializeField] private TextMeshProUGUI upgrades; // ì—…ê·¸ë ˆì´ë“œ ìƒì„¸
     [SerializeField] private Button pinButton;
-    [SerializeField] private GameObject detailArea;    // ÇÉ ½Ã È®Àå
+    [SerializeField] private GameObject detailArea;    // í•€ ì‹œ í™•ì¥ 
 
     private IInspectable current;
     private bool pinned;
@@ -42,7 +42,7 @@ public class InspectPanelManager : MonoSingleton<InspectPanelManager>
 
         if (panel.gameObject.activeSelf && !pinned && current != null && current.FollowTarget)
         {
-            // È­¸é µû¶ó´Ù´Ï±â
+            // í™”ë©´ ë”°ë¼ë‹¤ë‹ˆê¸°
             Vector2 screenPos = Camera.main.WorldToScreenPoint(current.FollowTarget.position + Vector3.up * 0.8f);
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 rootCanvas.transform as RectTransform, screenPos, rootCanvas.worldCamera, out var local);
@@ -77,7 +77,7 @@ public class InspectPanelManager : MonoSingleton<InspectPanelManager>
         detailArea?.SetActive(false);
         panel.gameObject.SetActive(true);
         TryRefresh();
-        // Áï½Ã À§Ä¡
+        // ì¦‰ì‹œ ìœ„ì¹˜
         if (current?.FollowTarget)
         {
             Vector2 screenPos = Camera.main.WorldToScreenPoint(current.FollowTarget.position + Vector3.up * 0.8f);
@@ -108,13 +108,13 @@ public class InspectPanelManager : MonoSingleton<InspectPanelManager>
         if (icon) icon.sprite = d.icon;
         if (title) title.text = d.name;
 
-        // À¯´Ö/¸ó½ºÅÍ °ø¿ë ¼­ºêÅ¸ÀÌÆ²
-        string star = d.star > 0 ? $"¡Ú{d.star}" : "";
+        // ìœ ë‹›/ëª¬ìŠ¤í„° ê³µìš© ì„œë¸Œíƒ€ì´í‹€
+        string star = d.star > 0 ? $"â˜…{d.star}" : "";
         string cost = d.cost > 0 ? $"Cost {d.cost}" : "";
         subtitle.text = $"{star} {cost}".Trim();
 
-        // ½ºÅÈ ÅØ½ºÆ®
-        // À¯´ÖÀÌ¸é ATK/APS/Range, ¸ó½ºÅÍ¸é HP/MoveSpd/Gold
+        // ìŠ¤íƒ¯ í…ìŠ¤íŠ¸
+        // ìœ ë‹›ì´ë©´ ATK/APS/Range, ëª¬ìŠ¤í„°ë©´ HP/MoveSpd/Gold
         string s = "";
         if (d.attack > 0 || d.aps > 0)
             s += $"ATK {d.attack}  APS {d.aps:F2}  Range {d.range:F1}\n";

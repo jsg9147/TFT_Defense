@@ -134,7 +134,10 @@ namespace CodeStage.Maintainer.UI.Filters
 				return true;
 			}
 
-			EditorUtility.DisplayDialog("Can't find specified scene", "Scene " + newItem + " wasn't found in project. Make sure you've entered relative path starting from Assets/.", "Cool, thanks!");
+			if (!Maintainer.SuppressDialogs)
+			{
+				EditorUtility.DisplayDialog("Can't find specified scene", "Scene " + newItem + " wasn't found in project. Make sure you've entered relative path starting from Assets/.", "Cool, thanks!");
+			}
 			return false;
 		}
 

@@ -49,7 +49,7 @@ namespace CodeStage.Maintainer.Core.Map.Processing
 					if (!asset.needToRebuildReferences) continue;
 
 					var dependencies = asset.dependenciesGUIDs;
-					if (dependencies == null || dependencies.Length == 0) continue;
+					if (dependencies == null || dependencies.Count == 0) continue;
 
 					ProcessAssetDependencies(asset, dependencies);
 					map.isDirty = true;
@@ -84,7 +84,7 @@ namespace CodeStage.Maintainer.Core.Map.Processing
 			referencedAtInfosPool = null;
 		}
 
-		private int ProcessAssetDependencies(AssetInfo asset, string[] dependencies)
+		private int ProcessAssetDependencies(AssetInfo asset, IList<string> dependencies)
 		{
 			var processedCount = 0;
 			referenceInfosPool.Clear();
@@ -101,20 +101,15 @@ namespace CodeStage.Maintainer.Core.Map.Processing
 
 				// Add backward reference
 				var referencedAtInfo = new ReferencedAtAssetInfo { assetInfo = asset };
-				var currentList = referencedAsset.referencedAtInfoList;
-				var newList = new ReferencedAtAssetInfo[currentList.Length + 1];
-				if (currentList.Length > 0)
-				{
-					Array.Copy(currentList, newList, currentList.Length);
-				}
-				newList[currentList.Length] = referencedAtInfo;
-				referencedAsset.referencedAtInfoList = newList;
+				referencedAsset.referencedAtInfoList.Add(referencedAtInfo);
 			}
 
 			// Set forward references
-			asset.assetReferencesInfo = referenceInfosPool.Count > 0 ? 
-				referenceInfosPool.ToArray() : 
-				Array.Empty<AssetReferenceInfo>();
+			asset.assetReferencesInfo.Clear();
+			if (referenceInfosPool.Count > 0)
+			{
+				asset.assetReferencesInfo.AddRange(referenceInfosPool);
+			}
 
 			asset.needToRebuildReferences = false;
 			return processedCount;

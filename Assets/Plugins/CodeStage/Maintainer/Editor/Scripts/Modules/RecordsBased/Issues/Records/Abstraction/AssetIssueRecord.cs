@@ -11,10 +11,12 @@ namespace CodeStage.Maintainer.Issues
 	using Core.Scan;
 	using Detectors;
 	using Tools;
+	using UnityEngine;
 
 	[Serializable]
 	public abstract class AssetIssueRecord : IssueRecord
 	{
+		[field: SerializeField]
 		public string Path { get; private set; }
 
 		internal AssetIssueRecord(IIssueDetector detector, IssueKind kind, AssetLocation location) : base(detector, kind, location)

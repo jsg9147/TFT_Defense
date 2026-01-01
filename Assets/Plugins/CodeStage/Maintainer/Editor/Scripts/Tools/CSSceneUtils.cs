@@ -187,12 +187,21 @@ namespace CodeStage.Maintainer.Tools
 
 			if (!anySceneIsDirty) return true;
 
-			var selection = EditorUtility.DisplayDialogComplex("Scene(s) Have Been Modified",
-				"Do you want to save the changes you made in the scenes:" +
-				scenesPaths + "\n\nYour changes will be lost if you don't save them.", "Save", "Don't Save", "Cancel");
-			if (selection == 0)
+			int selection;
+			if (Maintainer.SuppressDialogs)
 			{
-				EditorSceneManager.SaveScenes(scenesToSave.ToArray());
+				selection = 0;
+				EditorSceneManager.SaveScenes(scenesToSave);
+			}
+			else
+			{
+				selection = EditorUtility.DisplayDialogComplex("Scene(s) Have Been Modified",
+					"Do you want to save the changes you made in the scenes:" +
+					scenesPaths + "\n\nYour changes will be lost if you don't save them.", "Save", "Don't Save", "Cancel");
+				if (selection == 0)
+				{
+					EditorSceneManager.SaveScenes(scenesToSave);
+				}
 			}
 
 			return selection != 2;

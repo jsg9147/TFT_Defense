@@ -134,7 +134,10 @@ namespace CodeStage.Maintainer.UI
 		{
 			if (UserSettings.Cleaner.firstTime)
 			{
-				EditorUtility.DisplayDialog(ProjectCleaner.ModuleName, "Please note, this module can remove files and folders physically from your system.\nPlease always make a backup of your project before using Project Cleaner!\nUse it on your own peril, author is not responsible for any damage made due to the module usage!\nThis message shows only once.", "Dismiss");
+				if (!Maintainer.SuppressDialogs)
+				{
+					EditorUtility.DisplayDialog(ProjectCleaner.ModuleName, "Please note, this module can remove files and folders physically from your system.\nPlease always make a backup of your project before using Project Cleaner!\nUse it on your own peril, author is not responsible for any damage made due to the module usage!\nThis message shows only once.", "Dismiss");
+				}
 				UserSettings.Cleaner.firstTime = false;
 			}
 		}

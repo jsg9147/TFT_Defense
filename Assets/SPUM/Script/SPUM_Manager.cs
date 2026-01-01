@@ -6,9 +6,7 @@ using System.Linq;
 using System;
 using System.Globalization;
 using UnityEngine.SceneManagement;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
+
 [Serializable]
 public class SPUM_Animator{
     public string Type;
@@ -192,6 +190,11 @@ public class SPUM_Manager : MonoBehaviour
             var PreviewItem = UIManager.CreatePreviewItem();
             var previewButton = PreviewItem.GetComponent<SPUM_PreviewItem>();
             previewButton.name = package.Key.Name;
+            
+            // 관련 패키지 데이터 주입
+            var relatedPackages = package.Items.Select(item => item.Package).Distinct().ToList();
+            previewButton.spumPackages = relatedPackages;
+            
             // Hide Other Element
             foreach (Transform tr in previewButton.transform)
             {
@@ -674,13 +677,16 @@ public class SPUM_Manager : MonoBehaviour
     }
     
     public void SetPrefabToPreviewPackageData(List<SpumPackage> packages){
-        if(packages.Count.Equals(0)){
+        if(packages == null || packages.Count == 0){
             PreviewPrefab.spumPackages = GetSpumLegacyData();
-        }else{
-            PreviewPrefab.spumPackages = packages;
+            Debug.Log($"Using Legacy Data - Loaded { PreviewPrefab.spumPackages.Count } packages / Total Available { spumPackages.Count }");
         }
-        // 패키지 체크
-        Debug.Log($"Prefab Package { packages.Count } / Total Package { spumPackages.Count }");
+        //PreviewPrefab.spumPackages = GetSpumLegacyData();
+        // else
+        // {
+        //     PreviewPrefab.spumPackages = packages;
+        //     Debug.Log($"Using Provided Data - Loaded {packages.Count} packages / Total Available {spumPackages.Count}");
+        // }
         animationManager.PlayFirstAnimation();
     }
     
@@ -1132,7 +1138,7 @@ public class SPUM_Manager : MonoBehaviour
     public Sprite LoadSpriteFromMultiple(string path, string spriteName)
     {
         Sprite[] sprites = Resources.LoadAll<Sprite>(path);
-        
+
         if (sprites == null || sprites.Length == 0)
         {
             Debug.LogWarning($"No sprites found at path: {path}");

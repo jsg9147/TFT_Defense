@@ -1,24 +1,24 @@
-using Sirenix.OdinInspector;
+ï»¿using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UIManager : MonoSingleton<UIManager>
 {
-    [Header("UI ÆĞ³Î ÂüÁ¶")]
+    [Header("UI íŒ¨ë„ ì°¸ì¡°")]
     public GameObject battlePanel;
-    public GameObject winPanel;   // ±âÁ¸ ½ÂÆĞ ÆĞ³ÎÀº À¯Áö (ÇÊ¿ä½Ã ¼û±è¿ë)
+    public GameObject winPanel;   // ê¸°ì¡´ ìŠ¹íŒ¨ íŒ¨ë„ì€ ìœ ì§€ (í•„ìš”ì‹œ ìˆ¨ê¹€ìš©)
     public GameObject losePanel;
     public GameObject upgradePanel;
     public GameObject gamblePanel;
 
-    [Header("°øÅë HUD (ÀüÅõ Áß Ç¥½Ã)")]
+    [Header("ê³µí†µ HUD (ì „íˆ¬ ì¤‘ í‘œì‹œ)")]
     [SerializeField] private GameObject battleHUD;
 
-    [Header("½ÂÆĞ ÆĞ³Î (»õ ½Ã½ºÅÛ)")]
+    [Header("ìŠ¹íŒ¨ íŒ¨ë„ (ìƒˆ ì‹œìŠ¤í…œ)")]
     [Required]
-    [SerializeField] private WinLosePanel winLosePanel;
+    [SerializeField] private WinLosePanel winLosePanel; 
 
-    [Header("Àü¿ª ÀÔ·Â Â÷´Ü (Ç®½ºÅ©¸° Image+RaycastTarget)")]
+    [Header("ì „ì—­ ì…ë ¥ ì°¨ë‹¨ (í’€ìŠ¤í¬ë¦° Image+RaycastTarget)")]
     [Required]
     [SerializeField] private GameObject inputBlocker;
 
@@ -83,7 +83,7 @@ public class UIManager : MonoSingleton<UIManager>
         battleHUD?.SetActive(false);
         if (inputBlocker) inputBlocker.SetActive(true);
 
-        // °ÔÀÓ °á°ú µ¥ÀÌÅÍ ½º³À¼¦ ±¸¼º
+        // ê²Œì„ ê²°ê³¼ ë°ì´í„° ìŠ¤ëƒ…ìƒ· êµ¬ì„±
         var snap = ResultSnapshot.CaptureNow(
             currentWave: GameManager.Instance.currentWave,
             elapsed: Time.timeSinceLevelLoad,
@@ -104,18 +104,18 @@ public class UIManager : MonoSingleton<UIManager>
                 onNext: () =>
                 {
                     ResumeTime();
-                    // ´ÙÀ½ ½ºÅ×ÀÌÁö ÀÖÀ¸¸é ¿©±â¿¡ ¾À ·Îµù
+                    // ë‹¤ìŒ ìŠ¤í…Œì´ì§€ ìˆìœ¼ë©´ ì—¬ê¸°ì— ì”¬ ë¡œë”©
                     // SceneManager.LoadScene("NextStage");
                 },
                 onLobby: () =>
                 {
                     ResumeTime();
-                    SceneManager.LoadScene("Title"); // ·Îºñ³ª ¸ŞÀÎ Å¸ÀÌÆ²·Î ÀÌµ¿
+                    SceneManager.LoadScene("Title"); // ë¡œë¹„ë‚˜ ë©”ì¸ íƒ€ì´í‹€ë¡œ ì´ë™
                 });
         }
         else
         {
-            // WinLosePanel ¼¼ÆÃ ¾ÈµÆÀ» ¶§ ´ëºñ
+            // WinLosePanel ì„¸íŒ… ì•ˆëì„ ë•Œ ëŒ€ë¹„
             (isWin ? winPanel : losePanel)?.SetActive(true);
         }
     }

@@ -15,6 +15,7 @@ namespace CodeStage.Maintainer.Core.Map.Processing
     using Progress;
     using Tools;
     using Settings;
+    using ChangeTracking;
 
     internal class AssetUpdateProcessor
     {
@@ -36,20 +37,47 @@ namespace CodeStage.Maintainer.Core.Map.Processing
 
             var count = map.assets.Count;
             validExistingAssetsGuids = new HashSet<string>();
+            
+            // Get tracked changes for incremental processing
+            var changedGuids = new HashSet<string>(AssetsChangeTracker.GetChangedGuids());
+            var deletedGuids = new HashSet<string>(AssetsChangeTracker.GetDeletedGuids());
+            var shouldProcessAll = AssetsChangeTracker.IsIndexEmpty() || !AssetsChangeTracker.HasBaseline();
+            var removedAny = false;
                 
             for (var i = count - 1; i > -1; i--)
-            {
-                var index = count - i;
-                if (progressReporter.ShowProgress(1, "Checking existing assets in map... {0}/{1}", index, count))
-                {
-                    Debug.Log(Maintainer.ConstructLog("Assets Map update was canceled by user."));
-                    return false;
-                }
+			{
+				var index = count - i;
+				if (progressReporter.ShowProgress(1, "Checking existing assets in map... {0}/{1}", index, count))
+				{
+					Debug.Log(Maintainer.ConstructLog("Assets Map update was canceled by user."));
+					return false;
+				}
 
-                var assetInMap = map.assets[i];
+				var assetInMap = map.assets[i];
+				var assetGuid = assetInMap.GUID;
+				
+				// Skip processing if asset wasn't changed and isn't deleted
+				var isSkipped = !shouldProcessAll && !changedGuids.Contains(assetGuid) && !deletedGuids.Contains(assetGuid);
+				if (isSkipped)
+				{
+                    // Fallback: verify asset still exists on disk
+                    // This catches deleted assets that weren't properly tracked (e.g., when GUID couldn't be resolved)
+                    if (!assetInMap.Exists())
+                    {
+                        assetInMap.Clean();
+                        map.assets.RemoveAt(i);
+                        removedAny = true;
+                        map.isDirty = true;
+                        continue;
+                    }
+                        
+                    validExistingAssetsGuids.Add(assetGuid);
+                    continue;
+                }
+                    
                 if (assetInMap.Exists())
                 {
-                    validExistingAssetsGuids.Add(assetInMap.GUID);
+                    validExistingAssetsGuids.Add(assetGuid);
                     if (assetInMap.UpdateIfNeeded())
                     {
                         map.isDirty = true;
@@ -59,9 +87,13 @@ namespace CodeStage.Maintainer.Core.Map.Processing
                 {
                     assetInMap.Clean();
                     map.assets.RemoveAt(i);
+                    removedAny = true;
                     map.isDirty = true;
                 }
             }
+
+            if (removedAny)
+                map.InvalidateGuidCache();
 
             return true;
         }
@@ -74,31 +106,68 @@ namespace CodeStage.Maintainer.Core.Map.Processing
                 return false;
             }
 
-            var allAssetPaths = AssetDatabase.GetAllAssetPaths();
-            var validNewAssets = new List<RawAssetInfo>(allAssetPaths.Length);
-            foreach (var assetPath in allAssetPaths)
+            // Get tracked added assets for incremental processing
+            var addedGuids = new HashSet<string>(AssetsChangeTracker.GetAddedGuids());
+            var mapIsEmpty = map.assets == null || map.assets.Count == 0;
+            var validNewAssets = new List<RawAssetInfo>();
+            
+            // Only use incremental path if map already contains data
+            if (!mapIsEmpty && addedGuids.Count > 0)
             {
-                var guid = AssetDatabase.AssetPathToGUID(assetPath);
-                if (validExistingAssetsGuids.Contains(guid))
-                    continue;
-
-                var kind = CSAssetTools.GetAssetOrigin(assetPath);
-                if (kind == AssetOrigin.Unknown) continue;
-
-                if (!File.Exists(assetPath)) continue;
-                if (AssetDatabase.IsValidFolder(assetPath)) continue;
-
-                var rawInfo = new RawAssetInfo
+                foreach (var guid in addedGuids)
                 {
-                    path = CSPathTools.EnforceSlashes(assetPath),
-                    guid = guid,
-                    origin = kind,
-                };
+                    if (validExistingAssetsGuids.Contains(guid))
+                        continue;
 
-                validNewAssets.Add(rawInfo);
+                    var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (string.IsNullOrEmpty(assetPath)) continue;
+                    
+                    var kind = CSAssetTools.GetAssetOrigin(assetPath);
+                    if (kind == AssetOrigin.Unknown) continue;
+
+                    if (!File.Exists(assetPath)) continue;
+                    if (AssetDatabase.IsValidFolder(assetPath)) continue;
+
+                    var rawInfo = new RawAssetInfo
+                    {
+                        path = CSPathTools.EnforceSlashes(assetPath),
+                        guid = guid,
+                        origin = kind,
+                    };
+
+                    validNewAssets.Add(rawInfo);
+                }
+            }
+            else
+            {
+                // Fallback: scan all assets (for first run or when change tracking fails)
+                var allAssetPaths = AssetDatabase.GetAllAssetPaths();
+                validNewAssets = new List<RawAssetInfo>(allAssetPaths.Length);
+                foreach (var assetPath in allAssetPaths)
+                {
+                    var guid = AssetDatabase.AssetPathToGUID(assetPath);
+                    if (validExistingAssetsGuids.Contains(guid))
+                        continue;
+
+                    var kind = CSAssetTools.GetAssetOrigin(assetPath);
+                    if (kind == AssetOrigin.Unknown) continue;
+
+                    if (!File.Exists(assetPath)) continue;
+                    if (AssetDatabase.IsValidFolder(assetPath)) continue;
+
+                    var rawInfo = new RawAssetInfo
+                    {
+                        path = CSPathTools.EnforceSlashes(assetPath),
+                        guid = guid,
+                        origin = kind,
+                    };
+
+                    validNewAssets.Add(rawInfo);
+                }
             }
 
             var count = validNewAssets.Count;
+            var addedAny = false;
             for (var i = 0; i < count; i++)
             {
                 if (progressReporter.ShowProgress(2, "Processing new assets... {0}/{1}", i + 1, count))
@@ -138,10 +207,14 @@ namespace CodeStage.Maintainer.Core.Map.Processing
 
                 var settingsKind = rawAssetInfo.origin == AssetOrigin.Settings ? GetSettingsKind(rawAssetInfoPath) : AssetSettingsKind.Undefined;
 
-                var asset = AssetInfo.Create(rawAssetInfo, type, settingsKind);
-                map.assets.Add(asset);
-                map.isDirty = true;
+				var asset = AssetInfo.Create(rawAssetInfo, type, settingsKind);
+				map.assets.Add(asset);
+				addedAny = true;
+				map.isDirty = true;
             }
+
+            if (addedAny)
+                map.InvalidateGuidCache();
 
             return true;
         }

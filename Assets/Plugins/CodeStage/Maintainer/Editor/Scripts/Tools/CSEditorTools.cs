@@ -37,10 +37,13 @@ namespace CodeStage.Maintainer.Tools
 		public static string GetFullTransformPath(Transform transform, Transform stopAt = null)
 		{
 			var path = transform.name;
+
 			while (transform.parent != null)
 			{
 				transform = transform.parent;
-				if (transform == stopAt) break;
+				if ((transform == stopAt) ||
+					((transform.hideFlags & HideFlags.NotEditable) != 0 && (transform.hideFlags & HideFlags.DontSave) != 0 && transform.name == "Canvas (Environment)"))
+					break;
 				path = transform.name + "/" + path;
 			}
 			return path;

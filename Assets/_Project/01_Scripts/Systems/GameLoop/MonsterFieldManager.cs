@@ -1,10 +1,10 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 
-// Àü¿ª ¼­ºñ½º: "Ä«¿îÆ®¸¸" °ü¸® (°ÔÀÓ »óÅÂ ÀüÈ¯Àº GameManager°¡ ÀÌº¥Æ® ±¸µ¶ÇØ¼­ Ã³¸®)
+// ì „ì—­ ì„œë¹„ìŠ¤: "ì¹´ìš´íŠ¸ë§Œ" ê´€ë¦¬ (ê²Œì„ ìƒíƒœ ì „í™˜ì€ GameManagerê°€ ì´ë²¤íŠ¸ êµ¬ë…í•´ì„œ ì²˜ë¦¬)
 public class MonsterFieldManager : MonoSingleton<MonsterFieldManager>, IMonsterFieldService
 {
-    [Header("ÇÊµå ´©Àû ÇÑµµ")]
+    [Header("í•„ë“œ ëˆ„ì  í•œë„")]
     [SerializeField] private int fieldLimit = 50;
     public int FieldLimit => fieldLimit;
 
@@ -16,7 +16,7 @@ public class MonsterFieldManager : MonoSingleton<MonsterFieldManager>, IMonsterF
     public void Register(Monster m)
     {
         CurrentCount++;
-        OnCountChanged?.Invoke(CurrentCount, fieldLimit);
+        OnCountChanged?.Invoke(CurrentCount, fieldLimit); 
         if (CurrentCount >= fieldLimit)
             OnLimitReached?.Invoke();
 
@@ -29,14 +29,14 @@ public class MonsterFieldManager : MonoSingleton<MonsterFieldManager>, IMonsterF
         OnCountChanged?.Invoke(CurrentCount, fieldLimit);
     }
 
-    // ¼±ÅÃ: ¸®¼Â/½ºÅ×ÀÌÁö ÀüÈ¯ ½Ã Á¡¼ö ÃÊ±âÈ­¿ë
+    // ì„ íƒ: ë¦¬ì…‹/ìŠ¤í…Œì´ì§€ ì „í™˜ ì‹œ ì ìˆ˜ ì´ˆê¸°í™”ìš©
     public void ResetCount()
     {
         CurrentCount = 0;
         OnCountChanged?.Invoke(CurrentCount, fieldLimit);
     }
 
-    // ¼±ÅÃ: ³­ÀÌµµ¿¡ µû¶ó ÇÑµµ ·±Å¸ÀÓ Á¶Á¤
+    // ì„ íƒ: ë‚œì´ë„ì— ë”°ë¼ í•œë„ ëŸ°íƒ€ì„ ì¡°ì •
     public void SetFieldLimit(int newLimit, bool clampCount = true)
     {
         fieldLimit = Mathf.Max(1, newLimit);

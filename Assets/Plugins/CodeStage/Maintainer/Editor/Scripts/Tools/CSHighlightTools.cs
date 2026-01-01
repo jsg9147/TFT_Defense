@@ -35,6 +35,21 @@ namespace CodeStage.Maintainer.Tools
 				StopHighlight();
 		}
 
+		public static bool TryHighlightText(string text)
+		{
+			if (string.IsNullOrEmpty(text))
+				return false;
+
+			StopHighlight();
+
+			var focusedWindow = EditorWindow.focusedWindow;
+			if (focusedWindow == null)
+				return false;
+
+			var title = focusedWindow.titleContent.text;
+			return Highlight(title, text);
+		}
+
 		public static void TryHighlightProperty(ReferencingEntryData referencingEntry)
 		{
 			if (string.IsNullOrEmpty(referencingEntry.PropertyPath))
@@ -54,18 +69,7 @@ namespace CodeStage.Maintainer.Tools
 
                         var title = focusedWindow.titleContent.text;
 
-						try
-						{
-							Debug.unityLogger.logEnabled = false;
-							Highlighter.Highlight(title, referencingEntry.PropertyPath);
-						}
-						catch (Exception) {
-							// ignored
-						}
-						finally
-						{
-							Debug.unityLogger.logEnabled = true;
-						}
+						Highlight(title, referencingEntry.PropertyPath);
                         
                         var startTime = EditorApplication.timeSinceStartup;
 
@@ -92,6 +96,24 @@ namespace CodeStage.Maintainer.Tools
 			Highlighter.Stop();
 			EditorApplication.update -= currentHighlightTimer;
 			currentHighlightTimer = null;
+		}
+
+		private static bool Highlight(string title, string text)
+		{
+			try
+			{
+				Debug.unityLogger.logEnabled = false;
+				return Highlighter.Highlight(title, text);
+			}
+			catch (Exception) {
+				// ignored
+			}
+			finally
+			{
+				Debug.unityLogger.logEnabled = true;
+			}
+
+			return false;
 		}
 	}
 }

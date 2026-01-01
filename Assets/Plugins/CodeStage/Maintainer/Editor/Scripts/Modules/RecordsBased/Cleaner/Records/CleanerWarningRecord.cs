@@ -10,6 +10,7 @@ namespace CodeStage.Maintainer.Cleaner
 	using System.Text;
 	using Core;
 	using Core.Scan;
+	using UnityEngine;
 
 	/// <summary>
 	/// Project Cleaner search results item representing search warning.
@@ -25,7 +26,7 @@ namespace CodeStage.Maintainer.Cleaner
 			get { return errorText; }
 		}
 
-		internal string errorText;
+		[SerializeField] internal string errorText;
 
 		protected CleanerWarningRecord(string errorText) : base(RecordType.Warning, LocationGroup.Unknown)
 		{

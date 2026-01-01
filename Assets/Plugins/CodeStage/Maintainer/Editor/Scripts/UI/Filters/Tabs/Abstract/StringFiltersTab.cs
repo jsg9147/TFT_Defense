@@ -241,9 +241,19 @@ namespace CodeStage.Maintainer.UI.Filters
 				if (UIHelpers.ImageButton("Clear All " + caption.text, "Removes all added filters from the list.", CSIcons.Clear))
 				{
 					var cleanCaption = Regex.Replace(caption.text, @"<[^>]*>", string.Empty);
-					if (EditorUtility.DisplayDialog("Clearing the " + cleanCaption + " list",
+					var shouldClear = false;
+					if (Maintainer.SuppressDialogs)
+					{
+						shouldClear = true;
+					}
+					else if (EditorUtility.DisplayDialog("Clearing the " + cleanCaption + " list",
 						"Are you sure you wish to clear all the filters in the " + cleanCaption + " list?",
 						"Yes", "No"))
+					{
+						shouldClear = true;
+					}
+
+					if (shouldClear)
 					{
 						Array.Resize(ref filters, 0);
 						SaveChanges();

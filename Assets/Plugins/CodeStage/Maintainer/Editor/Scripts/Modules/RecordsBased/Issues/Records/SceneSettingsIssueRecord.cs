@@ -26,8 +26,8 @@ namespace CodeStage.Maintainer.Issues
 	[Serializable]
 	public class SceneSettingsIssueRecord : AssetIssueRecord, IShowableRecord
 	{
-		public string PropertyPath { get; private set; }
-		public SceneSettingsKind SettingsKind { get; private set; }
+		[field: SerializeField] public string PropertyPath { get; private set; }
+		[field: SerializeField] public SceneSettingsKind SettingsKind { get; private set; }
 
 		public override bool IsFixable
 		{

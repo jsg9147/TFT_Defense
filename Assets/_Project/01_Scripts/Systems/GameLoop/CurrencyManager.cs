@@ -4,23 +4,23 @@ using System;
 public class CurrencyManager : MonoSingleton<CurrencyManager>
 {
     [SerializeField] private int initialGold = 100;
-    [SerializeField] private int initialEssence = 0;   // ÃÊ±â Á¤¼ö
+    [SerializeField] private int initialEssence = 0;   // ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     public int Gold { get; private set; } = 0;
     public int Gem { get; private set; } = 0;
-    public int Essence { get; private set; } = 0;      // Á¤¼ö
+    public int Essence { get; private set; } = 0;      // ï¿½ï¿½ï¿½ï¿½
 
     public event Action<int> OnGoldChanged;
     public event Action<int> OnGemChanged;
-    public event Action<int> OnEssenceChanged;         // Á¤¼ö ÀÌº¥Æ®
+    public event Action<int> OnEssenceChanged;         // ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®
 
-    // °ÔÀÓ ½ÃÀÛ ½Ã ÃÊ±â °ñµå ¼³Á¤, ³ªÁß¿¡ ½ºÅ¸Æ®°¡ ¾Æ´Ï¶ó °ÔÀÓ¸Å´ÏÀú¿¡¼­ ÇÒ´çÇÏ´Â ÂÊÀÌ ´õ ÁÁÀ»µí
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½Å¸Æ®ï¿½ï¿½ ï¿½Æ´Ï¶ï¿½ ï¿½ï¿½ï¿½Ó¸Å´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     private void Start()
     {
         Gold = initialGold;
-        Essence = initialEssence;                      // ÃÊ±âÈ­
+        Essence = initialEssence;                      // ï¿½Ê±ï¿½È­
         OnGoldChanged?.Invoke(Gold);
-        OnEssenceChanged?.Invoke(Essence);            // UI °»½Å
+        OnEssenceChanged?.Invoke(Essence);            // UI ï¿½ï¿½ï¿½ï¿½
     }
 
     public void AddGold(int amount) { Gold += amount; OnGoldChanged?.Invoke(Gold); }
@@ -39,5 +39,16 @@ public class CurrencyManager : MonoSingleton<CurrencyManager>
         if (Essence < amount) return false;
         Essence -= amount; OnEssenceChanged?.Invoke(Essence);
         return true;
+    }
+
+    /// <summary>ê²Œìž„ ìž¬ì‹œìž‘ ì‹œ ì´ˆê¸°í™”</summary>
+    public void Reset()
+    {
+        Gold = initialGold;
+        Gem = 0;
+        Essence = initialEssence;
+        OnGoldChanged?.Invoke(Gold);
+        OnGemChanged?.Invoke(Gem);
+        OnEssenceChanged?.Invoke(Essence);
     }
 }
