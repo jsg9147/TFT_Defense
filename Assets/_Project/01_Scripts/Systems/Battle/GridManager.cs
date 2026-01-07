@@ -122,6 +122,31 @@ public class GridManager : MonoBehaviour
     public Unit GetUnitAt(Vector3Int cell)
         => occupiedBy.TryGetValue(cell, out var u) ? u : null;
 
+    // 유닛으로부터 셀 찾기 (역방향 조회)
+    public bool TryGetCellOfUnit(Unit unit, out Vector3Int cell)
+    {
+        foreach (var kvp in occupiedBy)
+        {
+            if (kvp.Value == unit)
+            {
+                cell = kvp.Key;
+                return true;
+            }
+        }
+        cell = default;
+        return false;
+    }
+
+    // 유닛을 직접 제거 (셀 좌표 없이)
+    public bool TryRemoveUnit(Unit unit)
+    {
+        if (TryGetCellOfUnit(unit, out var cell))
+        {
+            return TryRemoveUnit(cell, out _);
+        }
+        return false;
+    }
+
     // 벤치 → 보드 드롭용 헬퍼: 스크린/월드 포지션에서 즉시 배치 시도
     public bool TryPlaceAtWorld(Unit unit, Vector3 world, out Vector3Int cell)
     {

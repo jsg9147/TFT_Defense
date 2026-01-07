@@ -1,27 +1,32 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 
+/// <summary>
+/// ìœ ë‹› ì†Œí™˜ ì‹œìŠ¤í…œ ê´€ë¦¬ì
+/// ê³¨ë“œ/ì—ì„¼ìŠ¤ë¥¼ ì‚¬ìš©í•˜ì—¬ ìœ ë‹›ì„ ì†Œí™˜í•˜ê³ , ë„¤íŠ¸ì›Œí¬/ì‹±ê¸€ í”Œë ˆì´ ëª¨ë“œë¥¼ ìë™ìœ¼ë¡œ ì§€ì›í•©ë‹ˆë‹¤.
+/// </summary>
 public class SummonManager : MonoBehaviour
 {
     public static SummonManager Instance;
 
-    [Header("¼ÒÈ¯ ¼³Á¤")]
-    [Tooltip("¼ÒÈ¯ ½Ã ¼Ò¸ğµÇ´Â °ñµå")]
+    [Header("ì†Œí™˜ ì„¤ì •")]
+    [Tooltip("ì†Œí™˜ ì‹œ ì†Œëª¨ë˜ëŠ” ê³¨ë“œ")]
     public int summonCost = 2;
 
-    [Header("ÇÁ¸®¹Ì¾ö ¼ÒÈ¯")]
-    public int premiumSummonEssenceCost = 1;  // Á¤¼ö ±â¹İ ºñ¿ë
+    [Header("í”„ë¦¬ë¯¸ì—„ ì†Œí™˜")]
+    public int premiumSummonEssenceCost = 1;  // ì •ìˆ˜ ê¸°ë°˜ ë¹„ìš©
 
-    [Header("°æÇèÄ¡ ±¸¸Å")]
+    [Header("ê²½í—˜ì¹˜ êµ¬ë§¤")]
     public int expCost = 4;
     public int expPerBuy = 4;
 
-    [Header("È®·ü ¼³Á¤")]
+    [Header("í™•ë¥  ì„¤ì •")]
     public List<ShopProbabilityTable> probabilityTables;
     public ShopProbabilityUI probabilityUI;
 
-    [Header("¼ÒÈ¯ Ç® (µîÀå °¡´ÉÇÑ À¯´Ö)")]
+    [Header("ì†Œí™˜ í’€ (ë“±ì¥ ê°€ëŠ¥í•œ ìœ ë‹›)")]
     public List<UnitData> allUnitDatas;
 
     void Awake() => Instance = this;
@@ -30,6 +35,192 @@ public class SummonManager : MonoBehaviour
     {
         UpdateProbabilityUI();
     }
+
+    #region ë„¤íŠ¸ì›Œí¬ ìœ í‹¸ë¦¬í‹°
+
+    /// <summary>
+    /// ë¡œì»¬ í”Œë ˆì´ì–´ì˜ NetworkPlayer ì»´í¬ë„ŒíŠ¸ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤.
+    /// </summary>
+    /// <returns>ë¡œì»¬ í”Œë ˆì´ì–´ì˜ NetworkPlayer, ì—†ìœ¼ë©´ null</returns>
+    private NetworkPlayer GetLocalNetworkPlayer()
+    {
+        if (NetworkManager.Singleton == null) return null;
+        
+        var playerObj = NetworkManager.Singleton.SpawnManager?.GetLocalPlayerObject();
+        if (playerObj == null) return null;
+        
+        return playerObj.GetComponent<NetworkPlayer>();
+    }
+
+    /// <summary>
+    /// í˜„ì¬ ë„¤íŠ¸ì›Œí¬ ëª¨ë“œì¸ì§€ í™•ì¸í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <returns>ë„¤íŠ¸ì›Œí¬ ëª¨ë“œë©´ true, ì‹±ê¸€ í”Œë ˆì´ë©´ false</returns>
+    private bool IsNetworkMode()
+    {
+        return NetworkGameManager.Instance != null && NetworkGameManager.Instance.IsNetworkMode();
+    }
+
+    #endregion
+
+    #region í†µí™” ê´€ë¦¬ (ë„¤íŠ¸ì›Œí¬/ì‹±ê¸€ í”Œë ˆì´ ìë™ ë¶„ê¸°)
+
+    /// <summary>
+    /// ê³¨ë“œë¥¼ ì°¨ê°í•©ë‹ˆë‹¤. ë„¤íŠ¸ì›Œí¬ ëª¨ë“œì—ì„œëŠ” NetworkPlayerì˜ ServerRPCë¥¼ ì‚¬ìš©í•˜ê³ ,
+    /// ì‹±ê¸€ í”Œë ˆì´ì—ì„œëŠ” CurrencyManagerë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="amount">ì°¨ê°í•  ê³¨ë“œ ì–‘</param>
+    /// <returns>ì°¨ê° ì„±ê³µ ì—¬ë¶€</returns>
+    private bool TrySpendGold(int amount)
+    {
+        if (IsNetworkMode())
+        {
+            var player = GetLocalNetworkPlayer();
+            if (player == null)
+            {
+                Debug.LogWarning("[Summon] ë„¤íŠ¸ì›Œí¬ í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                return false;
+            }
+            
+            if (!player.CanSpendGold(amount))
+            {
+                return false;
+            }
+            
+            player.SpendGoldServerRpc(amount);
+            return true;
+        }
+        else
+        {
+            // ì‹±ê¸€ í”Œë ˆì´: ê¸°ì¡´ CurrencyManager ì‚¬ìš©
+            if (CurrencyManager.Instance == null)
+            {
+                Debug.LogWarning("[Summon] CurrencyManagerë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                return false;
+            }
+            
+            return CurrencyManager.Instance.SpendGold(amount);
+        }
+    }
+
+    /// <summary>
+    /// ê³¨ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤. ë„¤íŠ¸ì›Œí¬ ëª¨ë“œì—ì„œëŠ” NetworkPlayerì˜ ServerRPCë¥¼ ì‚¬ìš©í•˜ê³ ,
+    /// ì‹±ê¸€ í”Œë ˆì´ì—ì„œëŠ” CurrencyManagerë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="amount">ì¶”ê°€í•  ê³¨ë“œ ì–‘</param>
+    private void AddGold(int amount)
+    {
+        if (IsNetworkMode())
+        {
+            var player = GetLocalNetworkPlayer();
+            if (player == null)
+            {
+                Debug.LogWarning("[Summon] ë„¤íŠ¸ì›Œí¬ í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                return;
+            }
+            
+            player.AddGoldServerRpc(amount);
+        }
+        else
+        {
+            if (CurrencyManager.Instance != null)
+            {
+                CurrencyManager.Instance.AddGold(amount);
+            }
+        }
+    }
+
+    /// <summary>
+    /// ì—ì„¼ìŠ¤ë¥¼ ì°¨ê°í•©ë‹ˆë‹¤. ë„¤íŠ¸ì›Œí¬ ëª¨ë“œì—ì„œëŠ” NetworkPlayerì˜ ServerRPCë¥¼ ì‚¬ìš©í•˜ê³ ,
+    /// ì‹±ê¸€ í”Œë ˆì´ì—ì„œëŠ” CurrencyManagerë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="amount">ì°¨ê°í•  ì—ì„¼ìŠ¤ ì–‘</param>
+    /// <returns>ì°¨ê° ì„±ê³µ ì—¬ë¶€</returns>
+    private bool TrySpendEssence(int amount)
+    {
+        if (IsNetworkMode())
+        {
+            var player = GetLocalNetworkPlayer();
+            if (player == null)
+            {
+                Debug.LogWarning("[Summon] ë„¤íŠ¸ì›Œí¬ í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                return false;
+            }
+            
+            if (!player.CanSpendEssence(amount))
+            {
+                return false;
+            }
+            
+            player.SpendEssenceServerRpc(amount);
+            return true;
+        }
+        else
+        {
+            // ì‹±ê¸€ í”Œë ˆì´: ê¸°ì¡´ CurrencyManager ì‚¬ìš©
+            if (CurrencyManager.Instance == null)
+            {
+                Debug.LogWarning("[Summon] CurrencyManagerë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                return false;
+            }
+            
+            return CurrencyManager.Instance.SpendEssence(amount);
+        }
+    }
+
+    /// <summary>
+    /// ì—ì„¼ìŠ¤ë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤. ë„¤íŠ¸ì›Œí¬ ëª¨ë“œì—ì„œëŠ” NetworkPlayerì˜ ServerRPCë¥¼ ì‚¬ìš©í•˜ê³ ,
+    /// ì‹±ê¸€ í”Œë ˆì´ì—ì„œëŠ” CurrencyManagerë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="amount">ì¶”ê°€í•  ì—ì„¼ìŠ¤ ì–‘</param>
+    private void AddEssence(int amount)
+    {
+        if (IsNetworkMode())
+        {
+            var player = GetLocalNetworkPlayer();
+            if (player == null)
+            {
+                Debug.LogWarning("[Summon] ë„¤íŠ¸ì›Œí¬ í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                return;
+            }
+            
+            player.AddEssenceServerRpc(amount);
+        }
+        else
+        {
+            if (CurrencyManager.Instance != null)
+            {
+                CurrencyManager.Instance.AddEssence(amount);
+            }
+        }
+    }
+
+    /// <summary>
+    /// í˜„ì¬ í”Œë ˆì´ì–´ ë ˆë²¨ì„ ê°€ì ¸ì˜µë‹ˆë‹¤. ë„¤íŠ¸ì›Œí¬ ëª¨ë“œì—ì„œëŠ” NetworkPlayerë¥¼,
+    /// ì‹±ê¸€ í”Œë ˆì´ì—ì„œëŠ” PlayerLevelManagerë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <returns>í”Œë ˆì´ì–´ ë ˆë²¨ (ê¸°ë³¸ê°’: 1)</returns>
+    private int GetPlayerLevel()
+    {
+        if (IsNetworkMode())
+        {
+            var player = GetLocalNetworkPlayer();
+            if (player != null)
+            {
+                return player.Level;
+            }
+        }
+        
+        // ì‹±ê¸€ í”Œë ˆì´ ë˜ëŠ” ë„¤íŠ¸ì›Œí¬ í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ì„ ë•Œ
+        if (PlayerLevelManager.Instance != null)
+        {
+            return PlayerLevelManager.Instance.Level;
+        }
+        
+        return 1; // ê¸°ë³¸ê°’
+    }
+
+    #endregion
 
     public void SummonOnce() => SummonMultiple(1);
     public void SummonPremiumOnce() => SummonPremiumMultiple(1);
@@ -48,61 +239,61 @@ public class SummonManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// ÀÚµ¿ ¹èÄ¡: Ã¹ ¹øÂ° ºó Ä­À» Ã£¾Æ Áï½Ã »ı¼º/¹èÄ¡. ½ÇÆĞ ½Ã È¯ºÒ.
+    /// ìë™ ë°°ì¹˜: ì²« ë²ˆì§¸ ë¹ˆ ì¹¸ì„ ì°¾ì•„ ì¦‰ì‹œ ìƒì„±/ë°°ì¹˜. ì‹¤íŒ¨ ì‹œ í™˜ë¶ˆ. 
     /// </summary>
     bool TrySummonOne_AutoPlace()
     {
         var gm = GridManager.Instance;
 
-        // 1) Ä­ È®ÀÎ
+        // 1) ì¹¸ í™•ì¸
         if (gm == null || !gm.HasPlaceableCell())
         {
-            Debug.Log("¹èÄ¡ÇÒ Ä­ÀÌ ¾ø½À´Ï´Ù.");
+            Debug.Log("ë°°ì¹˜í•  ì¹¸ì´ ì—†ìŠµë‹ˆë‹¤.");
             return false;
         }
 
-        // 2) ºñ¿ë Â÷°¨
-        if (!CurrencyManager.Instance.SpendGold(summonCost))
+        // 2) ë¹„ìš© ì°¨ê° (ë„¤íŠ¸ì›Œí¬/ì‹±ê¸€ í”Œë ˆì´ ìë™ ë¶„ê¸°)
+        if (!TrySpendGold(summonCost))
         {
-            Debug.Log("°ñµå ºÎÁ·");
+            Debug.Log("ê³¨ë“œ ë¶€ì¡±");
             return false;
         }
 
-        // 3) À¯´Ö °áÁ¤
+        // 3) ìœ ë‹› ê²°ì •
         UnitData pick = RollOneUnit();
         if (pick == null)
         {
-            Debug.LogWarning("À¯´Ö Ç® ºñ¾îÀÖÀ½");
-            CurrencyManager.Instance.AddGold(summonCost); // È¯ºÒ
+            Debug.LogWarning("ìœ ë‹› í’€ ë¹„ì–´ìˆìŒ");
+            AddGold(summonCost); // í™˜ë¶ˆ
             return false;
         }
 
-        // 4) Áï½Ã ¼ÒÈ¯
+        // 4) ì¦‰ì‹œ ì†Œí™˜
         if (TrySpawnUnitAtFirstFreeCell(pick, out var spawned))
         {
             OnSummonSuccess(pick);
             return true;
         }
 
-        // ½ÇÆĞ ½Ã È¯ºÒ
-        CurrencyManager.Instance.AddGold(summonCost);
+        // ì‹¤íŒ¨ ì‹œ í™˜ë¶ˆ
+        AddGold(summonCost);
         return false;
     }
 
 
     void OnSummonSuccess(UnitData data)
     {
-        Debug.Log($"[Summon] {data.unitName} ÀÚµ¿ ¹èÄ¡ ¿Ï·á");
-        // TODO: µµ°¨ µî·Ï / ¡°New!¡± ¿¬Ãâ / ·¹½ÃÇÇ Ã¼Å© / »ç¿îµå
+        Debug.Log($"[Summon] {data.unitName} ìë™ ë°°ì¹˜ ì™„ë£Œ");
+        // TODO: ë„ê° ë“±ë¡ / â€œNew!â€ ì—°ì¶œ / ë ˆì‹œí”¼ ì²´í¬ / ì‚¬ìš´ë“œ
     }
 
-    // ¦¡ È®·ü ·ÎÁ÷ µ¿ÀÏ ¦¡
+    // â”€ í™•ë¥  ë¡œì§ ë™ì¼ â”€
     UnitData RollOneUnit()
     {
         if (allUnitDatas == null || allUnitDatas.Count == 0)
             return null;
 
-        int level = PlayerLevelManager.Instance.Level;
+        int level = GetPlayerLevel();
         if (probabilityTables == null || probabilityTables.Count == 0)
             return PickUniform(allUnitDatas);
 
@@ -150,13 +341,26 @@ public class SummonManager : MonoBehaviour
 
     public void BuyExp()
     {
-        if (!CurrencyManager.Instance.SpendGold(expCost))
+        if (!TrySpendGold(expCost))
         {
-            Debug.Log("°ñµå ºÎÁ·");
+            Debug.Log("ê³¨ë“œ ë¶€ì¡±");
             return;
         }
 
-        PlayerLevelManager.Instance.AddExp(expPerBuy);
+        // ê²½í—˜ì¹˜ ì¶”ê°€ë„ ë„¤íŠ¸ì›Œí¬ ëª¨ë“œë©´ NetworkPlayer ì‚¬ìš©
+        if (IsNetworkMode())
+        {
+            var player = GetLocalNetworkPlayer();
+            if (player != null)
+            {
+                player.AddExpServerRpc(expPerBuy);
+            }
+        }
+        else
+        {
+            PlayerLevelManager.Instance.AddExp(expPerBuy);
+        }
+        
         UpdateProbabilityUI();
     }
 
@@ -165,7 +369,7 @@ public class SummonManager : MonoBehaviour
         if (probabilityUI == null || probabilityTables == null || probabilityTables.Count == 0)
             return;
 
-        int level = PlayerLevelManager.Instance.Level;
+        int level = GetPlayerLevel();
         int idx = Mathf.Clamp(level - 1, 0, probabilityTables.Count - 1);
 
         var table = probabilityTables[idx];
@@ -178,13 +382,13 @@ public class SummonManager : MonoBehaviour
         var gm = GridManager.Instance;
         if (gm == null || !gm.HasPlaceableCell()) return false;
 
-        if (!CurrencyManager.Instance.SpendEssence(premiumSummonEssenceCost))
+        if (!TrySpendEssence(premiumSummonEssenceCost))
         {
-            Debug.Log("Á¤¼ö ºÎÁ·");
+            Debug.Log("ì—ì„¼ìŠ¤ ë¶€ì¡±");
             return false;
         }
 
-        UnitData pick = RollOneUnit(); // (ÇÊ¿äÇÏ¸é ¿©±â¼­ 4~5ÄÚ½ºÆ®·Î Á¦ÇÑÇÏ´Â Roll ±¸ÇöÀ¸·Î ±³Ã¼)
+        UnitData pick = RollOneUnit(); // (í•„ìš”í•˜ë©´ ì—¬ê¸°ì„œ 4~5ì½”ìŠ¤íŠ¸ë¡œ ì œí•œí•˜ëŠ” Roll êµ¬í˜„ìœ¼ë¡œ êµì²´)
 
         if (TrySpawnUnitAtFirstFreeCell(pick, out var spawned))
         {
@@ -192,8 +396,8 @@ public class SummonManager : MonoBehaviour
             return true;
         }
 
-        // ½ÇÆĞ ½Ã È¯ºÒ
-        CurrencyManager.Instance.AddEssence(premiumSummonEssenceCost);
+        // ì‹¤íŒ¨ ì‹œ í™˜ë¶ˆ
+        AddEssence(premiumSummonEssenceCost);
         return false;
     }
 
@@ -204,32 +408,32 @@ public class SummonManager : MonoBehaviour
 
         if (data == null || data.unitPrefab == null)
         {
-            Debug.LogWarning("[Spawn] UnitData ¶Ç´Â unitPrefab ´©¶ô");
+            Debug.LogWarning("[Spawn] UnitData ë˜ëŠ” unitPrefab ëˆ„ë½");
             return false;
         }
         var gm = GridManager.Instance;
         if (gm == null)
         {
-            Debug.LogWarning("[Spawn] GridManager ¾øÀ½");
+            Debug.LogWarning("[Spawn] GridManager ì—†ìŒ");
             return false;
         }
         if (!gm.TryFindFirstPlaceable(out var cell))
         {
-            Debug.Log("[Spawn] ¹èÄ¡ÇÒ Ä­ ¾øÀ½");
+            Debug.Log("[Spawn] ë°°ì¹˜í•  ì¹¸ ì—†ìŒ");
             return false;
         }
 
-        // 1) ÀÎ½ºÅÏ½º »ı¼º
+        // 1) ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
         var go = Instantiate(data.unitPrefab);
         var unit = go.GetComponent<Unit>();
         if (unit == null) unit = go.AddComponent<Unit>();
         unit.Init(data);
 
-        // 2) Grid ¹èÄ¡ (½ÇÆĞ ½Ã Á¤¸®)
+        // 2) Grid ë°°ì¹˜ (ì‹¤íŒ¨ ì‹œ ì •ë¦¬)
         if (!gm.TryPlaceUnit(unit, cell))
         {
             Destroy(go);
-            Debug.Log("[Spawn] ¹èÄ¡ ½ÇÆĞ");
+            Debug.Log("[Spawn] ë°°ì¹˜ ì‹¤íŒ¨");
             return false;
         }
 
@@ -238,26 +442,26 @@ public class SummonManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ºñ¿ë Â÷°¨ ¾øÀÌ, ÄÚ½ºÆ® ¹üÀ§¸¦ °¡ÁßÄ¡·Î ÀçÁ¤±ÔÈ­ÇØ 1°³ À¯´ÖÀ» ÀÚµ¿ ¹èÄ¡.
-    /// ¼º°ø ½Ã true, ½ÇÆĞ ½Ã false (Ä­ ¾ø°Å³ª Ç® ¾øÀ½ µî)
+    /// ë¹„ìš© ì°¨ê° ì—†ì´, ì½”ìŠ¤íŠ¸ ë²”ìœ„ë¥¼ ê°€ì¤‘ì¹˜ë¡œ ì¬ì •ê·œí™”í•´ 1ê°œ ìœ ë‹›ì„ ìë™ ë°°ì¹˜.
+    /// ì„±ê³µ ì‹œ true, ì‹¤íŒ¨ ì‹œ false (ì¹¸ ì—†ê±°ë‚˜ í’€ ì—†ìŒ ë“±)
     /// </summary>
     public bool TrySummonFree_ByCostRange_AutoPlace(int minCost, int maxCost)
     {
         var gm = GridManager.Instance;
         if (gm == null || !gm.HasPlaceableCell())
         {
-            Debug.Log("[Summon] Ä­ ¾øÀ½");
+            Debug.Log("[Summon] ì¹¸ ì—†ìŒ");
             return false;
         }
 
         UnitData pick = RollOneUnit_ByCostRangeWeighted(minCost, maxCost);
         if (pick == null)
         {
-            // Ç® ºñ¾îÀÖÀ» ¶§ Æú¹é (ÀüÃ¼¿¡¼­ ±Õµî)
+            // í’€ ë¹„ì–´ìˆì„ ë•Œ í´ë°± (ì „ì²´ì—ì„œ ê· ë“±)
             pick = PickUniform(allUnitDatas);
             if (pick == null)
             {
-                Debug.LogWarning("[Summon] Ç® ºñ¾îÀÖÀ½");
+                Debug.LogWarning("[Summon] í’€ ë¹„ì–´ìˆìŒ");
                 return false;
             }
         }
@@ -270,16 +474,16 @@ public class SummonManager : MonoBehaviour
         return false;
     }
 
-    // === È®·üÇ¥¸¦ ¹üÀ§ ³»·Î ÀçÁ¤±ÔÈ­ÇÑ µÚ ÄÚ½ºÆ® ÇÈ ¡æ À¯´Ö ÇÈ
+    // === í™•ë¥ í‘œë¥¼ ë²”ìœ„ ë‚´ë¡œ ì¬ì •ê·œí™”í•œ ë’¤ ì½”ìŠ¤íŠ¸ í”½ â†’ ìœ ë‹› í”½
     private UnitData RollOneUnit_ByCostRangeWeighted(int minCost, int maxCost)
     {
         if (allUnitDatas == null || allUnitDatas.Count == 0) return null;
 
-        float[] probs = GetCurrentLevelProbabilities(); // ±æÀÌ 5, ÇÕ=1 (¾øÀ¸¸é ±Õµî)
+        float[] probs = GetCurrentLevelProbabilities(); // ê¸¸ì´ 5, í•©=1 (ì—†ìœ¼ë©´ ê· ë“±)
         if (probs == null || probs.Length != 5)
             return PickUnitByCostRange(minCost, maxCost);
 
-        // ¹üÀ§ ¹ÛÀº 0À¸·Î ¸¸µé°í ÀçÁ¤±ÔÈ­
+        // ë²”ìœ„ ë°–ì€ 0ìœ¼ë¡œ ë§Œë“¤ê³  ì¬ì •ê·œí™”
         float sum = 0f;
         for (int i = 0; i < probs.Length; i++)
         {
@@ -293,7 +497,7 @@ public class SummonManager : MonoBehaviour
         for (int i = 0; i < probs.Length; i++) probs[i] /= sum;
 
         int chosenCost = PickCostByWeight(probs);
-        // ÇØ´ç ÄÚ½ºÆ® ¾øÀ¸¸é ¹üÀ§ ÀüÃ¼¿¡¼­ Æú¹é
+        // í•´ë‹¹ ì½”ìŠ¤íŠ¸ ì—†ìœ¼ë©´ ë²”ìœ„ ì „ì²´ì—ì„œ í´ë°±
         var list = allUnitDatas.Where(u => u != null && u.cost == chosenCost).ToList();
         if (list.Count == 0) return PickUnitByCostRange(minCost, maxCost);
 
@@ -304,14 +508,14 @@ public class SummonManager : MonoBehaviour
     {
         if (probabilityTables != null && probabilityTables.Count > 0)
         {
-            int level = PlayerLevelManager.Instance.Level;
+            int level = GetPlayerLevel();
             int idx = Mathf.Clamp(level - 1, 0, probabilityTables.Count - 1);
             var table = probabilityTables[idx];
             table.Normalize();
             var p = table.GetProbabilities();
             if (p != null && p.Length == 5) return p;
         }
-        // Æú¹é: ±Õµî
+        // í´ë°±: ê· ë“±
         return new float[] { 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
     }
 

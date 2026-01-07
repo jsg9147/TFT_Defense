@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class EvolutionManager : MonoSingleton<EvolutionManager>
+public class EvolutionManager : SceneSingleton<EvolutionManager>
 {
     [Header("설정")]
     [Tooltip("최대 성급 (설계: 최대 5성)")]
@@ -121,6 +121,11 @@ public class EvolutionManager : MonoSingleton<EvolutionManager>
         {
             SynergyManager.Instance?.UnregisterUnit(c); // 있으면 정합성 유지
             UnregisterOnField(c);
+            
+            // GridManager에서 점유 해제
+            if (GridManager.Instance != null)
+                GridManager.Instance.TryRemoveUnit(c);
+            
             PlayConsumeVFX(c.transform.position);
             Destroy(c.gameObject);
         }

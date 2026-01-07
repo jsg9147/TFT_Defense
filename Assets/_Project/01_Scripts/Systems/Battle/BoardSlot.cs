@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class BoardSlot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public Vector3Int Cell { get; private set; }
-    [SerializeField] private GameObject highlight; // ¿É¼Å³Î
-    [SerializeField] private SpriteRenderer highlightRenderer; // Åõ¸í ½ºÇÁ¶óÀÌÆ® µî
+    [SerializeField] private GameObject highlight; // ì˜µì…”ë„
+    [SerializeField] private SpriteRenderer highlightRenderer; // íˆ¬ëª… ìŠ¤í”„ë¼ì´íŠ¸ ë“±
 
     public void Init(Vector3Int cell) => Cell = cell;
 
@@ -14,20 +14,20 @@ public class BoardSlot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
         var upm = UnitPlacementManager.Instance;
         var gm = GridManager.Instance;
 
-        // 1) »óÁ¡ ±¸¸Å·Î ÁøÀÔÇÑ "¹èÄ¡ ¸ğµå"¸é: Áï½Ã ½ºÆù+¹èÄ¡
+        // 1) ìƒì  êµ¬ë§¤ë¡œ ì§„ì…í•œ "ë°°ì¹˜ ëª¨ë“œ"ë©´: ì¦‰ì‹œ ìŠ¤í°+ë°°ì¹˜
         if (upm != null && upm.IsPlacing)
         {
             upm.TryPlaceUnit(gm.CellToWorldCenter(Cell));
             return;
         }
 
-        // 2) ¾Æ´Ï¸é ±âÁ¸Ã³·³ ¼±ÅÃµÈ À¯´Ö(¿ÀºêÁ§Æ®) ÀÌµ¿/¹èÄ¡
+        // 2) ì•„ë‹ˆë©´ ê¸°ì¡´ì²˜ëŸ¼ ì„ íƒëœ ìœ ë‹›(ì˜¤ë¸Œì íŠ¸) ì´ë™/ë°°ì¹˜
         var selected = UnitSelectionManager.Instance?.GetSelectedUnit();
         if (selected == null || gm == null) return;
 
         var prevCell = gm.WorldToCell(selected.transform.position);
         if (gm.GetUnitAt(prevCell) == selected)
-            gm.TryMoveUnit(prevCell, Cell);
+            gm.TryMoveUnit(prevCell, Cell); 
         else
             gm.TryPlaceUnit(selected, Cell);
     }

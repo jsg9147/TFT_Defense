@@ -1,16 +1,16 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using System.Linq;
 
-/// SPUM ±âº» ÆÄ¶ó¹ÌÅÍ(1_Move, 2_Attack, ...)¸¦ ÀÚµ¿À¸·Î Ã£¾Æ ÇØ½Ã·Î º¸°üÇÏ°í,
-/// »óÈ²¿¡ ¸Â°Ô ¾ÈÀüÇÏ°Ô È£ÃâÇÏ´Â ·¡ÆÛ
+/// SPUM ê¸°ë³¸ íŒŒë¼ë¯¸í„°(1_Move, 2_Attack, ...)ë¥¼ ìë™ìœ¼ë¡œ ì°¾ì•„ í•´ì‹œë¡œ ë³´ê´€í•˜ê³ ,
+/// ìƒí™©ì— ë§ê²Œ ì•ˆì „í•˜ê²Œ í˜¸ì¶œí•˜ëŠ” ë˜í¼
 [DisallowMultipleComponent]
 public class UnitAnimatorDriver : MonoBehaviour
 {
     [SerializeField] private Animator animator;
 
-    // ÇØ½Ã Ä³½Ã
-    private int _pMove = -1;      // "1_Move" (float/È¤Àº bool·Î ¾²´Â °æ¿ìµµ ÀÖÀ¸³ª SPUMÀº º¸Åë float speed)
+    // í•´ì‹œ ìºì‹œ
+    private int _pMove = -1;      // "1_Move" (float/í˜¹ì€ boolë¡œ ì“°ëŠ” ê²½ìš°ë„ ìˆìœ¼ë‚˜ SPUMì€ ë³´í†µ float speed)
     private int _pAttack = -1;    // "2_Attack" (Trigger)
     private int _pDamaged = -1;   // "3_Damaged" (Trigger)
     private int _pDeath = -1;     // "4_Death" (Trigger)
@@ -18,7 +18,7 @@ public class UnitAnimatorDriver : MonoBehaviour
     private int _pOther = -1;     // "6_Other" (Trigger)
     private int _pIsDeath = -1;   // "isDeath" (Bool)
 
-    // ÀÌ¸§ ÈÄº¸(ÆÀ/Åø¿¡¼­ »ìÂ¦ ¹Ù²î¾îµµ °ßµô ¼ö ÀÖ°Ô ºÎºĞÀÏÄ¡ Å½»ö)
+    // ì´ë¦„ í›„ë³´(íŒ€/íˆ´ì—ì„œ ì‚´ì§ ë°”ë€Œì–´ë„ ê²¬ë”œ ìˆ˜ ìˆê²Œ ë¶€ë¶„ì¼ì¹˜ íƒìƒ‰)
     private static readonly string[] MoveNames = { "1_Move", "Move", "Speed" };
     private static readonly string[] AttackNames = { "2_Attack", "Attack" };
     private static readonly string[] DamageNames = { "3_Damaged", "Damaged", "Hit" };
@@ -28,7 +28,7 @@ public class UnitAnimatorDriver : MonoBehaviour
     private static readonly string[] IsDeathNames = { "isDeath", "IsDeath" };
 
     private void Awake()
-    {
+    { 
         if (!animator) animator = GetComponentInChildren<Animator>(true);
         RebindParameters();
     }
@@ -43,7 +43,7 @@ public class UnitAnimatorDriver : MonoBehaviour
     {
         if (!animator) return;
 
-        // Animator¿¡ µî·ÏµÈ ¸ğµç ÆÄ¶ó¹ÌÅÍ¸¦ ÈÈ¾î¼­ ÀÌ¸§ ºÎºĞÀÏÄ¡·Î ¸ÅÇÎ
+        // Animatorì— ë“±ë¡ëœ ëª¨ë“  íŒŒë¼ë¯¸í„°ë¥¼ í›‘ì–´ì„œ ì´ë¦„ ë¶€ë¶„ì¼ì¹˜ë¡œ ë§¤í•‘
         var ps = animator.parameters;
 
         _pMove = FindHash(ps, MoveNames);
@@ -63,19 +63,19 @@ public class UnitAnimatorDriver : MonoBehaviour
         return p != null ? Animator.StringToHash(p.name) : -1;
     }
 
-    // ===== ¿ÜºÎ¿¡¼­ È£ÃâÇÒ ¾ÈÀü ·¡ÆÛ =====
+    // ===== ì™¸ë¶€ì—ì„œ í˜¸ì¶œí•  ì•ˆì „ ë˜í¼ =====
     public void SetMoveSpeed(float speed)
     {
         if (!animator) return;
         if (_pMove != -1) animator.SetFloat(_pMove, speed);
-        animator.speed = Mathf.Max(0.1f, speed); // Å¬¸³ ¼Óµµµµ °°ÀÌ ºñ·Ê(¿øÇÏ¸é ÁÖ¼®)
+        animator.speed = Mathf.Max(0.1f, speed); // í´ë¦½ ì†ë„ë„ ê°™ì´ ë¹„ë¡€(ì›í•˜ë©´ ì£¼ì„)
     }
 
     public void PlayIdle()
     {
         if (!animator) return;
-        // SPUM ±âº»Àº IDLEÀÌ º£ÀÌ½ºÀÌ¹Ç·Î º°µµ ÆÄ¶ó¹ÌÅÍ ¾øÀÌµµ À¯ÁöµÊ.
-        // ÇÊ¿ä ½Ã animator.Play("IDLE"); ÇØµµ µÊ(½ºÅ×ÀÌÆ® ÀÌ¸§ °íÁ¤ ½Ã)
+        // SPUM ê¸°ë³¸ì€ IDLEì´ ë² ì´ìŠ¤ì´ë¯€ë¡œ ë³„ë„ íŒŒë¼ë¯¸í„° ì—†ì´ë„ ìœ ì§€ë¨.
+        // í•„ìš” ì‹œ animator.Play("IDLE"); í•´ë„ ë¨(ìŠ¤í…Œì´íŠ¸ ì´ë¦„ ê³ ì • ì‹œ)
     }
 
     public void TriggerAttack() { SetTriggerIfValid(_pAttack); }

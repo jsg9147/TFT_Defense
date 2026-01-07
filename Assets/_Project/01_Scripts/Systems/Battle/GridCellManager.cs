@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 
 public class GridCellManager : MonoBehaviour
@@ -13,14 +13,14 @@ public class GridCellManager : MonoBehaviour
     void GenerateGrid()
     {
         var gm = GridManager.Instance;
-        if (gm == null || gm.grid == null) { Debug.LogWarning("GridManager/grid ¾øÀ½"); return; }
+        if (gm == null || gm.grid == null) { Debug.LogWarning("GridManager/grid ì—†ìŒ"); return; }
 
-        // Àç»ý¼º ½Ã Á¤¸®
+        // ìž¬ìƒì„± ì‹œ ì •ë¦¬
         for (int i = cellParent.childCount - 1; i >= 0; --i)
             Destroy(cellParent.GetChild(i).gameObject);
 
         for (int y = 0; y < gm.height; y++)
-            for (int x = 0; x < gm.width; x++)
+            for (int x = 0; x < gm.width; x++) 
             {
                 var cell = new Vector3Int(gm.origin.x + x, gm.origin.y + y, 0);
                 var world = gm.CellToWorldCenter(cell);
