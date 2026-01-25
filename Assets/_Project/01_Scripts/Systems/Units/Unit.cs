@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
@@ -7,39 +7,39 @@ using System.Reflection;
 [RequireComponent(typeof(UnitInspectable))]
 public class Unit : MonoBehaviour
 {
-    [Header("Range Detector(ÀÚµ¿ »ı¼º/¿¬°á)")]
-    [SerializeField] private UnitRangeDetector rangeDetectorPrefab; // ºñ¿öµµ ÀÚµ¿ »ı¼º °¡´É
+    [Header("Range Detector(ìë™ ìƒì„±/ì—°ê²°)")]
+    [SerializeField] private UnitRangeDetector rangeDetectorPrefab; // ë¹„ì›Œë„ ìë™ ìƒì„± ê°€ëŠ¥
     [SerializeField] private UnitRangeDetector rangeDetectorRef;
 
-    [Header("±âº» ±¸¼º")]
+    [Header("ê¸°ë³¸ êµ¬ì„±")]
     public Animator animator;
     public CanvasGroup canvasGroup;
     public Transform firePoint;
 
-    [Header("±âº» µ¥ÀÌÅÍ")]
+    [Header("ê¸°ë³¸ ë°ì´í„°")]
     public UnitData data;
-    public GameObject bulletPrefab; // ±¸¹öÀü È£È¯¿ë (¾øÀ¸¸é data.projectilePrefab »ç¿ë)
+    public GameObject bulletPrefab; // êµ¬ë²„ì „ í˜¸í™˜ìš© (ì—†ìœ¼ë©´ data.projectilePrefab ì‚¬ìš©) 
 
-    [Header("»óÅÂ")]
+    [Header("ìƒíƒœ")]
     public int starLevel = 1;
 
-    // Unit.cs »ó´Ü ÇÊµå ±ÙÃ³¿¡ Ãß°¡
-    [Header("½ºÅ¸ ºñÁÖ¾ó")]
-    [SerializeField] private Transform visualRoot;       // ½ºÄÉÀÏ Àû¿ë ´ë»ó(¾øÀ¸¸é ÀÚµ¿À¸·Î transform)
+    // Unit.cs ìƒë‹¨ í•„ë“œ ê·¼ì²˜ì— ì¶”ê°€
+    [Header("ìŠ¤íƒ€ ë¹„ì£¼ì–¼")]
+    [SerializeField] private Transform visualRoot;       // ìŠ¤ì¼€ì¼ ì ìš© ëŒ€ìƒ(ì—†ìœ¼ë©´ ìë™ìœ¼ë¡œ transform)
 
     private Vector3 _baseScale = Vector3.one;
     private Coroutine _bumpCo;
 
-    // === µğ¹ö±× Åä±Û ===
+    // === ë””ë²„ê·¸ í† ê¸€ ===
     [Header("Debug")]
-    [SerializeField] private bool logOnApply = false;     // Àû¿ë ÇÑ ÁÙ ¿ä¾à
-    [SerializeField] private bool logBreakdown = false;    // Ãàº°(ÄÚ½ºÆ®/Á÷¾÷/¿À¸®Áø) ±â¿©µµ »ó¼¼
+    [SerializeField] private bool logOnApply = false;     // ì ìš© í•œ ì¤„ ìš”ì•½
+    [SerializeField] private bool logBreakdown = false;    // ì¶•ë³„(ì½”ìŠ¤íŠ¸/ì§ì—…/ì˜¤ë¦¬ì§„) ê¸°ì—¬ë„ ìƒì„¸
 
     private float attackCooldown;
     private float lastAttackTime;
     private readonly List<Monster> monstersInRange = new();
 
-    // === Ãß°¡: ¾÷±×·¹ÀÌµå ¹èÀ² Ä³½Ã ===
+    // === ì¶”ê°€: ì—…ê·¸ë ˆì´ë“œ ë°°ìœ¨ ìºì‹œ ===
     private float _atkMul = 1f;
     private float _aspdMul = 1f;
 
@@ -64,7 +64,7 @@ public class Unit : MonoBehaviour
         ApplyUpgradesNow();
         UpdateAnimatorSpeed();
 
-        // ÇöÀç º° ºñÁÖ¾ó Áï½Ã ¹İ¿µ
+        // í˜„ì¬ ë³„ ë¹„ì£¼ì–¼ ì¦‰ì‹œ ë°˜ì˜
         ApplyStarVisuals(false);
     }
 
@@ -73,7 +73,7 @@ public class Unit : MonoBehaviour
         if (UpgradeManager.Instance != null)
             UpgradeManager.Instance.OnUpgradeChanged -= HandleUpgradeChanged;
 
-        // ¿À¿À¶ó Á¤¸®(Àü¿ª ¼­ºñ½º)
+        // ì˜¤ì˜¤ë¼ ì •ë¦¬(ì „ì—­ ì„œë¹„ìŠ¤)
         AuraService.Instance?.Clear(this);
     }
 
@@ -82,7 +82,7 @@ public class Unit : MonoBehaviour
         if (animator != null) return;
         animator = GetComponentInChildren<Animator>(true);
     }
-    private void OnTransformChildrenChanged() // ÀÚ½Ä °¥¾Æ³¢¿ì¸é ÀÚµ¿ ÀçÅ½»ö
+    private void OnTransformChildrenChanged() // ìì‹ ê°ˆì•„ë¼ìš°ë©´ ìë™ ì¬íƒìƒ‰
     {
         CacheAnimatorIfNeeded();
         UpdateAnimatorSpeed();
@@ -92,7 +92,7 @@ public class Unit : MonoBehaviour
         if (animator == null || data == null) return;
         float aps = Mathf.Min(data.attackSpeed * _aspdMul, 5f);
         animator.speed = Mathf.Max(0.1f, aps / 1.0f);
-        animDrv?.SetMoveSpeed(aps); // SPUM Move ÆÄ¶ó¹ÌÅÍ¿¡µµ ¿¬µ¿(Á¤ÁöÇüÀÌ¸é À¯ÁöÇØµµ ¹«¹æ)
+        animDrv?.SetMoveSpeed(aps); // SPUM Move íŒŒë¼ë¯¸í„°ì—ë„ ì—°ë™(ì •ì§€í˜•ì´ë©´ ìœ ì§€í•´ë„ ë¬´ë°©)
     }
 
     private void HandleUpgradeChanged()
@@ -102,10 +102,10 @@ public class Unit : MonoBehaviour
 
     private void Start()
     {
-        // ±âÁ¸
+        // ê¸°ì¡´
         // attackCooldown = 1f / Mathf.Max(0.01f, data.attackSpeed);
 
-        // === º¯°æ: ¹èÀ² Æ÷ÇÔ(ÃÊ±â¿£ _aspdMul=1f ÀÌÁö¸¸ ÀÌº¥Æ® Á÷ÈÄ¿¡µµ ÀÏ°ü¼º À¯Áö) ===
+        // === ë³€ê²½: ë°°ìœ¨ í¬í•¨(ì´ˆê¸°ì—” _aspdMul=1f ì´ì§€ë§Œ ì´ë²¤íŠ¸ ì§í›„ì—ë„ ì¼ê´€ì„± ìœ ì§€) ===
         attackCooldown = 1f / Mathf.Max(0.01f, data.attackSpeed * _aspdMul);
 
         var col = GetComponent<CircleCollider2D>();
@@ -117,20 +117,20 @@ public class Unit : MonoBehaviour
     }
     private void Update()
     {
-        // ¹«È¿ Å¸°Ù Á¤¸®
+        // ë¬´íš¨ íƒ€ê²Ÿ ì •ë¦¬
         monstersInRange.RemoveAll(m => m == null || !m.gameObject.activeInHierarchy);
         if (monstersInRange.Count == 0) return;
 
         if (Time.time < lastAttackTime + attackCooldown) return;
 
-        // ÆĞÅÏ °áÁ¤
+        // íŒ¨í„´ ê²°ì •
         if (Has(data.types, UnitType.Area))
             FireArea();
         else if (Has(data.types, UnitType.MultiShot))
             FireMultiShot();
         else if (Has(data.types, UnitType.Chain))
             FireChain();
-        else // ±âº»: ´ÜÀÏ
+        else // ê¸°ë³¸: ë‹¨ì¼
             FireSingleShot();
 
         lastAttackTime = Time.time;
@@ -145,7 +145,7 @@ public class Unit : MonoBehaviour
             canvasGroup = GetComponentInChildren<CanvasGroup>();
         ApplyUpgradesNow();
 
-        // (¼±ÅÃ) Äİ¶óÀÌ´õ ¹İ°æµµ °»½ÅÇÏ°í ½ÍÀ¸¸é:
+        // (ì„ íƒ) ì½œë¼ì´ë” ë°˜ê²½ë„ ê°±ì‹ í•˜ê³  ì‹¶ìœ¼ë©´:
         var col = GetComponent<CircleCollider2D>();
         if (col != null)
         {
@@ -159,11 +159,11 @@ public class Unit : MonoBehaviour
     {
         if (!rangeDetectorRef)
         {
-            // ÀÚ½Ä¿¡¼­ ¸ÕÀú Ã£±â
+            // ìì‹ì—ì„œ ë¨¼ì € ì°¾ê¸°
             rangeDetectorRef = GetComponentInChildren<UnitRangeDetector>(true);
             if (!rangeDetectorRef)
             {
-                // ¾øÀ¸¸é »ı¼º
+                // ì—†ìœ¼ë©´ ìƒì„±
                 var go = new GameObject("RangeDetector");
                 go.transform.SetParent(transform, false);
                 go.transform.localPosition = Vector3.zero;
@@ -171,28 +171,28 @@ public class Unit : MonoBehaviour
                 rangeDetectorRef = go.AddComponent<UnitRangeDetector>();
                 rangeDetectorRef.unit = this;
 
-                // ÇÊ¼ö ÄÄÆ÷³ÍÆ®´Â UnitRangeDetector°¡ Require·Î ÀÚµ¿ ºÎÂøµÊ
+                // í•„ìˆ˜ ì»´í¬ë„ŒíŠ¸ëŠ” UnitRangeDetectorê°€ Requireë¡œ ìë™ ë¶€ì°©ë¨
             }
         }
-        // ¹İ°æ µ¿±âÈ­
+        // ë°˜ê²½ ë™ê¸°í™”
         rangeDetectorRef.unit = this;
         rangeDetectorRef.SyncRadius();
     }
     public void RefreshAfterStarChanged()
     {
-        ApplyStarVisuals(true);   // ÆßÇÁ ¿¬Ãâ Æ÷ÇÔ
+        ApplyStarVisuals(true);   // íŒí”„ ì—°ì¶œ í¬í•¨
         ApplyUpgradesNow();
         UpdateAnimatorSpeed();
-        AuraService.Instance?.Apply(this);   // Àü¿ª ¿À¿À¶ó °»½Å
+        AuraService.Instance?.Apply(this);   // ì „ì—­ ì˜¤ì˜¤ë¼ ê°±ì‹ 
     }
 
     private void ApplyStarVisuals(bool withBump)
     {
         if (visualRoot == null) visualRoot = transform;
         if (_baseScale == Vector3.one && visualRoot != null)
-            _baseScale = visualRoot.localScale; // ¾ÈÀü¸Á
+            _baseScale = visualRoot.localScale; // ì•ˆì „ë§
 
-        // 2¼º ½ºÄÉÀÏ: Àü¿ª SO °ª »ç¿ë(¾øÀ¸¸é 1.3f)
+        // 2ì„± ìŠ¤ì¼€ì¼: ì „ì—­ SO ê°’ ì‚¬ìš©(ì—†ìœ¼ë©´ 1.3f)
         float star2Scale = AuraService.Instance?.config?.star2Scale ?? 1.3f;
         float targetScale = (starLevel >= 2) ? star2Scale : 1f;
         Vector3 to = _baseScale * targetScale;
@@ -207,22 +207,22 @@ public class Unit : MonoBehaviour
             visualRoot.localScale = to;
         }
 
-        // ¿À¿À¶ó »ı¼º/°»½ÅÀº Àü¿ª ¼­ºñ½º¿¡ À§ÀÓ
+        // ì˜¤ì˜¤ë¼ ìƒì„±/ê°±ì‹ ì€ ì „ì—­ ì„œë¹„ìŠ¤ì— ìœ„ì„
         AuraService.Instance?.Apply(this);
     }
 
 
-    /// <summary> °£´ÜÇÑ Æ¢¾î¿À¸£´Â ½ºÄÉÀÏ ¿¬Ãâ(0.12s ¾÷, 0.10s ´Ù¿î) </summary>
+    /// <summary> ê°„ë‹¨í•œ íŠ€ì–´ì˜¤ë¥´ëŠ” ìŠ¤ì¼€ì¼ ì—°ì¶œ(0.12s ì—…, 0.10s ë‹¤ìš´) </summary>
     private System.Collections.IEnumerator CoBumpScale(Vector3 finalScale)
     {
         const float upTime = 0.12f;
         const float downTime = 0.10f;
 
         Vector3 start = visualRoot.localScale;
-        // ¾÷: 7% ´õ Å°¿ü´Ù°¡
+        // ì—…: 7% ë” í‚¤ì› ë‹¤ê°€
         Vector3 peak = finalScale * 1.07f;
 
-        // ¾÷ ±¸°£
+        // ì—… êµ¬ê°„
         float t = 0f;
         while (t < upTime)
         {
@@ -232,7 +232,7 @@ public class Unit : MonoBehaviour
             yield return null;
         }
 
-        // ´Ù¿î ±¸°£(ÇÇÅ© -> ÃÖÁ¾)
+        // ë‹¤ìš´ êµ¬ê°„(í”¼í¬ -> ìµœì¢…)
         t = 0f;
         while (t < downTime)
         {
@@ -251,7 +251,7 @@ public class Unit : MonoBehaviour
         var target = SelectPrimaryTarget();
         if (!target) return;
 
-        animDrv?.TriggerAttack();   // ¡Ú ¿©±â¸¸ Ãß°¡
+        animDrv?.TriggerAttack();   // â˜… ì—¬ê¸°ë§Œ ì¶”ê°€
         if (ShouldUseProjectile()) SpawnProjectile(target.transform);
         else ApplyHit(target);
     }
@@ -261,7 +261,7 @@ public class Unit : MonoBehaviour
         var targets = GetSortedTargetsByDistance().Take(Mathf.Max(1, data.multishotCount)).ToList();
         if (targets.Count == 0) return;
 
-        animDrv?.TriggerAttack();   // ¡Ú µ¿ÀÏ
+        animDrv?.TriggerAttack();   // â˜… ë™ì¼
         if (ShouldUseProjectile()) foreach (var t in targets) SpawnProjectile(t.transform);
         else foreach (var t in targets) ApplyHit(t);
     }
@@ -271,7 +271,7 @@ public class Unit : MonoBehaviour
         var center = SelectPrimaryTarget();
         if (!center) return;
 
-        animDrv?.TriggerAttack();   // ¡Ú µ¿ÀÏ
+        animDrv?.TriggerAttack();   // â˜… ë™ì¼
         if (ShouldUseProjectile()) SpawnProjectile(center.transform);
         else
         {
@@ -286,7 +286,7 @@ public class Unit : MonoBehaviour
         var first = SelectPrimaryTarget();
         if (!first) return;
 
-        animDrv?.TriggerAttack();   // ¡Ú µ¿ÀÏ
+        animDrv?.TriggerAttack();   // â˜… ë™ì¼
         if (ShouldUseProjectile()) SpawnProjectile(first.transform);
         else
         {
@@ -303,8 +303,8 @@ public class Unit : MonoBehaviour
         }
     }
 
-    // === Åõ»çÃ¼ ½ºÆù ===
-    // (¼­¸í º¯°æ) _legacyDamage Á¦°Å, attacker(this) Àü´Ş
+    // === íˆ¬ì‚¬ì²´ ìŠ¤í° ===
+    // (ì„œëª… ë³€ê²½) _legacyDamage ì œê±°, attacker(this) ì „ë‹¬
     private void SpawnProjectile(Transform target)
     {
         var prefab = data.projectilePrefab != null ? data.projectilePrefab : bulletPrefab;
@@ -313,10 +313,10 @@ public class Unit : MonoBehaviour
         var go = Instantiate(prefab, firePoint.position, Quaternion.identity);
         var b = go.GetComponent<Bullet>();
         if (b != null)
-            b.Initialize(target, /*payload:*/ default, /*attacker:*/ this); // payload´Â Bullet¿¡¼­ ¸íÁß ½Ã »ı¼º
+            b.Initialize(target, /*payload:*/ default, /*attacker:*/ this); // payloadëŠ” Bulletì—ì„œ ëª…ì¤‘ ì‹œ ìƒì„±
     }
 
-    // === BulletÀÌ ¾µ ¼ö ÀÖµµ·Ï °ø°³ ===
+    // === Bulletì´ ì“¸ ìˆ˜ ìˆë„ë¡ ê³µê°œ ===
     public DamagePayload BuildImpactPayload()
     {
         int baseDmg = GetAttackDamage();
@@ -337,11 +337,11 @@ public class Unit : MonoBehaviour
     }
 
 
-    // ===== Å¸°Ù/À¯Æ¿ =====
+    // ===== íƒ€ê²Ÿ/ìœ í‹¸ =====
 
     private Monster SelectPrimaryTarget()
     {
-        // °£´Ü: °¡Àå °¡±î¿î Å¸°Ù
+        // ê°„ë‹¨: ê°€ì¥ ê°€ê¹Œìš´ íƒ€ê²Ÿ
         return GetSortedTargetsByDistance().FirstOrDefault();
     }
 
@@ -371,8 +371,8 @@ public class Unit : MonoBehaviour
 
     private bool ShouldUseProjectile()
     {
-        // ±ÙÁ¢ÀÌµç ¿ø°Å¸®µç ÀÏ´Ü ¹ß»çÃ¼ ¿ì¼± »ç¿ëÇÏ°í ½Í´Ù¸é true ¹İÈ¯
-        // Áö±İÀº prefab À¯¹«·Î ÆÇ´Ü
+        // ê·¼ì ‘ì´ë“  ì›ê±°ë¦¬ë“  ì¼ë‹¨ ë°œì‚¬ì²´ ìš°ì„  ì‚¬ìš©í•˜ê³  ì‹¶ë‹¤ë©´ true ë°˜í™˜
+        // ì§€ê¸ˆì€ prefab ìœ ë¬´ë¡œ íŒë‹¨
         return (data.projectilePrefab != null) || (bulletPrefab != null && data.projectilePrefab == null);
     }
 
@@ -397,25 +397,25 @@ public class Unit : MonoBehaviour
         if (Has(data.types, UnitType.Poison))
             StartCoroutine(CoPoison(target));
     }
-    // ===== Unit.cs ¾È¿¡ ³Ö´Â ÃÖÁ¾º» =====
+    // ===== Unit.cs ì•ˆì— ë„£ëŠ” ìµœì¢…ë³¸ =====
     private DamagePayload BuildBasicPayload()
     {
-        // 1) ±âº» Å¸ÀÔ ÆÇÁ¤
+        // 1) ê¸°ë³¸ íƒ€ì… íŒì •
         DamageType type =
             Has(data.types, UnitType.Magic) ? DamageType.Magic :
-            Has(data.types, UnitType.Elemental) ? DamageType.Magic : // ¿ø¼Ò´Â ÃÊ±â¿¡ ¸¶¹ı Ãë±Ş
+            Has(data.types, UnitType.Elemental) ? DamageType.Magic : // ì›ì†ŒëŠ” ì´ˆê¸°ì— ë§ˆë²• ì·¨ê¸‰
             Has(data.types, UnitType.Area) ? DamageType.Area :
                                                    DamageType.Physical;
 
-        // 2) ±âº» °ø°İ·Â
+        // 2) ê¸°ë³¸ ê³µê²©ë ¥
         float dmg = GetAttackDamage();
 
-        // 3) ½Ã³ÊÁö ½º³À¼¦ ¹Ş¾Æ¼­ º¸Á¤ (¾øÀ¸¸é ±âº»°ª)
+        // 3) ì‹œë„ˆì§€ ìŠ¤ëƒ…ìƒ· ë°›ì•„ì„œ ë³´ì • (ì—†ìœ¼ë©´ ê¸°ë³¸ê°’)
         var snap = (SynergyManager.Instance != null)
             ? SynergyManager.Instance.GetSnapshotFor(this)
             : SynergySnapshot.Default;
 
-        // 4) Å¸ÀÔº° ¹èÀ² Àû¿ë + Æòµô °¡»ê
+        // 4) íƒ€ì…ë³„ ë°°ìœ¨ ì ìš© + í‰ë”œ ê°€ì‚°
         dmg += snap.flatAdd;
         switch (type)
         {
@@ -425,13 +425,13 @@ public class Unit : MonoBehaviour
             case DamageType.True: dmg *= snap.trueMul; break;
         }
 
-        // 5) Å©¸®/°üÅë º¸Á¤
-        float critChance = Mathf.Clamp01(0.10f + snap.critAdd);   // ±âº» 10% + ½Ã³ÊÁö
+        // 5) í¬ë¦¬/ê´€í†µ ë³´ì •
+        float critChance = Mathf.Clamp01(0.10f + snap.critAdd);   // ê¸°ë³¸ 10% + ì‹œë„ˆì§€
         float critMultiplier = Mathf.Max(1f, 1.50f + snap.critMultAdd);
         float armorPen = Mathf.Clamp01(snap.armorPenAdd);
         float magicPen = Mathf.Clamp01(snap.magicPenAdd);
 
-        // 6) ÆäÀÌ·Îµå ±¸¼º
+        // 6) í˜ì´ë¡œë“œ êµ¬ì„±
         return new DamagePayload
         {
             BaseDamage = Mathf.Max(1, Mathf.RoundToInt(dmg)),
@@ -451,14 +451,14 @@ public class Unit : MonoBehaviour
         if (Has(data.types, UnitType.Elemental))
             return DamageType.True;
 
-        // AOE ÆĞÅÏÀÌ¸é ÇÇÇØ Å¸ÀÔµµ Area·Î ÅÂ±ë(¹æ¾î 50% ±ÔÄ¢ Àû¿ë ¸ñÀû)
+        // AOE íŒ¨í„´ì´ë©´ í”¼í•´ íƒ€ì…ë„ Areaë¡œ íƒœê¹…(ë°©ì–´ 50% ê·œì¹™ ì ìš© ëª©ì )
         if (Has(data.types, UnitType.Area))
             return DamageType.Area;
 
         return DamageType.Physical;
     }
 
-    // Poison(DoT)µµ ÆäÀÌ·Îµå·Î Àü¼Û
+    // Poison(DoT)ë„ í˜ì´ë¡œë“œë¡œ ì „ì†¡
     private System.Collections.IEnumerator CoPoison(Monster target)
     {
         int ticks = Mathf.Max(1, data.poisonTickCount);
@@ -469,7 +469,7 @@ public class Unit : MonoBehaviour
             var payload = new DamagePayload
             {
                 BaseDamage = Mathf.Max(1, data.poisonDamagePerTick),
-                Type = DamageType.True, // ÃÊ±â¿£ °íÁ¤ÇÇÇØ·Î Ã³¸®
+                Type = DamageType.True, // ì´ˆê¸°ì—” ê³ ì •í”¼í•´ë¡œ ì²˜ë¦¬
                 Source = this.gameObject
             };
 
@@ -484,7 +484,7 @@ public class Unit : MonoBehaviour
     {
         int baseDmg = data.baseAttack + (starLevel - 1) * 5;
 
-        // === Ãß°¡: ¾÷±×·¹ÀÌµå °íÁ¤ Áõ°¡·® ===
+        // === ì¶”ê°€: ì—…ê·¸ë ˆì´ë“œ ê³ ì • ì¦ê°€ëŸ‰ ===
         int flat = 0;
         if (UpgradeManager.Instance != null)
             flat = UpgradeManager.Instance.GetFinalAttackFlat(data);
@@ -494,10 +494,10 @@ public class Unit : MonoBehaviour
     }
 
 
-    // ¹ü¿ë ÇÃ·¡±× Ã¼Å©
+    // ë²”ìš© í”Œë˜ê·¸ ì²´í¬
     private static bool Has(UnitType mask, UnitType flag) => (mask & flag) == flag;
 
-    // »ç°Å¸® °¨½Ã
+    // ì‚¬ê±°ë¦¬ ê°ì‹œ
     public void AddMonsterInRange(Monster monster)
     {
         if (monster != null && !monstersInRange.Contains(monster))
@@ -514,7 +514,7 @@ public class Unit : MonoBehaviour
         if (canvasGroup != null) canvasGroup.alpha = active ? 0.7f : 1f;
     }
 
-    // === Ãß°¡: ¾÷±×·¹ÀÌµå Àû¿ë º»Ã¼ ===
+    // === ì¶”ê°€: ì—…ê·¸ë ˆì´ë“œ ì ìš© ë³¸ì²´ ===
     private void ApplyUpgradesNow()
     {
         if (data == null || UpgradeManager.Instance == null) return;
@@ -523,15 +523,15 @@ public class Unit : MonoBehaviour
         _atkMul = Mathf.Max(0f, atkMul);
         _aspdMul = Mathf.Max(0.0001f, aspdMul);
 
-        // °ø¼Ó »óÇÑ(¼±ÅÃ)
+        // ê³µì† ìƒí•œ(ì„ íƒ)
         float aps = data.attackSpeed * _aspdMul;
-        aps = Mathf.Min(aps, 5f); // ¿¹: ÃÊ´ç 5Å¸ »óÇÑ
+        aps = Mathf.Min(aps, 5f); // ì˜ˆ: ì´ˆë‹¹ 5íƒ€ ìƒí•œ
 
-        attackCooldown = 1f / Mathf.Max(0.01f, aps);  // ¡ç ÀÌ ÁÙ¸¸ ³²±â°í, Áßº¹ °è»ê ÁÙÀº Á¦°Å
+        attackCooldown = 1f / Mathf.Max(0.01f, aps);  // â† ì´ ì¤„ë§Œ ë‚¨ê¸°ê³ , ì¤‘ë³µ ê³„ì‚° ì¤„ì€ ì œê±°
 
         if (logOnApply || logBreakdown) LogUpgradeApplied();
     }
-    // === ½ÇÁ¦ ·Î±× Ãâ·Â ===
+    // === ì‹¤ì œ ë¡œê·¸ ì¶œë ¥ ===
     private void LogUpgradeApplied()
     {
         var um = UpgradeManager.Instance;
@@ -539,7 +539,7 @@ public class Unit : MonoBehaviour
 
         int baseDmg = data.baseAttack + (starLevel - 1) * 5;
         int flat = 0;
-        if (um != null) flat = um.GetFinalAttackFlat(data);   // Flat ¾È ¾²¸é 0 ¹İÈ¯
+        if (um != null) flat = um.GetFinalAttackFlat(data);   // Flat ì•ˆ ì“°ë©´ 0 ë°˜í™˜
 
         float finalDmg = (baseDmg + flat) * _atkMul;
         float aps = Mathf.Min(data.attackSpeed * _aspdMul, 5f);
@@ -549,13 +549,13 @@ public class Unit : MonoBehaviour
         {
             Debug.Log(
                 $"[Upgrade][{name}] cost={data.cost}, jobs={data.jobs}, origins={data.origins} | " +
-                $"ATK {baseDmg} + {flat} ¡æ {finalDmg:F1} (x{_atkMul:F2}), " +
-                $"APS {data.attackSpeed:F2} ¡æ {aps:F2} (x{_aspdMul:F2}) | CD {cd:F3}s");
+                $"ATK {baseDmg} + {flat} â†’ {finalDmg:F1} (x{_atkMul:F2}), " +
+                $"APS {data.attackSpeed:F2} â†’ {aps:F2} (x{_aspdMul:F2}) | CD {cd:F3}s");
         }
 
         if (logBreakdown)
         {
-            var bd = um.BuildBreakdown(data); // ¾Æ·¡ 2) Âü°í
+            var bd = um.BuildBreakdown(data); // ì•„ë˜ 2) ì°¸ê³ 
             var lines = string.Join("\n   ", bd.lines);
             Debug.Log(
                 $"[Upgrade-Breakdown][{name}] sums: +ATK% {bd.atkPctSum:P1}, +ASPD% {bd.aspdPctSum:P1}, +Flat {bd.flatSum}\n   {lines}");
@@ -563,12 +563,12 @@ public class Unit : MonoBehaviour
 
         if (logBreakdown)
         {
-            var bd = um.BuildBreakdown(data); // ÀÌ¹Ì ¾²°í ÀÖ´Â ºê·¹ÀÌÅ©´Ù¿î
+            var bd = um.BuildBreakdown(data); // ì´ë¯¸ ì“°ê³  ìˆëŠ” ë¸Œë ˆì´í¬ë‹¤ìš´
             var lines = string.Join("\n   ", bd.lines);
             Debug.Log(
                 $"[Upgrade-Breakdown][{name}] sums: +ATK% {bd.atkPctSum:P1}, +ASPD% {bd.aspdPctSum:P1}, +Flat {bd.flatSum}\n   {lines}");
 #if UNITY_EDITOR
-            LogCurvePresenceEditor();   // ¡ç Ä¿ºê À¯¹«/½ºÅ×ÀÌÁö ÇÑ ÁÙ ¿ä¾à
+            LogCurvePresenceEditor();   // â† ì»¤ë¸Œ ìœ ë¬´/ìŠ¤í…Œì´ì§€ í•œ ì¤„ ìš”ì•½
 #endif
         }
 
@@ -583,7 +583,7 @@ public class Unit : MonoBehaviour
             var um = UpgradeManager.Instance;
             if (um == null || data == null) return;
 
-            // UpgradeManagerÀÇ private 'config' ÀĞ±â
+            // UpgradeManagerì˜ private 'config' ì½ê¸°
             var cfgField = typeof(UpgradeManager).GetField("config",
                 BindingFlags.NonPublic | BindingFlags.Instance);
             var cfg = cfgField?.GetValue(um) as UpgradeConfig;

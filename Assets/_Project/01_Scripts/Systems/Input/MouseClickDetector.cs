@@ -1,23 +1,23 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class MouseClickDetector : MonoBehaviour
 {
     [Header("Layers")]
-    public LayerMask unitLayer;  // À¯´Ö ¼±ÅÃ
-    public LayerMask slotLayer;  // º¸µå ½½·Ô(Äİ¶óÀÌ´õ °¡Áø ¼¿)
+    public LayerMask unitLayer;  // ìœ ë‹› ì„ íƒ
+    public LayerMask slotLayer;  // ë³´ë“œ ìŠ¬ë¡¯(ì½œë¼ì´ë” ê°€ì§„ ì…€)
 
-    [Header("ÆÇ¸Å ÀÔ·Â")]
-    [Tooltip("¿ìÅ¬¸¯À¸·Î Ä¿¼­ ¾Æ·¡ À¯´Ö ÆÇ¸Å")]
+    [Header("íŒë§¤ ì…ë ¥")]
+    [Tooltip("ìš°í´ë¦­ìœ¼ë¡œ ì»¤ì„œ ì•„ë˜ ìœ ë‹› íŒë§¤")]
     public bool rightClickSell = true;
 
-    [Tooltip("¼±ÅÃµÈ À¯´Ö Delete Å°·Î ÆÇ¸Å")]
+    [Tooltip("ì„ íƒëœ ìœ ë‹› Delete í‚¤ë¡œ íŒë§¤")]
     public bool deleteKeySellSelected = true;
 
     private Vector3 originUnitPos;
-    private BoardSlot lastHovered; // ½½·Ô ´ÜÀ§·Î ÃßÀû
+    private BoardSlot lastHovered; // ìŠ¬ë¡¯ ë‹¨ìœ„ë¡œ ì¶”ì 
 
-    private Vector3Int originCell;
+    private Vector3Int originCell; 
     private bool draggedFromBoard;
 
 
@@ -34,16 +34,16 @@ public class MouseClickDetector : MonoBehaviour
         if (Mouse.current.leftButton.wasReleasedThisFrame)
             EndDragTryPlace();
 
-        // --- Ãß°¡: ¿ìÅ¬¸¯ ÆÇ¸Å ---
+        // --- ì¶”ê°€: ìš°í´ë¦­ íŒë§¤ ---
         //if (rightClickSell && Mouse.current.rightButton.wasPressedThisFrame)
         //    TrySellUnderCursor();
 
-        // --- Ãß°¡: Delete Å°·Î '¼±ÅÃ À¯´Ö' ÆÇ¸Å ---
+        // --- ì¶”ê°€: Delete í‚¤ë¡œ 'ì„ íƒ ìœ ë‹›' íŒë§¤ ---
         if (deleteKeySellSelected && Keyboard.current.deleteKey.wasPressedThisFrame)
             TrySellSelectedUnit();
     }
 
-    // --- À¯´Ö ¼±ÅÃ ½ÃÀÛ ---
+    // --- ìœ ë‹› ì„ íƒ ì‹œì‘ ---
     void BeginDragIfUnit()
     {
         var world = GetMouseWorld();
@@ -59,7 +59,7 @@ public class MouseClickDetector : MonoBehaviour
             var gm = GridManager.Instance;
             var cell = gm.WorldToCell(originUnitPos);
 
-            // ÀÌ À¯´ÖÀÌ º¸µå À§¿¡ ÀÖ´ÂÁö È®ÀÎ
+            // ì´ ìœ ë‹›ì´ ë³´ë“œ ìœ„ì— ìˆëŠ”ì§€ í™•ì¸
             if (gm.GetUnitAt(cell) == unit)
             {
                 originCell = cell;
@@ -67,7 +67,7 @@ public class MouseClickDetector : MonoBehaviour
             }
             else
             {
-                draggedFromBoard = false; // º¥Ä¡/»óÁ¡ À¯´Ö °°Àº °æ¿ì
+                draggedFromBoard = false; // ë²¤ì¹˜/ìƒì  ìœ ë‹› ê°™ì€ ê²½ìš°
             }
 
             UnitDragHandler.Instance.StartDragging(unit);
@@ -76,7 +76,7 @@ public class MouseClickDetector : MonoBehaviour
     }
 
 
-    // --- µå·¡±× Áß ÀÌµ¿(½Ã°¢¿ë) ---
+    // --- ë“œë˜ê·¸ ì¤‘ ì´ë™(ì‹œê°ìš©) ---
     void UpdateDragFollow()
     {
         if (!UnitDragHandler.Instance.IsDragging()) return;
@@ -85,7 +85,7 @@ public class MouseClickDetector : MonoBehaviour
         unit.transform.position = world;
     }
 
-    // --- µå·¡±× Á¾·á: º¸µå ¼¿ ¹èÄ¡ ½Ãµµ ---
+    // --- ë“œë˜ê·¸ ì¢…ë£Œ: ë³´ë“œ ì…€ ë°°ì¹˜ ì‹œë„ ---
     void EndDragTryPlace()
     {
         if (!UnitDragHandler.Instance.IsDragging()) return;
@@ -99,8 +99,8 @@ public class MouseClickDetector : MonoBehaviour
 
         if (draggedFromBoard)
         {
-            // === º¸µå¿¡¼­ º¸µå·Î ÀÌµ¿ ===
-            // °°Àº Ä­ÀÌ¸é ±×³É ¿ø·¡ ÀÚ¸®·Î ½º³À¸¸
+            // === ë³´ë“œì—ì„œ ë³´ë“œë¡œ ì´ë™ ===
+            // ê°™ì€ ì¹¸ì´ë©´ ê·¸ëƒ¥ ì›ë˜ ìë¦¬ë¡œ ìŠ¤ëƒ…ë§Œ
             if (targetCell == originCell)
             {
                 unit.transform.position = gm.CellToWorldCenter(originCell);
@@ -108,20 +108,20 @@ public class MouseClickDetector : MonoBehaviour
             }
             else
             {
-                // ÀÌµ¿Àº TryMoveUnit »ç¿ë (IsPlaceable ¸»°í ³»ºÎ¿¡¼­ Ã¼Å©)
+                // ì´ë™ì€ TryMoveUnit ì‚¬ìš© (IsPlaceable ë§ê³  ë‚´ë¶€ì—ì„œ ì²´í¬)
                 placed = gm.TryMoveUnit(originCell, targetCell);
             }
         }
         else
         {
-            // === º¥Ä¡/»óÁ¡ À¯´Ö ¡æ º¸µå Ã¹ ¹èÄ¡ ===
+            // === ë²¤ì¹˜/ìƒì  ìœ ë‹› â†’ ë³´ë“œ ì²« ë°°ì¹˜ ===
             if (gm.IsPlaceable(targetCell))
                 placed = gm.TryPlaceUnit(unit, targetCell);
         }
 
         if (!placed)
         {
-            // ½ÇÆĞÇÏ¸é ¿ø·¡ ÀÚ¸®·Î º¹±Í
+            // ì‹¤íŒ¨í•˜ë©´ ì›ë˜ ìë¦¬ë¡œ ë³µê·€
             unit.transform.position = originUnitPos;
         }
 
@@ -129,7 +129,7 @@ public class MouseClickDetector : MonoBehaviour
         draggedFromBoard = false;
     }
 
-    // --- ½½·Ô ÇÏÀÌ¶óÀÌÆ® ---
+    // --- ìŠ¬ë¡¯ í•˜ì´ë¼ì´íŠ¸ ---
     void MouseOverSlot()
     {
         var world = GetMouseWorld();
@@ -148,7 +148,7 @@ public class MouseClickDetector : MonoBehaviour
                 {
                     var dragging = UnitDragHandler.Instance.GetDraggingUnit();
                     if (slot.Cell == originCell)
-                        can = true; // ¿ø·¡ ÀÚ¸®·Î´Â Ç×»ó °¡´É
+                        can = true; // ì›ë˜ ìë¦¬ë¡œëŠ” í•­ìƒ ê°€ëŠ¥
                     else
                         can = gm.IsInBounds(slot.Cell) && !gm.IsBlocked(slot.Cell) && !gm.IsOccupied(slot.Cell);
                 }
@@ -165,22 +165,22 @@ public class MouseClickDetector : MonoBehaviour
         lastHovered = null;
     }
 
-    // --- Ãß°¡: Ä¿¼­ ¾Æ·¡ À¯´Ö ¿ìÅ¬¸¯ ÆÇ¸Å ---
-    // --- Ãß°¡: Ä¿¼­ ¾Æ·¡ À¯´Ö ¿ìÅ¬¸¯ ÆÇ¸Å ---
+    // --- ì¶”ê°€: ì»¤ì„œ ì•„ë˜ ìœ ë‹› ìš°í´ë¦­ íŒë§¤ ---
+    // --- ì¶”ê°€: ì»¤ì„œ ì•„ë˜ ìœ ë‹› ìš°í´ë¦­ íŒë§¤ ---
     void TrySellUnderCursor()
     {
-        // µå·¡±× ÁßÀÌ¸é ÆÇ¸ÅÇÏÁö ¾ÊÀ½(¿ÀÀÛµ¿ ¹æÁö)
+        // ë“œë˜ê·¸ ì¤‘ì´ë©´ íŒë§¤í•˜ì§€ ì•ŠìŒ(ì˜¤ì‘ë™ ë°©ì§€)
         if (UnitDragHandler.Instance.IsDragging()) return;
 
         Vector3 world = GetMouseWorld();
 
-        // 1) Æ÷ÀÎÆ® ´ë½Å ÀÛÀº ¹İ°æÀ¸·Î °ü¿ëµµ ¡è (Ä«¸Ş¶ó/¾ÆÆ® ½ºÄÉÀÏ¿¡ µû¶ó 0.2~0.4 Á¶Àı)
+        // 1) í¬ì¸íŠ¸ ëŒ€ì‹  ì‘ì€ ë°˜ê²½ìœ¼ë¡œ ê´€ìš©ë„ â†‘ (ì¹´ë©”ë¼/ì•„íŠ¸ ìŠ¤ì¼€ì¼ì— ë”°ë¼ 0.2~0.4 ì¡°ì ˆ)
         const float pickRadius = 0.1f;
         var hits = Physics2D.OverlapCircleAll(world, pickRadius, unitLayer);
 
         Unit target = null;
 
-        // 2) ¸ğµç È÷Æ®¸¦ ¼øÈ¸ÇÏ¸é¼­ UnitÀ» Á¤È®È÷ Ã£±â (trigger/ºñtrigger ¸ğµÎ Çã¿ë)
+        // 2) ëª¨ë“  íˆíŠ¸ë¥¼ ìˆœíšŒí•˜ë©´ì„œ Unitì„ ì •í™•íˆ ì°¾ê¸° (trigger/ë¹„trigger ëª¨ë‘ í—ˆìš©)
         foreach (var h in hits)
         {
             if (!h) continue;
@@ -192,17 +192,17 @@ public class MouseClickDetector : MonoBehaviour
 
         if (UnitSellManager.Instance.SellUnit(target, out var refunded))
         {
-            // ¼±ÅÃ ÇØÁ¦(ÀÖ´Ù¸é)
+            // ì„ íƒ í•´ì œ(ìˆë‹¤ë©´)
             if (UnitSelectionManager.Instance != null &&
                 UnitSelectionManager.Instance.GetSelectedUnit() == target)
                 UnitSelectionManager.Instance.Deselect();
 
-            Debug.Log($"¿ìÅ¬¸¯ ÆÇ¸Å: +{refunded} Gold");
+            Debug.Log($"ìš°í´ë¦­ íŒë§¤: +{refunded} Gold");
         }
     }
 
 
-    // --- Ãß°¡: ¼±ÅÃ À¯´Ö Delete ÆÇ¸Å ---
+    // --- ì¶”ê°€: ì„ íƒ ìœ ë‹› Delete íŒë§¤ ---
     void TrySellSelectedUnit()
     {
         var sel = UnitSelectionManager.Instance != null ? UnitSelectionManager.Instance.GetSelectedUnit() : null;
@@ -211,7 +211,7 @@ public class MouseClickDetector : MonoBehaviour
         if (UnitSellManager.Instance.SellUnit(sel, out var refunded))
         {
             UnitSelectionManager.Instance.Deselect();
-            Debug.Log($"¼±ÅÃ À¯´Ö ÆÇ¸Å: +{refunded} Gold");
+            Debug.Log($"ì„ íƒ ìœ ë‹› íŒë§¤: +{refunded} Gold");
         }
     }
 

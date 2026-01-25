@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -7,57 +7,57 @@ using System;
 [CreateAssetMenu(menuName = "Unit/UnitData")]
 public class UnitData : ScriptableObject
 {
-    [Header("ÇÁ¸®ÆÕ ÂüÁ¶(ÇÊ¼ö ±ÇÀå)")]
+    [Header("í”„ë¦¬íŒ¹ ì°¸ì¡°(í•„ìˆ˜ ê¶Œì¥)")]
 #if ODIN_INSPECTOR
     [InlineEditor(Expanded = true)]
 #endif
-    public GameObject unitPrefab;  // ¡ç À¯´Ö °íÀ¯ ÇÁ¸®ÆÕ (SPUM Export °á°ú µî)
-    [Header("±âº»")]
+    public GameObject unitPrefab;  // â† ìœ ë‹› ê³ ìœ  í”„ë¦¬íŒ¹ (SPUM Export ê²°ê³¼ ë“±)
+    [Header("ê¸°ë³¸")]
     public string unitName;
     public Sprite icon;
-    [Header("À¯´Ö Å¸ÀÔ")]
+    [Header("ìœ ë‹› íƒ€ì…")]
 #if ODIN_INSPECTOR
     [EnumToggleButtons, HideLabel]
 #endif
     public UnitType types = UnitType.SingleShot | UnitType.Physical;
-    [Header("À¯´Ö Á÷¾÷")]
+    [Header("ìœ ë‹› ì§ì—…")]
 #if ODIN_INSPECTOR
     [EnumToggleButtons, HideLabel]
 #endif
     public JobSynergy jobs = JobSynergy.None;
-    [Header("°íÀ¯ ½Ã³ÊÁö")]
+    [Header("ê³ ìœ  ì‹œë„ˆì§€")]
 #if ODIN_INSPECTOR
     [EnumToggleButtons, HideLabel]
 #endif
     public OriginSynergy origins = OriginSynergy.None;
-    public int cost = 1;          // 1~9 °¡Á¤ (°ÔÀÓ ³» ºñ¿ë, UI Ç¥½Ã¿ë ¾Æ´Ô)
+    public int cost = 1;          // 1~9 ê°€ì • (ê²Œì„ ë‚´ ë¹„ìš©, UI í‘œì‹œìš© ì•„ë‹˜) 
 
-    [Header("ÀüÅõ ½ºÅÈ")]
+    [Header("ì „íˆ¬ ìŠ¤íƒ¯")]
     public int baseAttack = 10;
-    public float attackSpeed = 1.0f;     // ÃÊ´ç °ø°İ
-    public float range = 3.0f;           // »ç°Å¸®
+    public float attackSpeed = 1.0f;     // ì´ˆë‹¹ ê³µê²©
+    public float range = 3.0f;           // ì‚¬ê±°ë¦¬
 
-    [Header("Åº/ÀÌÆåÆ®")]
-    public GameObject projectilePrefab;  // ¿ø°Å¸® ¹ß»ç¿ë (¹°¸®/¸¶¹ı/¿ø¼Ò °øÅë)
+    [Header("íƒ„/ì´í™íŠ¸")]
+    public GameObject projectilePrefab;  // ì›ê±°ë¦¬ ë°œì‚¬ìš© (ë¬¼ë¦¬/ë§ˆë²•/ì›ì†Œ ê³µí†µ)
 
     [Header("MultiShot")]
-    public int multishotCount = 3;       // µ¿½Ã¿¡ ¸ÂÃâ Å¸°Ù ¼ö
+    public int multishotCount = 3;       // ë™ì‹œì— ë§ì¶œ íƒ€ê²Ÿ ìˆ˜
 
     [Header("Area")]
-    public float areaRadius = 1.5f;      // AOE ¹İ°æ
+    public float areaRadius = 1.5f;      // AOE ë°˜ê²½
 
     [Header("Chain")]
-    public int chainCount = 3;           // ÃÖ´ë Á¡ÇÁ È½¼ö
-    public float chainRange = 2.5f;      // ´ÙÀ½ ´ë»ó Å½»ö ¹İ°æ
+    public int chainCount = 3;           // ìµœëŒ€ ì í”„ íšŸìˆ˜
+    public float chainRange = 2.5f;      // ë‹¤ìŒ ëŒ€ìƒ íƒìƒ‰ ë°˜ê²½
 
     [Header("Poison(DoT)")]
     public int poisonDamagePerTick = 2;
     public float poisonTickInterval = 0.5f;
     public int poisonTickCount = 6;
 
-    [Header("Áö¿ø/Æ¯¼ö(ÇâÈÄ È®Àå¿ë)")]
-    public float buffValue = 0f;   // ¿¹: °ø°İ·Â% Áõ°¡
-    public float debuffValue = 0f; // ¿¹: ¹æ¾î·Â% °¨¼Ò
+    [Header("ì§€ì›/íŠ¹ìˆ˜(í–¥í›„ í™•ì¥ìš©)")]
+    public float buffValue = 0f;   // ì˜ˆ: ê³µê²©ë ¥% ì¦ê°€
+    public float debuffValue = 0f; // ì˜ˆ: ë°©ì–´ë ¥% ê°ì†Œ
 }
 
 
@@ -66,22 +66,22 @@ public enum UnitType
 {
     None = 0,
 
-    // °ø°İ ÆĞÅÏ
-    SingleShot = 1 << 0,   // ´ÜÀÏ Å¸°Ù
-    MultiShot = 1 << 1,   // µ¿½Ã ´ÙÁß Å¸°Ù (N¹ß)
-    Area = 1 << 2,   // ¹üÀ§ ÇÇÇØ (AOE)
-    Chain = 1 << 3,   // ¿¬¼â Á¡ÇÁ ÇÇÇØ
+    // ê³µê²© íŒ¨í„´
+    SingleShot = 1 << 0,   // ë‹¨ì¼ íƒ€ê²Ÿ
+    MultiShot = 1 << 1,   // ë™ì‹œ ë‹¤ì¤‘ íƒ€ê²Ÿ (Në°œ)
+    Area = 1 << 2,   // ë²”ìœ„ í”¼í•´ (AOE)
+    Chain = 1 << 3,   // ì—°ì‡„ ì í”„ í”¼í•´
 
-    // °ø°İ ¼Ó¼º
-    Physical = 1 << 4,   // ¹°¸®
-    Magic = 1 << 5,   // ¸¶¹ı
-    Elemental = 1 << 6,   // ¿ø¼Ò(ºÒ/¹°/¹Ù¶÷/´ëÁö µî, ¼¼ºÎ´Â º°µµ enum·Î È®Àå °¡´É)
-    Poison = 1 << 7,   // Áö¼Ó ÇÇÇØÇü(Áßµ¶)
+    // ê³µê²© ì†ì„±
+    Physical = 1 << 4,   // ë¬¼ë¦¬
+    Magic = 1 << 5,   // ë§ˆë²•
+    Elemental = 1 << 6,   // ì›ì†Œ(ë¶ˆ/ë¬¼/ë°”ëŒ/ëŒ€ì§€ ë“±, ì„¸ë¶€ëŠ” ë³„ë„ enumë¡œ í™•ì¥ ê°€ëŠ¥)
+    Poison = 1 << 7,   // ì§€ì† í”¼í•´í˜•(ì¤‘ë…)
 
-    // Áö¿ø/Æ¯¼ö
-    Buff = 1 << 8,   // ¾Æ±º °­È­
-    Debuff = 1 << 9,   // Àû ¾àÈ­
-    Summon = 1 << 10,  // ¼ÒÈ¯
+    // ì§€ì›/íŠ¹ìˆ˜
+    Buff = 1 << 8,   // ì•„êµ° ê°•í™”
+    Debuff = 1 << 9,   // ì  ì•½í™”
+    Summon = 1 << 10,  // ì†Œí™˜
 }
 
 
