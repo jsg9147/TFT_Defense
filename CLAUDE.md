@@ -24,46 +24,28 @@ This is a Unity project - there are no CLI build commands. Open in Unity Editor 
 3. **Manager Pattern**: Each system has a dedicated Manager class
 4. **Data-Driven Design**: ScriptableObjects in `04_Data/` for all configurable data
 
-### Major Systems (in `Assets/_Project/01_Scripts/Systems/`)
+### Major Systems
 
-| System | Manager | Purpose |
-|--------|---------|---------|
-| GameLoop | `GameManager` | Game state machine (Prepare→Battle→Win/Lose), wave loop, timer |
-| Units | `UnitPlacementManager`, `EvolutionManager` | Unit placement, 3-star evolution system |
-| Monsters | `MonsterSpawner`, `MonsterFieldManager` | Wave-based spawning, field limit tracking |
-| Battle | `GridManager` | 2D grid board (8x5), unit positioning |
-| Combat | `DamageFormula` | Damage calculation with defense/resistance |
-| Synergy | `SynergyManager` | Job/Origin synergy bonuses (tier thresholds: 2/4/6, 1/3/5) |
-| Economy | `SummonManager`, `ShopManager` | Shop, unit summons, currency |
-| Network | `NetworkGameManager`, `NetworkPlayer` | Netcode wrapper, per-player state sync |
+All systems located in `Assets/_Project/01_Scripts/Systems/`. For detailed documentation, see [docs/systems/](docs/systems/README.md).
 
-### Network Architecture
+| System | Manager | Purpose | Docs |
+|--------|---------|---------|------|
+| GameLoop | `GameManager` | Game state machine, wave loop, timer | [gameloop.md](docs/systems/gameloop.md) |
+| Units | `UnitPlacementManager`, `EvolutionManager` | Unit placement, 3-star evolution | [units.md](docs/systems/units.md) |
+| Monsters | `MonsterSpawner`, `MonsterFieldManager` | Wave-based spawning, field limit | [monsters.md](docs/systems/monsters.md) |
+| Battle | `GridManager` | 2D grid board (8x5), unit positioning | [battle.md](docs/systems/battle.md) |
+| Combat | `DamageFormula` | Damage calculation with defense/resistance | [combat.md](docs/systems/combat.md) |
+| Synergy | `SynergyManager` | Job/Origin synergy bonuses | [synergy.md](docs/systems/synergy.md) |
+| Economy | `SummonManager`, `ShopManager` | Shop, unit summons, currency | [economy.md](docs/systems/economy.md) |
+| Upgrade | `UpgradeManager` | Unit enhancement system | [upgrade.md](docs/systems/upgrade.md) |
+| Network | `NetworkGameManager`, `NetworkPlayer` | Netcode wrapper, per-player state sync | [network.md](docs/systems/network.md) |
 
-- **Single-player**: Uses `CurrencyManager` (local singleton)
-- **Multiplayer**: Uses `NetworkPlayer` with NetworkVariables and ServerRPCs
-- Check `NetworkGameManager.IsNetworkMode()` to distinguish modes
-- Monster spawning is server-authoritative
+### Quick Reference
 
-### Key Event Flows
-
-```
-GameManager.InitializeGame() → ResetAllManagers() → WaveLoop()
-    → Prepare Phase (timer) → Battle Phase (MonsterSpawner.StartWave())
-    → Check win/lose → Next wave or end
-
-Unit Placement → GridManager.TryPlaceUnit()
-    → EvolutionManager.RegisterOnField()
-    → SynergyManager.RegisterUnit()
-    → SynergyManager.Recalculate()
-```
-
-### Data Locations (`Assets/_Project/04_Data/`)
-
-- `MonsterData/` - Monster definitions
-- `PlayerUnitData/` - Units organized by cost (Cost01-Cost05)
-- `WaveData/` - Wave configurations
-- `ProbabilityTable/` - Shop roll probabilities by level
-- `Upgrade/` - Enhancement configurations
+- **Network mode check**: `NetworkGameManager.IsNetworkMode()`
+- **Synergy thresholds**: Jobs (2/4/6), Origins (1/3/5)
+- **Grid size**: 8 columns × 5 rows
+- **Data location**: `Assets/_Project/04_Data/`
 
 ## Coding Conventions
 
@@ -79,10 +61,6 @@ Unit Placement → GridManager.TryPlaceUnit()
 - Stop coroutines before starting new ones (prevent duplicates)
 - All managers must implement `Reset()` for scene reload handling
 - Null-check singletons before access
-
-### Synergy Types (Flags Enums)
-- **Jobs (8)**: Warrior, Mage, Ranger, Assassin, Guardian, Support, Engineer, Summoner
-- **Origins (8)**: Kingdom, Undead, Beast, Mech, Spirit, Void, Goblin, Slime
 
 ## External Dependencies
 
