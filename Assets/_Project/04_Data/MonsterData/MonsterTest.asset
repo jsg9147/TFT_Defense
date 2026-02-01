@@ -17,6 +17,6 @@ MonoBehaviour:
   prefab: {fileID: 2132965842359536540, guid: febf62c76f23b2b47afb63e52dfbbc49, type: 3}
   maxHP: 30
   moveSpeed: 5
-  defense: 0
-  magicResistance: 0
+  defense: 10
+  magicResistance: 10
   goldReward: 1

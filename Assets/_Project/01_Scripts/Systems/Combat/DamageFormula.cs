@@ -1,22 +1,22 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public static class DamageFormula
 {
-    // Á¡°¨Çü ¹æ¾î °ø½Ä: effArmor / (100 + effArmor)
+    // ì ê°í˜• ë°©ì–´ ê³µì‹: effArmor / (100 + effArmor)
     static float ArmorReduction(float armor, float pen01)
     {
         float eff = Mathf.Max(0f, armor * (1f - Mathf.Clamp01(pen01)));
         return eff / (100f + eff);
     }
 
-    public static int ComputeFinal(in DamagePayload p, int defense, int magicResist)
+    public static int ComputeFinal(in DamagePayload p, int defense, int magicResist) 
     {
-        // 1) Ä¡¸íÅ¸
+        // 1) ì¹˜ëª…íƒ€
         float raw = p.BaseDamage;
         if (p.CritChance > 0f && Random.value < Mathf.Clamp01(p.CritChance))
             raw *= Mathf.Max(1f, p.CritMultiplier);
 
-        // 2) Å¸ÀÔº° °æ°¨
+        // 2) íƒ€ìž…ë³„ ê²½ê°
         float after = raw;
         switch (p.Type)
         {
@@ -34,7 +34,7 @@ public static class DamageFormula
                 }
             case DamageType.Area:
                 {
-                    // ¿¹: ¹°¸®ÀÇ 50%¸¸ ¹æ¾î Àû¿ë (¿øÇÏ¸é Á¶Àý)
+                    // ì˜ˆ: ë¬¼ë¦¬ì˜ 50%ë§Œ ë°©ì–´ ì ìš© (ì›í•˜ë©´ ì¡°ì ˆ)
                     float red = ArmorReduction(Mathf.RoundToInt(defense * 0.5f), p.ArmorPen);
                     after = raw * (1f - red);
                     break;
@@ -45,7 +45,7 @@ public static class DamageFormula
                 break;
         }
 
-        // 3) ÃÖ¼Ò ÇÇÇØ º¸Àå
+        // 3) ìµœì†Œ í”¼í•´ ë³´ìž¥
         return Mathf.Max(1, Mathf.RoundToInt(after));
     }
 }

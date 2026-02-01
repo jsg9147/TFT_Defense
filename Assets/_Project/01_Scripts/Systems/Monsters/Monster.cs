@@ -36,6 +36,7 @@ public class Monster : MonoBehaviour, IDamageable
     public void Init()
     {
         currentHP = data.maxHP;
+        UpdateHpUI(); // Add this line to update UI immediately
         currentWaypointIndex = 0;
         target = MonsterPathManager.Instance.GetWaypoint(currentWaypointIndex);
         _unregistered = false;
