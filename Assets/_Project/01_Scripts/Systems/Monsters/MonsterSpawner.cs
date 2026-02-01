@@ -9,41 +9,60 @@ public class MonsterSpawner : MonoBehaviour
     [SerializeField] private Transform[] spawnPoints; // pathId와 매칭 
 
     [Header("풀링")]
-    [SerializeField] private Monster prefab;   // 기본 프리팹 (데모용)
     [SerializeField] private Transform poolParent;
-    private MonsterPool pool;
+    private readonly Dictionary<MonsterData, MonsterPool> _pools = new();
 
     private IMonsterFieldService field;
 
     // 상태
     private Coroutine spawnCo;
     private readonly List<Monster> aliveMonsters = new();
-    private int plannedThisWave;   // 이번 웨이브에 스폰 예정 총합
-    private int spawnedThisWave;   // 실제 스폰된 수
 
     public int AliveCount => aliveMonsters.Count;
-    public bool AllPlannedSpawned => spawnedThisWave >= plannedThisWave;
 
     private void Start()
     {
-        pool = new MonsterPool(prefab, 32, poolParent); // 초기치 임의
         field = MonsterFieldManager.Instance;
     }
 
     public bool IsLastWave(int waveIndex)
         => waveSet != null && waveSet.waves != null && waveIndex >= waveSet.waves.Length - 1;
 
-    /// <summary>웨이브 시작</summary>
-    public void StartWave(int waveIndex)
+    public bool IsLastGroup(int waveIndex, int groupIndex)
+    {
+        if (waveSet == null || waveSet.waves == null) return true;
+        if (waveIndex < 0 || waveIndex >= waveSet.waves.Length) return true;
+        
+        return groupIndex >= waveSet.waves[waveIndex].groups.Length - 1;
+    }
+    
+    public WaveGroup GetWaveGroup(int waveIndex, int groupIndex)
+    {
+        return waveSet.waves[waveIndex].groups[groupIndex];
+    }
+    
+    public int GetGroupCount(int waveIndex)
+    {
+        if (waveSet == null || waveSet.waves == null || waveIndex < 0 || waveIndex >= waveSet.waves.Length)
+        {
+            return 0;
+        }
+        return waveSet.waves[waveIndex].groups.Length;
+    }
+
+    /// <summary>웨이브 시작 시 각종 상태 초기화</summary>
+    public void PrepareWave()
     {
         StopSpawning();
-
         aliveMonsters.Clear();
-        spawnedThisWave = 0;
-        plannedThisWave = CountPlanned(waveIndex);
+    }
 
-        spawnCo = StartCoroutine(CoSpawnWave(waveIndex));
-        Debug.Log($"[Spawner] 웨이브 {waveIndex} 시작 | planned={plannedThisWave}");
+    /// <summary>특정 그룹 스폰 시작</summary>
+    public void SpawnWaveGroup(int waveIndex, int groupIndex)
+    {
+        StopSpawning();
+        spawnCo = StartCoroutine(CoSpawnWaveGroup(waveIndex, groupIndex));
+        Debug.Log($"[Spawner] 웨이브 {waveIndex} - 그룹 {groupIndex} 스폰 시작");
     }
 
     /// <summary>웨이브 중단(추가 스폰만 중단, 이미 나온 몬스터는 게임매니저 규칙에 따름)</summary>
@@ -55,52 +74,50 @@ public class MonsterSpawner : MonoBehaviour
             spawnCo = null;
         }
     }
-
-    /// <summary>이번 웨이브에 계획된 몬스터 수 합계</summary>
-    private int CountPlanned(int waveIndex)
-    {
-        if (waveSet == null || waveSet.waves == null) return 0;
-        if (waveIndex < 0 || waveIndex >= waveSet.waves.Length) return 0;
-
-        int sum = 0;
-        foreach (var g in waveSet.waves[waveIndex].groups)
-            sum += Mathf.Max(0, g.count);
-        return sum;
-    }
-
-    private IEnumerator CoSpawnWave(int waveIndex)
+    
+    private IEnumerator CoSpawnWaveGroup(int waveIndex, int groupIndex)
     {
         if (waveSet == null || waveSet.waves == null) yield break;
         if (waveIndex < 0 || waveIndex >= waveSet.waves.Length) yield break;
 
         var wave = waveSet.waves[waveIndex];
+        if (groupIndex < 0 || groupIndex >= wave.groups.Length) yield break;
+        
+        var g = wave.groups[groupIndex];
 
-        foreach (var g in wave.groups)
+        for (int i = 0; i < g.count; i++)
         {
-            for (int i = 0; i < g.count; i++)
-            {
-                // 필드 한도 체크: 넘치면 잠깐 대기
-                while (field != null && field.CurrentCount >= field.FieldLimit)
-                    yield return null;
+            // 필드 한도 체크: 넘치면 잠깐 대기
+            while (field != null && field.CurrentCount >= field.FieldLimit)
+                yield return null;
 
-                SpawnOne(g.monster, g.pathId);
-                spawnedThisWave++;
+            SpawnOne(g.monster, g.pathId);
 
-                if (g.spawnInterval > 0f)
-                    yield return new WaitForSeconds(g.spawnInterval);
-                else
-                    yield return null; // 한 프레임 텀
-            }
+            if (g.spawnInterval > 0f)
+                yield return new WaitForSeconds(g.spawnInterval);
+            else
+                yield return null; // 한 프레임 텀
         }
-
-        // 모든 계획 스폰 완료
-        Debug.Log($"[Spawner] 웨이브 {waveIndex} 계획 스폰 완료 (spawned={spawnedThisWave}/{plannedThisWave})");
+        
+        Debug.Log($"[Spawner] 웨이브 {waveIndex} - 그룹 {groupIndex} 스폰 완료");
         spawnCo = null;
     }
 
     private void SpawnOne(MonsterData data, int pathId)
     {
-        var m = pool.Get();
+        // 데이터에 맞는 풀이 없으면 새로 생성
+        if (!_pools.ContainsKey(data))
+        {
+            if (data.prefab == null)
+            {
+                Debug.LogError($"[MonsterSpawner] MonsterData '{data.name}'에 프리팹이 할당되지 않았습니다!");
+                return;
+            }
+            var newPool = new MonsterPool(data.prefab, 10, poolParent); // 초기 사이즈 10
+            _pools.Add(data, newPool);
+        }
+
+        var m = _pools[data].Get();
         m.transform.position = GetSpawnPoint(pathId).position;
         m.data = data;
         m.Init();
@@ -122,8 +139,17 @@ public class MonsterSpawner : MonoBehaviour
         // 생존 리스트에서 제거
         aliveMonsters.Remove(m);
 
-        // 풀 반납
-        pool.Return(m);
+        // 자신의 데이터에 맞는 풀에 반납
+        if (m.data != null && _pools.TryGetValue(m.data, out var pool))
+        {
+            pool.Return(m);
+        }
+        else
+        {
+            // 풀을 찾지 못하면 그냥 파괴
+            Debug.LogWarning($"[MonsterSpawner] 몬스터 {m.name}의 풀을 찾지 못해 파괴합니다.");
+            Destroy(m.gameObject);
+        }
     }
 
     public Transform GetSpawnPoint(int pathId)

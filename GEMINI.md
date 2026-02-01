@@ -87,6 +87,7 @@ To maintain code quality, we adhere to SOLID principles and clean code practices
     *   Always stop existing coroutines before starting a new one to prevent duplicates.
     *   All singleton managers must implement a `Reset()` method to handle scene reloads gracefully.
     *   Always null-check singletons before accessing their properties or methods.
+*   **Comments**: 가급적 코드에 주석을 추가하여 코드의 의도, 복잡한 로직, 중요한 결정 사항 등을 설명해주세요. 주석은 한글로 작성하는 것을 권장합니다.
 
 ## 6. External Dependencies
 

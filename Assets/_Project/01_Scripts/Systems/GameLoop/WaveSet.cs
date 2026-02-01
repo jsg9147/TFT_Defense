@@ -21,4 +21,7 @@ public struct WaveGroup
     public int count;                  // 몇 마리
     public float spawnInterval;        // 마리 간 간격
     public int pathId;                 // 경로분기 쓰면
+    
+    [Tooltip("이 그룹의 전투 시간(초). 0 이하면 GameManager의 기본 battleTime을 사용합니다.")]
+    public float battleDuration;
 }

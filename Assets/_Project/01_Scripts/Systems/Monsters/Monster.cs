@@ -1,20 +1,21 @@
 using TMPro;
 using UnityEngine;
+using TFT_Defense.Managers;
 
 public class Monster : MonoBehaviour, IDamageable
 {
     public delegate void MonsterDieHandler(Monster monster);
     public event MonsterDieHandler OnMonsterDie;
 
-    [Header("설정")]
+    [Header("")]
     public SpriteRenderer unitSprite;
     public MonsterData data;
-    public TextMeshPro hpText; // 나중에 게이지 형식으로 교체 할꺼임
+    public TextMeshPro hpText; 
 
-    [Header("상태")]
+    [Header("")]
     private int currentHP;
-    private Transform target; // 목표 위치 (경로 끝 또는 목표 타일)
-    private int currentWaypointIndex = 0; // 현재 웨이포인트 인덱스
+    private Transform target; 
+    private int currentWaypointIndex = 0; 
 
     private bool _unregistered;
 
@@ -25,7 +26,7 @@ public class Monster : MonoBehaviour, IDamageable
     private void Start()
     {
         currentHP = data.maxHP;
-        target = MonsterPathManager.Instance.GetWaypoint(currentWaypointIndex); // 예시: 경로 끝 반환
+        target = MonsterPathManager.Instance.GetWaypoint(currentWaypointIndex); 
     }
 
     private void Update()
@@ -48,13 +49,12 @@ public class Monster : MonoBehaviour, IDamageable
         if (target == null) 
         {
             Destroy(gameObject);
-            return; // 목표가 없으면 몬스터 제거
+            return;  
         }
 
         Vector3 dir = (target.position - transform.position).normalized;
         transform.position += dir * data.moveSpeed * Time.deltaTime;
 
-        // 목표 지점에 도달했는지 확인
         if (Vector3.Distance(transform.position, target.position) < 0.1f)
         {
             GetNextTarget();
@@ -65,7 +65,6 @@ public class Monster : MonoBehaviour, IDamageable
     {
         currentWaypointIndex++;
 
-        // 마지막 웨이포인트를 지나면 다시 0으로 되돌림
         if (currentWaypointIndex >= MonsterPathManager.Instance.GetWaypointCount())
         {
             currentWaypointIndex = 0;
@@ -79,7 +78,7 @@ public class Monster : MonoBehaviour, IDamageable
         if (hpText) hpText.text = currentHP.ToString();
     }
 
-    // 인터페이스 적용: 데미지 페이로드로 받기
+
     public void TakeDamage(in DamagePayload payload)
     {
         int finalDamage = DamageFormula.ComputeFinal(
@@ -87,6 +86,11 @@ public class Monster : MonoBehaviour, IDamageable
             data.defense,
             data.magicResistance
         );
+
+        if (finalDamage > 0)
+        {
+            DamageTextManager.Instance.ShowDamage(finalDamage, transform.position);
+        }
 
         currentHP -= finalDamage;
         UpdateHpUI();
@@ -97,13 +101,12 @@ public class Monster : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        OnMonsterDie?.Invoke(this); // 스포너가 Unregister + Return 담당
+        OnMonsterDie?.Invoke(this);     
         _unregistered = true;
     }
 
     private void OnDisable()
     {
-        // 예기치 않은 비활성화 시 누수 방지(씬 종료 시 인위적 생성 방지)
         if (!_unregistered && Application.isPlaying)
         {
             var svc = FindAnyObjectByType<MonsterFieldManager>();

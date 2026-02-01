@@ -114,34 +114,46 @@ public class GameManager : MonoSingleton<GameManager>
     {
         while (true)
         {
-            // 1) 준비 페이즈 (⬅️ 복구)
+            // 1) 준비 페이즈
             SetGameState(GameState.Prepare);
             OnWaveChanged?.Invoke(currentWave);
+            monsterSpawner?.PrepareWave(); // 스포너 상태 초기화
             yield return StartCoroutine(RunTimer(prepareTime));
 
-            // 2) 전투 페이즈
-            SetGameState(GameState.Battle);
-            monsterSpawner?.StartWave(currentWave);
-
-            yield return StartCoroutine(RunTimer(battleTime));
-            monsterSpawner?.StopSpawning(); // 추가 스폰 금지
-
-            int alive = MonsterFieldManager.Instance ? MonsterFieldManager.Instance.CurrentCount : 0;
-            bool last = monsterSpawner != null && monsterSpawner.IsLastWave(currentWave);
-
-            if (alive > 0)
+            // 2) 전투 페이즈 (그룹 단위로 반복)
+            int groupCount = monsterSpawner.GetGroupCount(currentWave);
+            for (int i = 0; i < groupCount; i++)
             {
-                SetGameState(GameState.Lose);
+                // 2-1. 전투 시작
+                SetGameState(GameState.Battle);
+                monsterSpawner.SpawnWaveGroup(currentWave, i);
+
+                // 2-2. 해당 그룹의 전투 시간만큼 타이머 실행
+                WaveGroup currentGroup = monsterSpawner.GetWaveGroup(currentWave, i);
+                float currentBattleTime = currentGroup.battleDuration > 0 ? currentGroup.battleDuration : battleTime;
+                yield return StartCoroutine(RunTimer(currentBattleTime));
+                
+                monsterSpawner.StopSpawning(); // 시간 다 되면 추가 스폰 중지
+
+                // 2-3. 몬스터 생존 여부 체크
+                // 한 프레임 대기하여 StopSpawning 이후 정리될 시간을 줌
+                yield return null; 
+                
+                // (이전: 몬스터 생존 시 그룹 클리어 실패, 즉시 패배)
+                // 이제 몬스터 생존 여부로 즉시 패배하지 않고, MonsterFieldManager의 필드 제한으로 패배 판정.
+                Debug.Log($"[GameManager] 그룹 {i} 클리어 성공 여부: {(monsterSpawner.AliveCount == 0 ? "성공" : "남은 몬스터 있음")}");
+            }
+
+            // 3) 모든 그룹 클리어 후
+            Debug.Log($"[GameManager] 웨이브 {currentWave} 모든 그룹 클리어!");
+            bool isLastWave = monsterSpawner != null && monsterSpawner.IsLastWave(currentWave);
+            if (isLastWave)
+            {
+                SetGameState(GameState.Win);
                 yield break;
             }
             else
             {
-                if (last)
-                {
-                    SetGameState(GameState.Win);
-                    yield break;
-                }
-
                 // 상점 페이즈를 쓰려면 아래 3줄 주석 해제
                 //SetGameState(GameState.Shop);
                 //yield return StartCoroutine(RunTimer(shopTime));
