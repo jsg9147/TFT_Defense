@@ -198,3 +198,4 @@ public class GameManager : MonoSingleton<GameManager>
 
     public bool IsBattlePhase() => CurrentState == GameState.Battle;
 }
+

@@ -18,3 +18,23 @@ MonoBehaviour:
       count: 20
       spawnInterval: 1
       pathId: 0
+    - monster: {fileID: 11400000, guid: ad0e9699b60f36942af284c44164bbf1, type: 2}
+      count: 20
+      spawnInterval: 1
+      pathId: 0
+    - monster: {fileID: 11400000, guid: 29d5a66e1f9a7dd46a0655d70702c7db, type: 2}
+      count: 20
+      spawnInterval: 1
+      pathId: 0
+    - monster: {fileID: 11400000, guid: 6a70dd3bb7bd18e4c88e41a06e629a27, type: 2}
+      count: 20
+      spawnInterval: 1
+      pathId: 0
+    - monster: {fileID: 11400000, guid: 7a115bf069b4c484d825ac8c001b355c, type: 2}
+      count: 20
+      spawnInterval: 1
+      pathId: 0
+    - monster: {fileID: 11400000, guid: 169838d098f4ed944bb19ba9a2a6d5b3, type: 2}
+      count: 1
+      spawnInterval: 0
+      pathId: 0

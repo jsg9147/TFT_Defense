@@ -1,4 +1,4 @@
-// WaveConfig.cs
+ï»¿// WaveConfig.cs
 using UnityEngine;
 using System;
 
@@ -11,14 +11,14 @@ public class WaveSet : ScriptableObject
 [Serializable]
 public struct Wave
 {
-    public WaveGroup[] groups; // ¿şÀÌºê ¾È¿¡ ¿©·¯ ±×·ì(Á¾·ù/¼ö/µô·¹ÀÌ µî)
+    public WaveGroup[] groups; // ì›¨ì´ë¸Œ ì•ˆì— ì—¬ëŸ¬ ê·¸ë£¹(ì¢…ë¥˜/ìˆ˜/ë”œë ˆì´ ë“±) 
 }
 
 [Serializable]
 public struct WaveGroup
 {
-    public MonsterData monster;        // ¾î¶² ¸ó½ºÅÍ
-    public int count;                  // ¸î ¸¶¸®
-    public float spawnInterval;        // ¸¶¸® °£ °£°İ
-    public int pathId;                 // °æ·ÎºĞ±â ¾²¸é
+    public MonsterData monster;        // ì–´ë–¤ ëª¬ìŠ¤í„°
+    public int count;                  // ëª‡ ë§ˆë¦¬
+    public float spawnInterval;        // ë§ˆë¦¬ ê°„ ê°„ê²©
+    public int pathId;                 // ê²½ë¡œë¶„ê¸° ì“°ë©´
 }
