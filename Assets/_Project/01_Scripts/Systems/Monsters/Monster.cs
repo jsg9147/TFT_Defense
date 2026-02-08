@@ -16,7 +16,6 @@ public class Monster : MonoBehaviour, IDamageable
     private int currentHP;
     private Transform target; 
     private int currentWaypointIndex = 0; 
-
     private bool _unregistered;
 
     public bool IsAlive => currentHP > 0;
@@ -42,8 +41,6 @@ public class Monster : MonoBehaviour, IDamageable
         _unregistered = false;
         gameObject.SetActive(true);
     }
-
-
 
     private void MoveTowardsTarget()
     {

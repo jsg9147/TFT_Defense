@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monsterName: Boss
   sprite: {fileID: 21300000, guid: 8cf5b50b646053b4d821ae3e0b6b3e76, type: 3}
+  prefab: {fileID: 2132965842359536540, guid: 0cbc0191bb9980b49928506bbf24cd0e, type: 3}
   maxHP: 300
   moveSpeed: 4
   defense: 10

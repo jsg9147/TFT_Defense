@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monsterName: "\uC2A4\uD53C\uB4DC 1.5"
   sprite: {fileID: 21300000, guid: 0e6078922facc034abcc766474df6718, type: 3}
-  prefab: {fileID: 2132965842359536540, guid: febf62c76f23b2b47afb63e52dfbbc49, type: 3}
+  prefab: {fileID: 2132965842359536540, guid: 2c1709a05e0ce2c4e9c7b6fdbf345ee1, type: 3}
   maxHP: 30
   moveSpeed: 8
   defense: 0

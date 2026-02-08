@@ -49,18 +49,23 @@ All systems located in `Assets/_Project/01_Scripts/Systems/`. For detailed docum
 
 ## Coding Conventions
 
+### Standards & Quality
+- **Clean Code**: Adhere rigidly to SOLID principles. Keep methods small, focused, and testable (Single Responsibility).
+- **Comments**: Mandatory XML documentation (`///`) for public APIs. Explain the *intent* ("why"), not just the mechanics, especially for complex logic.
+- **Optimization**: Avoid frequent allocation in `Update` loops (GC pressure).
+
 ### Naming
-- Classes/Methods: PascalCase
-- Fields/Properties: camelCase
-- Events: `On` prefix (e.g., `OnWaveChanged`)
-- Interfaces: `I` prefix (e.g., `IDamageable`)
+- **Classes/Methods**: PascalCase
+- **Fields/Properties**: camelCase
+- **Events**: `On` prefix (e.g., `OnWaveChanged`)
+- **Interfaces**: `I` prefix (e.g., `IDamageable`)
 
 ### Unity Patterns
-- Scene-dependent managers use `FindAnyObjectByType` for binding
-- Subscribe events in `OnEnable`, unsubscribe in `OnDisable`
-- Stop coroutines before starting new ones (prevent duplicates)
-- All managers must implement `Reset()` for scene reload handling
-- Null-check singletons before access
+- Use `FindAnyObjectByType` for managers (avoid `FindObjectOfType`).
+- Subscribe events in `OnEnable`, unsubscribe in `OnDisable`.
+- Stop coroutines before starting new ones to prevent duplicates.
+- All managers must implement `Reset()` for scene reload handling.
+- Null-check singletons before access.
 
 ## External Dependencies
 
