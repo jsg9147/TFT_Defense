@@ -12,10 +12,20 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("플레이어 정보")]
     [SerializeField] private string playerName = "Player";
 
+    // 플레이어 인덱스 (0 또는 1, 서버에서 접속 순서대로 할당)
+    private NetworkVariable<int> playerIndex = new NetworkVariable<int>(
+        -1,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    /// <summary>이 플레이어의 보드/경로/필드 인덱스 (0 또는 1)</summary>
+    public int PlayerIndex => playerIndex.Value;
+
     // 네트워크 동기화 변수들
     private NetworkVariable<int> gold = new NetworkVariable<int>(
-        default, 
-        NetworkVariableReadPermission.Everyone, 
+        default,
+        NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
     
@@ -110,13 +120,19 @@ public class NetworkPlayer : NetworkBehaviour
     /// </summary>
     private void InitializePlayerData()
     {
-        gold.Value = 100; // 초기 골드
-        essence.Value = 0; // 초기 에센스
+        gold.Value = 100;
+        essence.Value = 0;
         gem.Value = 0;
         level.Value = 1;
         currentExp.Value = 0;
 
-        Debug.Log($"[NetworkPlayer] 플레이어 데이터 초기화: {OwnerClientId}");
+        // 접속 순서에 따라 playerIndex 할당 (0, 1)
+        if (NetworkGameManager.Instance != null)
+            playerIndex.Value = NetworkGameManager.Instance.GetConnectedPlayerCount();
+        else
+            playerIndex.Value = 0;
+
+        Debug.Log($"[NetworkPlayer] 플레이어 데이터 초기화: ClientId={OwnerClientId}, PlayerIndex={playerIndex.Value}");
     }
 
     #region 통화 관리 (서버 RPC)

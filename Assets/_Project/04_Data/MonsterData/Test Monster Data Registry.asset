@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f70641c3c16cf7047a9a0951afd34598, type: 3}
+  m_Name: Test Monster Data Registry
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDataRegistry
+  allMonsters:
+  - {fileID: 11400000, guid: 169838d098f4ed944bb19ba9a2a6d5b3, type: 2}
+  - {fileID: 11400000, guid: c41a84458a72e2b4cad53dad8ec29923, type: 2}
+  - {fileID: 11400000, guid: 412a6aa68996f6b46993193360b41713, type: 2}
+  - {fileID: 11400000, guid: ad0e9699b60f36942af284c44164bbf1, type: 2}
+  - {fileID: 11400000, guid: 29d5a66e1f9a7dd46a0655d70702c7db, type: 2}
+  - {fileID: 11400000, guid: 6a70dd3bb7bd18e4c88e41a06e629a27, type: 2}
+  - {fileID: 11400000, guid: 7a115bf069b4c484d825ac8c001b355c, type: 2}

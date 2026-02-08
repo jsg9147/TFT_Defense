@@ -1,47 +1,70 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// í”Œë ˆì´ì–´ë³„ ëª¬ìŠ¤í„° ì´ë™ ê²½ë¡œ(ì›¨ì´í¬ì¸íŠ¸) ê´€ë¦¬.
+/// playerIndex(0/1)ë¡œ ê° í”Œë ˆì´ì–´ì˜ ê²½ë¡œë¥¼ êµ¬ë¶„í•œë‹¤.
+/// </summary>
 public class MonsterPathManager : MonoBehaviour
 {
     public static MonsterPathManager Instance { get; private set; }
 
-    [Header("°æ·Î¸¦ ÀÌ·ç´Â ¿şÀÌÆ÷ÀÎÆ®µé (¼ø¼­ Áß¿ä)")]
-    [SerializeField] private List<Transform> waypoints = new List<Transform>();
+    [Serializable]
+    public class PathData
+    {
+        public List<Transform> waypoints = new();
+    }
+
+    [Header("í”Œë ˆì´ì–´ë³„ ê²½ë¡œ (index 0 = Player 0, index 1 = Player 1)")]
+    [SerializeField] private PathData[] playerPaths = new PathData[2];
 
     private void Awake()
     {
         if (Instance != null)
         {
-            Debug.LogWarning("MonsterPathManager Áßº¹ ÀÎ½ºÅÏ½º ¹ß°ß");
+            Debug.LogWarning("[MonsterPathManager] ì¤‘ë³µ ì¸ìŠ¤í„´ìŠ¤ ê°ì§€");
             Destroy(gameObject);
             return;
         }
         Instance = this;
     }
 
-    public Transform GetWaypoint(int index)
+    public Transform GetWaypoint(int playerIndex, int waypointIndex)
     {
-        if (index < 0 || index >= waypoints.Count) return null;
-        return waypoints[index];
+        var wps = GetWaypoints(playerIndex);
+        if (waypointIndex < 0 || waypointIndex >= wps.Count) return null;
+        return wps[waypointIndex];
     }
 
-    public int GetWaypointCount()
+    public int GetWaypointCount(int playerIndex)
     {
-        return waypoints.Count;
+        return GetWaypoints(playerIndex).Count;
     }
 
-    public Transform GetStartPoint()
+    public Transform GetStartPoint(int playerIndex)
     {
-        return waypoints.Count > 0 ? waypoints[0] : null;
+        var wps = GetWaypoints(playerIndex);
+        return wps.Count > 0 ? wps[0] : null;
     }
 
-    public Transform GetEndPoint()
+    public Transform GetEndPoint(int playerIndex)
     {
-        return waypoints.Count > 0 ? waypoints[^1] : null;
+        var wps = GetWaypoints(playerIndex);
+        return wps.Count > 0 ? wps[^1] : null;
     }
 
-    public List<Transform> GetAllWaypoints()
+    public List<Transform> GetAllWaypoints(int playerIndex)
     {
-        return waypoints;
+        return GetWaypoints(playerIndex);
+    }
+
+    private List<Transform> GetWaypoints(int playerIndex)
+    {
+        if (playerPaths == null || playerPaths.Length == 0)
+            return new List<Transform>();
+
+        int idx = Mathf.Clamp(playerIndex, 0, playerPaths.Length - 1);
+        return playerPaths[idx]?.waypoints ?? new List<Transform>();
     }
 }

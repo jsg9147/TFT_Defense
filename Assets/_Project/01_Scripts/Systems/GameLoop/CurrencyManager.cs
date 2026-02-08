@@ -4,23 +4,21 @@ using System;
 public class CurrencyManager : MonoSingleton<CurrencyManager>
 {
     [SerializeField] private int initialGold = 100;
-    [SerializeField] private int initialEssence = 0;   // �ʱ� ����
+    [SerializeField] private int initialEssence = 0;  
 
     public int Gold { get; private set; } = 0;
     public int Gem { get; private set; } = 0;
-    public int Essence { get; private set; } = 0;      // ����
+    public int Essence { get; private set; } = 0;    
 
     public event Action<int> OnGoldChanged;
     public event Action<int> OnGemChanged;
-    public event Action<int> OnEssenceChanged;         // ���� �̺�Ʈ
-
-    // ���� ���� �� �ʱ� ��� ����, ���߿� ��ŸƮ�� �ƴ϶� ���ӸŴ������� �Ҵ��ϴ� ���� �� ������
+    public event Action<int> OnEssenceChanged;        
     private void Start()
     {
         Gold = initialGold;
-        Essence = initialEssence;                      // �ʱ�ȭ
+        Essence = initialEssence;                    
         OnGoldChanged?.Invoke(Gold);
-        OnEssenceChanged?.Invoke(Essence);            // UI ����
+        OnEssenceChanged?.Invoke(Essence);           
     }
 
     public void AddGold(int amount) { Gold += amount; OnGoldChanged?.Invoke(Gold); }

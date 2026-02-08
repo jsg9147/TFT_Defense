@@ -1,14 +1,16 @@
-// IMonsterFieldService.cs
 using System;
 
 public interface IMonsterFieldService
 {
-    int CurrentCount { get; }
-    int FieldLimit { get; }
+    int GetCurrentCount(int playerIndex);
+    int GetFieldLimit(int playerIndex);
 
-    event Action<int, int> OnCountChanged;
-    event Action OnLimitReached;
+    /// <summary>(playerIndex, currentCount, fieldLimit)</summary>
+    event Action<int, int, int> OnCountChanged;
 
-    void Register(Monster m);
-    void Unregister(Monster m);
+    /// <summary>한도 도달한 playerIndex</summary>
+    event Action<int> OnLimitReached;
+
+    void Register(Monster m, int playerIndex);
+    void Unregister(Monster m, int playerIndex);
 }

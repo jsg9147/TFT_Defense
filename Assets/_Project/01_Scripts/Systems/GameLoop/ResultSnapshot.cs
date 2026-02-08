@@ -1,18 +1,18 @@
-using System;
+ï»¿using System;
 
 [Serializable]
 public struct ResultSnapshot
 {
     public int reachedWave;
     public float elapsedSeconds;
-    public int goldCurrent;    // ÇöÀç º¸À¯(°£´Ü ¹öÀü)
-    public int essenceCurrent; // ÇöÀç º¸À¯
+    public int goldCurrent;    // í˜„ìž¬ ë³´ìœ (ê°„ë‹¨ ë²„ì „)
+    public int essenceCurrent; // í˜„ìž¬ ë³´ìœ 
 
     public static ResultSnapshot CaptureNow(int currentWave, float elapsed, int gold, int essence)
     {
         return new ResultSnapshot
         {
-            reachedWave = currentWave,
+            reachedWave = currentWave, 
             elapsedSeconds = elapsed,
             goldCurrent = gold,
             essenceCurrent = essence
