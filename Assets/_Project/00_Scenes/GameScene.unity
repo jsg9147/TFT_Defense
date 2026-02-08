@@ -5892,7 +5892,7 @@ Transform:
   m_GameObject: {fileID: 888391971}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.48, y: 4.32, z: 0}
+  m_LocalPosition: {x: 8.2, y: 4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7060,7 +7060,7 @@ Transform:
   m_GameObject: {fileID: 1127776647}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.53, y: -2.36, z: 0}
+  m_LocalPosition: {x: 8.2, y: -2.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7204,7 +7204,6 @@ MonoBehaviour:
   waveSet: {fileID: 11400000, guid: 4f6e2ca75e259f54787af59e6e419dda, type: 2}
   spawnPoints:
   - {fileID: 1784640186}
-  prefab: {fileID: 2132965842359536540, guid: febf62c76f23b2b47afb63e52dfbbc49, type: 3}
   poolParent: {fileID: 1658470322}
 --- !u!4 &1165021710
 Transform:
@@ -11784,7 +11783,7 @@ Transform:
   m_GameObject: {fileID: 1441789931}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.33, y: -2.44, z: 0}
+  m_LocalPosition: {x: -8.2, y: -2.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14566,7 +14565,7 @@ Transform:
   m_GameObject: {fileID: 1784640185}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.67, y: -3.34, z: 0}
+  m_LocalPosition: {x: -10.93, y: -2.32, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15897,8 +15896,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1803024590}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.45498, y: -0.57869, z: 0.19532}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25578,7 +25577,7 @@ Transform:
   m_GameObject: {fileID: 2085480294}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.28, y: 4.4, z: 0}
+  m_LocalPosition: {x: -8.2, y: 4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25887,7 +25886,7 @@ MonoBehaviour:
   grid: {fileID: 1822709276}
   width: 14
   height: 4
-  origin: {x: -7, y: -1, z: 0}
+  origin: {x: -7, y: 0, z: 0}
   lockPlacementDuringBattle: 1
 --- !u!4 &2140419298
 Transform:

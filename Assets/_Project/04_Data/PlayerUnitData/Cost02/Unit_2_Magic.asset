@@ -21,7 +21,7 @@ MonoBehaviour:
   cost: 2
   baseAttack: 10
   attackSpeed: 1
-  range: 3
+  range: 4
   projectilePrefab: {fileID: 1143787252086882, guid: 465e835a8859cea4392495ac947e2b30, type: 3}
   multishotCount: 3
   areaRadius: 1.5

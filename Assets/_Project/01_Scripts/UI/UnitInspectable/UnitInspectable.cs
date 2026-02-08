@@ -1,4 +1,4 @@
-// UnitInspectable.cs
+ï»¿// UnitInspectable.cs
 using System.Text;
 using UnityEngine;
 
@@ -13,7 +13,7 @@ public class UnitInspectable : MonoBehaviour, IInspectable
     void Awake() => u = GetComponent<Unit>();
 
     public InspectData BuildData()
-    {
+    { 
         var d = u.data;
         var r = new InspectData
         {
@@ -24,24 +24,24 @@ public class UnitInspectable : MonoBehaviour, IInspectable
             range = d.range
         };
 
-        // ¾÷±×·¹ÀÌµå ¹èÀ²/Flat ÇÕ»ê
+        // ì—…ê·¸ë ˆì´ë“œ ë°°ìœ¨/Flat í•©ì‚°
         float atkMul = 1f, aspdMul = 1f;
         int flat = 0;
         if (UpgradeManager.Instance)
         {
-            (atkMul, aspdMul) = UpgradeManager.Instance.GetFinalMultipliers(d); // ¹èÀ²
+            (atkMul, aspdMul) = UpgradeManager.Instance.GetFinalMultipliers(d); // ë°°ìœ¨
             flat = UpgradeManager.Instance.GetFinalAttackFlat(d);              // Flat
         }
 
-        // ÃÖÁ¾ °ø°İ·Â(À¯´Ö ³»ºÎ °è»ê°ú µ¿ÀÏÇÑ °³·«Ä¡)
+        // ìµœì¢… ê³µê²©ë ¥(ìœ ë‹› ë‚´ë¶€ ê³„ì‚°ê³¼ ë™ì¼í•œ ê°œëµì¹˜)
         int baseDmg = d.baseAttack + (u.starLevel - 1) * 5;
         r.attack = Mathf.Max(1, Mathf.RoundToInt((baseDmg + flat) * atkMul));
         r.aps = Mathf.Min(d.attackSpeed * aspdMul, 5f);
 
-        // ÅÂ±× ¹®ÀÚ¿­(Job / Origin / Type)
+        // íƒœê·¸ ë¬¸ìì—´(Job / Origin / Type)
         r.tags = $"{d.jobs} | {d.origins} | {d.types}";
 
-        // ½Ã³ÊÁö °³¿ä (°£´Ü ¿ä¾à)
+        // ì‹œë„ˆì§€ ê°œìš” (ê°„ë‹¨ ìš”ì•½)
         if (SynergyManager.Instance)
         {
             var snap = SynergyManager.Instance.GetSnapshotFor(u);
@@ -56,7 +56,7 @@ public class UnitInspectable : MonoBehaviour, IInspectable
             r.synergySummary = sb.ToString().Trim();
         }
 
-        // ¾÷±×·¹ÀÌµå »ó¼¼ ·Î±×(¼±ÅÃ Ç¥½Ã)
+        // ì—…ê·¸ë ˆì´ë“œ ìƒì„¸ ë¡œê·¸(ì„ íƒ í‘œì‹œ)
         if (UpgradeManager.Instance != null)
         {
             var bd = UpgradeManager.Instance.BuildBreakdown(d);

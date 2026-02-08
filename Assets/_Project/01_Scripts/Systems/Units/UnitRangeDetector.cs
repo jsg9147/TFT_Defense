@@ -5,36 +5,36 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class UnitRangeDetector : MonoBehaviour
 {
-    [Tooltip("º¸Åë ºÎ¸ğ¿¡ UnitÀÌ ºÙ¾î ÀÖÀ½")]
+    [Tooltip("ë³´í†µ ë¶€ëª¨ì— Unitì´ ë¶™ì–´ ìˆìŒ")]
     public Unit unit;
 
-    [Header("ÀÚµ¿ ¼¼ÆÃ")]
+    [Header("ìë™ ì„¸íŒ…")]
     public string monsterTag = "Monster";
-    public string detectorLayerName = "UnitRange"; // ÇÁ·ÎÁ§Æ®¿¡ ¸ÂÃç ¼³Á¤
+    public string detectorLayerName = "UnitRange"; // í”„ë¡œì íŠ¸ì— ë§ì¶° ì„¤ì •
 
     CircleCollider2D col;
     Rigidbody2D rb;
 
     void Awake()
     {
-        if (!unit) unit = GetComponentInParent<Unit>();
+        if (!unit) unit = GetComponentInParent<Unit>(); 
         col = GetComponent<CircleCollider2D>();
         rb = GetComponent<Rigidbody2D>();
 
-        // ÇÊ¼ö ¹°¸® ¼³Á¤
+        // í•„ìˆ˜ ë¬¼ë¦¬ ì„¤ì •
         col.isTrigger = true;
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.simulated = true;
         rb.gravityScale = 0f;
 
-        // ·¹ÀÌ¾î ÀÚµ¿ ¼¼ÆÃ(¿É¼Ç)
+        // ë ˆì´ì–´ ìë™ ì„¸íŒ…(ì˜µì…˜)
         if (!string.IsNullOrEmpty(detectorLayerName))
         {
             int layer = LayerMask.NameToLayer(detectorLayerName);
             if (layer >= 0) gameObject.layer = layer;
         }
 
-        // ¹İ°æ µ¿±âÈ­
+        // ë°˜ê²½ ë™ê¸°í™”
         SyncRadius();
     }
 
@@ -43,7 +43,7 @@ public class UnitRangeDetector : MonoBehaviour
     public void SyncRadius()
     {
         if (unit != null && unit.data != null && col != null)
-            col.radius = unit.data.range + 1;  // µ¥ÀÌÅÍ º¯°æ ½Ã¸¶´Ù È£Ãâ °¡´É
+            col.radius = unit.data.range + 1;  // ë°ì´í„° ë³€ê²½ ì‹œë§ˆë‹¤ í˜¸ì¶œ ê°€ëŠ¥
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -57,4 +57,30 @@ public class UnitRangeDetector : MonoBehaviour
         if (!string.IsNullOrEmpty(monsterTag) && !other.CompareTag(monsterTag)) return;
         if (other.TryGetComponent(out Monster m)) unit?.RemoveMonsterInRange(m);
     }
+
+#if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        DrawRangeGizmo(0.4f);
+    }
+
+    void OnDrawGizmos()
+    {
+        DrawRangeGizmo(0.15f);
+    }
+
+    void DrawRangeGizmo(float alpha)
+    {
+        var c = GetComponent<CircleCollider2D>();
+        if (c == null) return;
+
+        float radius = c.radius;
+        if (unit != null && unit.data != null)
+            radius = unit.data.range + 1f;
+
+        Vector3 center = transform.position;
+        Gizmos.color = new Color(0f, 1f, 1f, alpha);
+        Gizmos.DrawWireSphere(center, radius);
+    }
+#endif
 }

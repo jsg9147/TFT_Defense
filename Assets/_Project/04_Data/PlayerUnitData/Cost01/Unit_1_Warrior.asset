@@ -24,7 +24,7 @@ MonoBehaviour:
   range: 2
   projectilePrefab: {fileID: 1143787252086882, guid: 465e835a8859cea4392495ac947e2b30, type: 3}
   multishotCount: 3
-  areaRadius: 1.5
+  areaRadius: 2
   chainCount: 3
   chainRange: 2.5
   poisonDamagePerTick: 2
