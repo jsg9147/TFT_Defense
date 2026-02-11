@@ -1,20 +1,20 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// À¯´Ö ÆÇ¸Å Àü´ã ¸Å´ÏÀú.
-/// - È¯±Ş·ü/º°½Â±Ş ¹èÀ²/ÀüÅõ Áß ÆÇ¸Å Çã¿ë °°Àº Á¤Ã¥À» ÇÑ °÷¿¡¼­ °ü¸®
-/// - Grid, Currency, Synergy¿ÍÀÇ ¿¬°áÀ» Ä¸½¶È­
-/// </summary>
+/// ìœ ë‹› íŒë§¤ ì „ë‹´ ë§¤ë‹ˆì €.
+/// - í™˜ê¸‰ë¥ /ë³„ìŠ¹ê¸‰ ë°°ìœ¨/ì „íˆ¬ ì¤‘ íŒë§¤ í—ˆìš© ê°™ì€ ì •ì±…ì„ í•œ ê³³ì—ì„œ ê´€ë¦¬
+/// - Grid, Currency, Synergyì™€ì˜ ì—°ê²°ì„ ìº¡ìŠí™”
+/// </summary> 
 public class UnitSellManager : MonoSingleton<UnitSellManager>
 {
-    [Header("ÆÇ¸Å Á¤Ã¥")]
+    [Header("íŒë§¤ ì •ì±…")]
     [Range(0f, 1f)]
-    [SerializeField] private float refundRate = 0.8f;          // ±âº» È¯±Ş·ü(80%)
-    [SerializeField] private bool allowSellDuringBattle = true; // ÀüÅõ Áß ÆÇ¸Å Çã¿ë
-    [Tooltip("±¸¸Å°¡ °è»ê: cost * pricePerCost. (¿¹: ÄÚ½ºÆ® 1 ¡æ 2°ñµå)")]
+    [SerializeField] private float refundRate = 0.8f;          // ê¸°ë³¸ í™˜ê¸‰ë¥ (80%)
+    [SerializeField] private bool allowSellDuringBattle = true; // ì „íˆ¬ ì¤‘ íŒë§¤ í—ˆìš©
+    [Tooltip("êµ¬ë§¤ê°€ ê³„ì‚°: cost * pricePerCost. (ì˜ˆ: ì½”ìŠ¤íŠ¸ 1 â†’ 2ê³¨ë“œ)")]
     [SerializeField] private int pricePerCost = 2;
 
-    [Header("º° ½Â±Ş È¯±Ş °¡ÁßÄ¡ (1~5¼º ÀÎµ¦½º »ç¿ë, ºÎÁ·ÇÏ¸é ¸¶Áö¸· °ª »ç¿ë)")]
+    [Header("ë³„ ìŠ¹ê¸‰ í™˜ê¸‰ ê°€ì¤‘ì¹˜ (1~5ì„± ì¸ë±ìŠ¤ ì‚¬ìš©, ë¶€ì¡±í•˜ë©´ ë§ˆì§€ë§‰ ê°’ ì‚¬ìš©)")]
     [SerializeField] private float[] starRefundMultipliers = new float[] { 1.0f, 1.8f, 3.5f, 6.0f, 9.0f };
 
     public float RefundRate
@@ -29,16 +29,16 @@ public class UnitSellManager : MonoSingleton<UnitSellManager>
         set => allowSellDuringBattle = value;
     }
 
-    /// <summary> ÇØ´ç À¯´ÖÀÇ '±¸¸Å°¡' ÃßÁ¤Ä¡ (Å×ÀÌºí/»óÁ¡ ¿¬µ¿ ½Ã ±³Ã¼ °¡´É) </summary>
+    /// <summary> í•´ë‹¹ ìœ ë‹›ì˜ 'êµ¬ë§¤ê°€' ì¶”ì •ì¹˜ (í…Œì´ë¸”/ìƒì  ì—°ë™ ì‹œ êµì²´ ê°€ëŠ¥) </summary>
     public int GetPurchasePrice(Unit unit)
     {
         if (unit == null || unit.data == null) return 0;
         int basePrice = Mathf.Max(0, unit.data.cost) * Mathf.Max(1, pricePerCost);
-        // ÇÊ¿ä ½Ã Èñ±Íµµ/½Ã³ÊÁö ÇÁ¸®¹Ì¾ö µîÀ» ´õÇÒ ¼ö ÀÖÀ½
+        // í•„ìš” ì‹œ í¬ê·€ë„/ì‹œë„ˆì§€ í”„ë¦¬ë¯¸ì—„ ë“±ì„ ë”í•  ìˆ˜ ìˆìŒ
         return basePrice;
     }
 
-    /// <summary> È¯±Ş¾× °è»ê (È¯±Ş·ü * º° °¡ÁßÄ¡ * ±¸¸Å°¡) </summary>
+    /// <summary> í™˜ê¸‰ì•¡ ê³„ì‚° (í™˜ê¸‰ë¥  * ë³„ ê°€ì¤‘ì¹˜ * êµ¬ë§¤ê°€) </summary>
     public int GetRefundAmount(Unit unit)
     {
         int buy = GetPurchasePrice(unit);
@@ -50,12 +50,12 @@ public class UnitSellManager : MonoSingleton<UnitSellManager>
         return Mathf.Max(0, Mathf.RoundToInt(raw));
     }
 
-    /// <summary> ¿ùµå ÁÂÇ¥ÀÇ À¯´ÖÀ» Ã£¾Æ ÆÇ¸Å (¸¶¿ì½º ¿ìÅ¬¸¯ µî) </summary>
+    /// <summary> ì›”ë“œ ì¢Œí‘œì˜ ìœ ë‹›ì„ ì°¾ì•„ íŒë§¤ (ë§ˆìš°ìŠ¤ ìš°í´ë¦­ ë“±) </summary>
     public bool SellUnitAtWorld(Vector3 world, LayerMask unitLayer, out int refunded)
     {
         refunded = 0;
 
-        // ÀüÅõ Áß ÆÇ¸Å Çã¿ë ¿©ºÎ
+        // ì „íˆ¬ ì¤‘ íŒë§¤ í—ˆìš© ì—¬ë¶€
         if (!allowSellDuringBattle && GameManager.Instance != null && GameManager.Instance.IsBattlePhase())
             return false;
 
@@ -68,20 +68,20 @@ public class UnitSellManager : MonoSingleton<UnitSellManager>
         return SellUnit(unit, out refunded);
     }
 
-    /// <summary> Á÷Á¢ À¯´ÖÀ» ³Ñ°Ü ÆÇ¸Å </summary>
+    /// <summary> ì§ì ‘ ìœ ë‹›ì„ ë„˜ê²¨ íŒë§¤ </summary>
     public bool SellUnit(Unit unit, out int refunded)
     {
         refunded = 0;
         if (unit == null) return false;
 
-        // ÀüÅõ Áß ÆÇ¸Å Çã¿ë ¿©ºÎ
+        // ì „íˆ¬ ì¤‘ íŒë§¤ í—ˆìš© ì—¬ë¶€
         if (!allowSellDuringBattle && GameManager.Instance != null && GameManager.Instance.IsBattlePhase())
             return false;
 
-        // È¯±Ş °ñµå °è»ê
+        // í™˜ê¸‰ ê³¨ë“œ ê³„ì‚°
         int amount = GetRefundAmount(unit);
 
-        // º¸µå Á¡À¯ ÇØÁ¦
+        // ë³´ë“œ ì ìœ  í•´ì œ
         var gm = GridManager.Instance;
         if (gm != null && gm.grid != null)
         {
@@ -91,15 +91,15 @@ public class UnitSellManager : MonoSingleton<UnitSellManager>
 
         SynergyManager.Instance.UnregisterUnit(unit);
 
-        // °ñµå Áö±Ş
+        // ê³¨ë“œ ì§€ê¸‰
         if (CurrencyManager.Instance != null && amount > 0)
             CurrencyManager.Instance.AddGold(amount);
 
-        // À¯´Ö ÆÄ±«
+        // ìœ ë‹› íŒŒê´´
         Object.Destroy(unit.gameObject);
 
         refunded = amount;
-        Debug.Log($"[Sell] {unit.name} ÆÇ¸Å ¡æ +{amount} Gold");
+        Debug.Log($"[Sell] {unit.name} íŒë§¤ â†’ +{amount} Gold");
         return true;
     }
 }
