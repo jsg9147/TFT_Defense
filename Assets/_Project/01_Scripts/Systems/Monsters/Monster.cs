@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using TFT_Defense.Managers;
+using UI.KillLog;
 
 /// <summary>
 /// 네트워크 동기화되는 몬스터.
@@ -31,6 +34,9 @@ public class Monster : NetworkBehaviour, IDamageable
     private Transform target;
     private int currentWaypointIndex;
     private bool _unregistered;
+
+    /// <summary>이 몬스터에 데미지를 입힌 유닛별 누적 데미지 (서버 전용)</summary>
+    private readonly Dictionary<string, int> _damageLog = new();
 
     public int OwnerPlayerIndex => netOwnerPlayerIndex.Value;
     public bool IsAlive => netHP.Value > 0;
@@ -71,6 +77,7 @@ public class Monster : NetworkBehaviour, IDamageable
         currentWaypointIndex = 0;
         target = MonsterPathManager.Instance.GetWaypoint(playerIndex, 0);
         _unregistered = false;
+        _damageLog.Clear();
     }
 
     // === Server-Authoritative Movement ===
@@ -113,12 +120,24 @@ public class Monster : NetworkBehaviour, IDamageable
             payload, data.defense, data.magicResistance);
 
         if (finalDamage > 0)
+        {
             ShowDamageClientRpc(finalDamage, transform.position);
+            RecordDamage(payload.Source as Unit, finalDamage);
+        }
 
         netHP.Value -= finalDamage;
 
         if (netHP.Value <= 0)
             Die();
+    }
+
+    /// <summary>데미지를 입힌 유닛의 기여도를 누적한다. 동일 유닛의 여러 공격은 합산된다.</summary>
+    private void RecordDamage(Unit attacker, int damage)
+    {
+        if (attacker == null || attacker.data == null) return;
+        string key = attacker.data.unitName;
+        _damageLog.TryGetValue(key, out int prev);
+        _damageLog[key] = prev + damage;
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -161,7 +180,47 @@ public class Monster : NetworkBehaviour, IDamageable
     {
         if (_unregistered) return;
         _unregistered = true;
+        NotifyKillLog();
         OnMonsterDie?.Invoke(this);
+    }
+
+    /// <summary>몬스터 처치 시 데미지 기여도 로그를 UI에 전달한다.</summary>
+    private void NotifyKillLog()
+    {
+        if (_damageLog.Count == 0) return;
+
+        string monsterName = data?.monsterName ?? "Monster";
+        string logPayload = SerializeKillLog(monsterName, _damageLog);
+
+        if (!NetworkGameManager.Instance.IsNetworkMode())
+            KillLogPanel.Instance?.ShowLog(logPayload);
+        else
+            BroadcastKillLogClientRpc(logPayload);
+    }
+
+    /// <summary>
+    /// 데미지 로그를 단일 문자열로 직렬화한다.
+    /// ASCII 제어 문자를 구분자로 사용해 유닛/몬스터 이름과 충돌을 방지한다.
+    /// 포맷: "{monsterName}\u0001{unitA}\u0003{dmg}\u0002{unitB}\u0003{dmg}..."
+    /// </summary>
+    private static string SerializeKillLog(string monsterName, Dictionary<string, int> log)
+    {
+        var sb = new StringBuilder();
+        sb.Append(monsterName).Append('\u0001'); // SOH: 몬스터명 구분자
+        bool first = true;
+        foreach (var kv in log)
+        {
+            if (!first) sb.Append('\u0002'); // STX: 항목 구분자
+            sb.Append(kv.Key).Append('\u0003').Append(kv.Value); // ETX: key-value 구분자
+            first = false;
+        }
+        return sb.ToString();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void BroadcastKillLogClientRpc(string logPayload)
+    {
+        KillLogPanel.Instance?.ShowLog(logPayload);
     }
 
     private void OnDisable()

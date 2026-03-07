@@ -470,7 +470,7 @@ public class Unit : MonoBehaviour
             {
                 BaseDamage = Mathf.Max(1, data.poisonDamagePerTick),
                 Type = DamageType.True, // 초기엔 고정피해로 처리
-                Source = this.gameObject
+                Source = this
             };
 
             if (target is IDamageable dmg)
