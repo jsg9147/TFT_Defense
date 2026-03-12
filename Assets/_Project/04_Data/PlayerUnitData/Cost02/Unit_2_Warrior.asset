@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Unit_2_Warrior
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 7461835846871970091, guid: 22386ca802d925945ab7466d62e48e58, type: 3}
-  unitName: Unit_2_Warrior
+  unitName: "\uC624\uD06C \uC804\uC0AC"
   icon: {fileID: 2003643120, guid: 99c3bfc96fe7dd04b904c4b5a86f7a49, type: 3}
   types: 17
-  jobs: 0
-  origins: 0
+  jobs: 1
+  origins: 4
   cost: 2
-  baseAttack: 10
-  attackSpeed: 1
-  range: 3
+  baseAttack: 30
+  attackSpeed: 0.9
+  range: 2
   projectilePrefab: {fileID: 1143787252086882, guid: 465e835a8859cea4392495ac947e2b30, type: 3}
   multishotCount: 3
   areaRadius: 1.5

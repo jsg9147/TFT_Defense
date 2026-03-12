@@ -11,12 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c48840aee5d1a7a4fbd7af9f3b201f62, type: 3}
   m_Name: MonsterTest
-  m_EditorClassIdentifier: 
-  monsterName: Base
+  m_EditorClassIdentifier:
+  monsterName: "\uACE0\uBE14\uB9B0 \uC804\uC0AC"
   sprite: {fileID: 21300000, guid: 34d4c6255956f2a43baeb85b2959db99, type: 3}
   prefab: {fileID: 2132965842359536540, guid: febf62c76f23b2b47afb63e52dfbbc49, type: 3}
-  maxHP: 30
-  moveSpeed: 5
-  defense: 10
-  magicResistance: 10
+  maxHP: 60
+  moveSpeed: 4
+  defense: 5
+  magicResistance: 0
   goldReward: 1

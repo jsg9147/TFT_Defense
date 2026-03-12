@@ -11,12 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c48840aee5d1a7a4fbd7af9f3b201f62, type: 3}
   m_Name: BossTest
-  m_EditorClassIdentifier: 
-  monsterName: Boss
+  m_EditorClassIdentifier:
+  monsterName: "\uC624\uD06C \uC871\uC7A5"
   sprite: {fileID: 21300000, guid: 8cf5b50b646053b4d821ae3e0b6b3e76, type: 3}
   prefab: {fileID: 2132965842359536540, guid: 0cbc0191bb9980b49928506bbf24cd0e, type: 3}
-  maxHP: 300
-  moveSpeed: 4
-  defense: 10
-  magicResistance: 10
-  goldReward: 10
+  maxHP: 800
+  moveSpeed: 2.5
+  defense: 30
+  magicResistance: 20
+  goldReward: 15

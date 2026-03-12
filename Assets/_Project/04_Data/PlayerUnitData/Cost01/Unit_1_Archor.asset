@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Unit_1_Archor
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 4944913121331984577, guid: 4a7862e9f66c00843943fa01625cf826, type: 3}
-  unitName: Unit_1_Archor
+  unitName: "\uAD81\uC218"
   icon: {fileID: -2127905542, guid: 0dd4469dd1abd2d4b8d472eedba8098c, type: 3}
-  types: 18
-  jobs: 1
+  types: 17
+  jobs: 4
   origins: 1
   cost: 1
-  baseAttack: 10
-  attackSpeed: 1
-  range: 4
+  baseAttack: 15
+  attackSpeed: 1.1
+  range: 4.5
   projectilePrefab: {fileID: 1143787252086882, guid: 465e835a8859cea4392495ac947e2b30, type: 3}
   multishotCount: 3
   areaRadius: 5

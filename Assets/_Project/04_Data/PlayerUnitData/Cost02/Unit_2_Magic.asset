@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Unit_2_Magic
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 3795686020288693584, guid: 0330139c15791cd41895d28e542e0bc1, type: 3}
-  unitName: Unit_2_Magic
+  unitName: "\uC5B8\uB370\uB4DC \uB9C8\uBC95\uC0AC"
   icon: {fileID: 2003643120, guid: 99c3bfc96fe7dd04b904c4b5a86f7a49, type: 3}
-  types: 17
-  jobs: 0
-  origins: 0
+  types: 33
+  jobs: 2
+  origins: 2
   cost: 2
-  baseAttack: 10
-  attackSpeed: 1
-  range: 4
+  baseAttack: 28
+  attackSpeed: 0.9
+  range: 5.5
   projectilePrefab: {fileID: 1143787252086882, guid: 465e835a8859cea4392495ac947e2b30, type: 3}
   multishotCount: 3
   areaRadius: 1.5

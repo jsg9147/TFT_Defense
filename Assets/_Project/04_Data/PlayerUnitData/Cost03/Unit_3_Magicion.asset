@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: Unit_3_Magicion
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 6491674725774390789, guid: b97407917d068c24ea41444bf4883a61, type: 3}
-  unitName: Unit_3_Magicion
+  unitName: "\uC815\uB839 \uC220\uC0AC"
   icon: {fileID: -1011160483, guid: a652388039de29e42b64eb88b2ccb6c8, type: 3}
-  types: 17
-  jobs: 0
-  origins: 0
+  types: 36
+  jobs: 2
+  origins: 16
   cost: 3
-  baseAttack: 10
-  attackSpeed: 1
-  range: 3
+  baseAttack: 40
+  attackSpeed: 0.9
+  range: 4
   projectilePrefab: {fileID: 1143787252086882, guid: 465e835a8859cea4392495ac947e2b30, type: 3}
   multishotCount: 3
-  areaRadius: 1.5
+  areaRadius: 2.5
   chainCount: 3
   chainRange: 2.5
   poisonDamagePerTick: 2
