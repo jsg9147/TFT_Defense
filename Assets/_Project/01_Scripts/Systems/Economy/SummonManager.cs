@@ -29,10 +29,14 @@ public class SummonManager : MonoBehaviour
     [Header("소환 풀 (등장 가능한 유닛)")]
     public List<UnitData> allUnitDatas;
 
+    [Header("네트워크 동기화")]
+    [SerializeField] private UnitDataRegistry unitDataRegistry;
+
     void Awake() => Instance = this;
 
     void Start()
     {
+        unitDataRegistry?.Initialize();
         UpdateProbabilityUI();
     }
 
@@ -411,6 +415,30 @@ public class SummonManager : MonoBehaviour
             Debug.LogWarning("[Spawn] UnitData 또는 unitPrefab 누락");
             return false;
         }
+
+        // 멀티플레이: 서버 RPC로 소환 위임
+        if (IsNetworkMode())
+        {
+            var player = GetLocalNetworkPlayer();
+            if (player == null)
+            {
+                Debug.LogWarning("[Spawn] 네트워크 플레이어를 찾을 수 없습니다.");
+                return false;
+            }
+
+            int idx = UnitDataRegistry.Instance != null ? UnitDataRegistry.Instance.GetIndex(data) : -1;
+            if (idx < 0)
+            {
+                Debug.LogWarning($"[Spawn] UnitDataRegistry에 '{data.unitName}' 없음. 레지스트리를 확인하세요.");
+                return false;
+            }
+
+            player.RequestSummonUnitServerRpc(idx, summonCost);
+            spawned = null;
+            return true; // 낙관적 반환, 실패 시 서버가 골드 환불
+        }
+
+        // 싱글플레이: 로컬 직접 생성
         var gm = GridManager.Instance;
         if (gm == null)
         {

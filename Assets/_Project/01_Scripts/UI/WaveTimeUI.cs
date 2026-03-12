@@ -19,7 +19,7 @@ public class WaveTimerUI : MonoBehaviour
         gm.OnTimerTick += HandleTimerTick;
         gm.OnTimerEnd += HandleTimerEnd;
 
-        // ÃÊ±â Ç¥½Ã
+        // ï¿½Ê±ï¿½ Ç¥ï¿½ï¿½
         HandleWaveChanged(gm.currentWave);
         HandlePhaseChanged(gm.CurrentState);
         HandleTimerTick(0, 1);
@@ -36,7 +36,7 @@ public class WaveTimerUI : MonoBehaviour
 
     private void HandleWaveChanged(int wave)
     {
-        // ³»ºÎ´Â 0ºÎÅÍ, Ç¥½Ã¿ëÀº +1
+        // ï¿½ï¿½ï¿½Î´ï¿½ 0ï¿½ï¿½ï¿½ï¿½, Ç¥ï¿½Ã¿ï¿½ï¿½ï¿½ +1
         if (waveText) waveText.text = $"Wave {wave + 1}";
     }
 
@@ -47,7 +47,6 @@ public class WaveTimerUI : MonoBehaviour
         {
             case GameManager.GameState.Prepare: phaseText.text = "Prepare"; break;
             case GameManager.GameState.Battle: phaseText.text = "Battle"; break;
-            case GameManager.GameState.Shop: phaseText.text = "Shop"; break;
             case GameManager.GameState.Win: phaseText.text = "Win"; break;
             case GameManager.GameState.Lose: phaseText.text = "Lose"; break;
         }

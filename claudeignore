@@ -1,0 +1,42 @@
+# Unity 자동 생성 폴더 (용량 크고 불필요)
+Library/
+Temp/
+obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+
+# 패키지 캐시
+Packages/
+PackageCache/
+
+# 녹음/녹화
+Recordings/
+
+# Visual Studio 관련
+.vs/
+*.suo
+*.user
+
+# 빌드 결과물
+*.apk
+*.aab
+*.exe
+*.app
+
+# IL2CPP 빌드 아티팩트
+Il2CppOutputProject/
+il2cpp_cache/
+
+# 에셋 메타 (보통 안 봐도 됨)
+# *.meta  ← 주석 해제하면 meta 파일도 제외
+
+# 에디터 전용 캐시
+.idea/
+*.pidb
+*.booproj
+
+# 크래시 리포트
+CrashReport*/
+sysinfo.txt

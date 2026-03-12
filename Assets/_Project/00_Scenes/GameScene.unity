@@ -3631,6 +3631,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 990beef3368c2c8488405865aa198e9e, type: 2}
   - {fileID: 11400000, guid: 4033ff033caee93408c5e347331b3d55, type: 2}
   - {fileID: 11400000, guid: bf582849af77b1149a0c8d1a0420c1c2, type: 2}
+  unitDataRegistry: {fileID: 11400000, guid: 47857dd0d01e4c9409b88c5680ce4362, type: 2}
 --- !u!1 &522009948
 GameObject:
   m_ObjectHideFlags: 0
@@ -13543,8 +13544,6 @@ MonoBehaviour:
   currentWave: 0
   prepareTime: 10
   battleTime: 20
-  shopTime: 0
-  shopManager: {fileID: 0}
   monsterSpawner: {fileID: 0}
 --- !u!4 &1571549954
 Transform:

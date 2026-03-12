@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoSingleton<GameManager>
 {
-    public enum GameState { Prepare, Battle, Shop, Win, Lose }
+    public enum GameState { Prepare, Battle, Win, Lose }
     public GameState CurrentState { get; private set; }
 
     private const int MaxPlayers = 2;
@@ -16,10 +16,8 @@ public class GameManager : MonoSingleton<GameManager>
     public int currentWave = 0;
     public float prepareTime = 5f;
     public float battleTime = 20f;
-    public float shopTime = 10f;
 
     [Header("씬 종속 매니저")]
-    public ShopManager shopManager;
     public MonsterSpawner monsterSpawner;
 
     // UI 이벤트
@@ -113,7 +111,6 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void BindSceneManagers()
     {
-        if (shopManager == null) shopManager = FindAnyObjectByType<ShopManager>();
         if (monsterSpawner == null) monsterSpawner = FindAnyObjectByType<MonsterSpawner>();
         Debug.Log("[GameManager] 씬 매니저 바인딩 완료");
     }
@@ -188,9 +185,6 @@ public class GameManager : MonoSingleton<GameManager>
 
         switch (state)
         {
-            case GameState.Shop:
-                monsterSpawner?.StopSpawning();
-                break;
             case GameState.Battle:
                 UIManager.Instance.ShowBattleUI();
                 break;

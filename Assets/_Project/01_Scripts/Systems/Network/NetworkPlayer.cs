@@ -278,5 +278,84 @@ public class NetworkPlayer : NetworkBehaviour
     }
 
     #endregion
+
+    #region 유닛 배치 RPC
+
+    /// <summary>
+    /// 클라이언트가 서버에 유닛 소환 및 배치를 요청합니다.
+    /// 골드는 호출 전 클라이언트에서 이미 차감되었으며, 실패 시 서버가 환불합니다.
+    /// </summary>
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+    public void RequestSummonUnitServerRpc(int unitDataIndex, int summonCost)
+    {
+        var data = UnitDataRegistry.Instance?.GetData(unitDataIndex);
+        if (data == null || data.unitPrefab == null)
+        {
+            gold.Value += summonCost;
+            Debug.LogWarning($"[NetworkPlayer] 유닛 소환 실패: UnitData 없음 (index={unitDataIndex})");
+            return;
+        }
+
+        var gm = GridManager.Instance;
+        if (gm == null || !gm.TryFindFirstPlaceable(out var cell))
+        {
+            gold.Value += summonCost;
+            Debug.Log("[NetworkPlayer] 유닛 소환 실패: 빈 셀 없음");
+            return;
+        }
+
+        var go = Instantiate(data.unitPrefab);
+        var netObj = go.GetComponent<NetworkObject>();
+        var unit = go.GetComponent<Unit>();
+        if (netObj == null || unit == null)
+        {
+            Destroy(go);
+            gold.Value += summonCost;
+            Debug.LogWarning("[NetworkPlayer] 유닛 소환 실패: 프리팹에 NetworkObject 또는 Unit 없음");
+            return;
+        }
+
+        // NetworkVar 설정 후 Spawn (클라이언트가 초기 snapshot에서 올바른 값을 받도록)
+        unit.InitServer(data, unitDataIndex, PlayerIndex);
+        unit.SetNetCell(cell);
+        netObj.Spawn();
+
+        if (!gm.TryPlaceUnit(unit, cell))
+        {
+            netObj.Despawn();
+            gold.Value += summonCost;
+            Debug.Log("[NetworkPlayer] 유닛 소환 실패: 배치 불가");
+            return;
+        }
+
+        Debug.Log($"[NetworkPlayer] 유닛 소환 성공: {data.unitName}, cell={cell}");
+    }
+
+    /// <summary>
+    /// 클라이언트가 서버에 유닛 이동을 요청합니다.
+    /// 실패 시 클라이언트는 OnCellChanged 콜백으로 원위치 복원됩니다.
+    /// </summary>
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+    public void RequestMoveUnitServerRpc(ulong unitNetworkId, int toCellX, int toCellY)
+    {
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(unitNetworkId, out var netObj))
+            return;
+
+        var unit = netObj.GetComponent<Unit>();
+        if (unit == null || unit.OwnerPlayerIndex != PlayerIndex)
+            return;
+
+        var gm = GridManager.Instance;
+        if (gm == null) return;
+
+        if (!gm.TryGetCellOfUnit(unit, out var fromCell))
+            return;
+
+        var toCell = new Vector3Int(toCellX, toCellY, 0);
+        if (gm.TryMoveUnit(fromCell, toCell))
+            unit.SetNetCell(toCell);
+    }
+
+    #endregion
 }
 

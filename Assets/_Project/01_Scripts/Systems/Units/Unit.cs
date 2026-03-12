@@ -3,9 +3,11 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 using System.Reflection;
+using Unity.Netcode;
 
 [RequireComponent(typeof(UnitInspectable))]
-public class Unit : MonoBehaviour
+[RequireComponent(typeof(NetworkObject))]
+public class Unit : NetworkBehaviour
 {
     [Header("Range Detector(자동 생성/연결)")]
     [SerializeField] private UnitRangeDetector rangeDetectorPrefab; // 비워도 자동 생성 가능
@@ -29,6 +31,12 @@ public class Unit : MonoBehaviour
 
     private Vector3 _baseScale = Vector3.one;
     private Coroutine _bumpCo;
+
+    // === 네트워크 동기화 ===
+    private NetworkVariable<int> netDataIndex = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private NetworkVariable<int> netOwnerPlayerIndex = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private NetworkVariable<int> netCellX = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private NetworkVariable<int> netCellY = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     // === 디버그 토글 ===
     [Header("Debug")]
@@ -102,8 +110,8 @@ public class Unit : MonoBehaviour
 
     private void Start()
     {
-        // 기존
-        // attackCooldown = 1f / Mathf.Max(0.01f, data.attackSpeed);
+        // 네트워크 클라이언트는 OnNetworkSpawn → Init() 에서 설정되므로 data가 없으면 건너뜀
+        if (data == null) return;
 
         // === 변경: 배율 포함(초기엔 _aspdMul=1f 이지만 이벤트 직후에도 일관성 유지) ===
         attackCooldown = 1f / Mathf.Max(0.01f, data.attackSpeed * _aspdMul);
@@ -117,6 +125,8 @@ public class Unit : MonoBehaviour
     }
     private void Update()
     {
+        if (data == null) return;
+
         // 무효 타겟 정리
         monstersInRange.RemoveAll(m => m == null || !m.gameObject.activeInHierarchy);
         if (monstersInRange.Count == 0) return;
@@ -626,5 +636,61 @@ public class Unit : MonoBehaviour
         }
     }
 #endif
+
+    #region 네트워크
+
+    /// <summary>서버에서 유닛 데이터를 초기화하고 NetworkVariable 값을 설정합니다.</summary>
+    public void InitServer(UnitData unitData, int dataIndex, int playerIndex)
+    {
+        if (!IsServer) return;
+        netDataIndex.Value = dataIndex;
+        netOwnerPlayerIndex.Value = playerIndex;
+        Init(unitData);
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        // 클라이언트: 초기 NetVar 값으로 유닛 데이터 초기화
+        if (!IsServer && netDataIndex.Value >= 0)
+        {
+            var unitData = UnitDataRegistry.Instance?.GetData(netDataIndex.Value);
+            if (unitData != null) Init(unitData);
+        }
+
+        // 셀 변경 콜백 구독 (서버/클라 모두)
+        netCellX.OnValueChanged += (oldVal, newVal) => SyncPositionFromNetCell();
+        netCellY.OnValueChanged += (oldVal, newVal) => SyncPositionFromNetCell();
+
+        // 초기 셀 위치 반영
+        SyncPositionFromNetCell();
+    }
+
+    /// <summary>서버 전용: 유닛의 그리드 셀 NetworkVariable을 업데이트합니다.</summary>
+    public void SetNetCell(Vector3Int cell)
+    {
+        if (!IsServer) return;
+        netCellX.Value = cell.x;
+        netCellY.Value = cell.y;
+    }
+
+    private void SyncPositionFromNetCell()
+    {
+        if (IsServer) return; // 서버는 TryPlaceUnit/TryMoveUnit이 직접 position 설정
+        if (netCellX.Value < 0 || netCellY.Value < 0) return;
+        var gm = GridManager.Instance;
+        if (gm == null) return;
+        var cell = new Vector3Int(netCellX.Value, netCellY.Value, 0);
+        transform.position = gm.CellToWorldCenter(cell);
+    }
+
+    /// <summary>현재 서버에서 확인된 그리드 셀 좌표</summary>
+    public Vector3Int NetCell => new Vector3Int(netCellX.Value, netCellY.Value, 0);
+
+    /// <summary>소속 플레이어 인덱스 (네트워크 동기화됨)</summary>
+    public int OwnerPlayerIndex => netOwnerPlayerIndex.Value;
+
+    #endregion
 
 }

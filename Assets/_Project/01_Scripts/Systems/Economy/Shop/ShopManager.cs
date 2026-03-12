@@ -1,33 +1,33 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
 public class ShopManager : MonoBehaviour
 {
-    [Header("»óÁ¡ ¼³Á¤")]
-    public Transform slotParent;                 // ½½·ÔµéÀ» ´ãÀ» ºÎ¸ğ ¿ÀºêÁ§Æ®
-    public List<UnitData> allUnitDatas;          // µîÀå °¡´ÉÇÑ À¯´Ö ¸ñ·Ï
+    [Header("ìƒì  ì„¤ì •")]
+    public Transform slotParent;                 // ìŠ¬ë¡¯ë“¤ì„ ë‹´ì„ ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸
+    public List<UnitData> allUnitDatas;          // ë“±ì¥ ê°€ëŠ¥í•œ ìœ ë‹› ëª©ë¡
 
-    [Header("»óÁ¡ ºñ¿ë")]
+    [Header("ìƒì  ë¹„ìš©")]
     public int unitCost = 2;
 
-    [Header("°æÇèÄ¡ ±¸¸Å")]
-    public int expCost = 4;    // °ñµå ¼Ò¸ğ·®
-    public int expPerBuy = 4;  // ±¸¸Å ½Ã È¹µæ °æÇèÄ¡
+    [Header("ê²½í—˜ì¹˜ êµ¬ë§¤")]
+    public int expCost = 4;    // ê³¨ë“œ ì†Œëª¨ëŸ‰
+    public int expPerBuy = 4;  // êµ¬ë§¤ ì‹œ íšë“ ê²½í—˜ì¹˜ 
 
-    [Header("µµ¹Ú(Á¤¼ö / Essence)")]
-    public int lowGambleEssenceCost = 1;   // ÇÏ±Ş µµ¹Ú: 1 Á¤¼ö
-    public int highGambleEssenceCost = 5;  // °í±Ş µµ¹Ú: 5 Á¤¼ö
+    [Header("ë„ë°•(ì •ìˆ˜ / Essence)")]
+    public int lowGambleEssenceCost = 1;   // í•˜ê¸‰ ë„ë°•: 1 ì •ìˆ˜
+    public int highGambleEssenceCost = 5;  // ê³ ê¸‰ ë„ë°•: 5 ì •ìˆ˜
 
-    [Header("µµ¹Ú ¼º°ø È®·ü (0~1)")]
-    [Range(0f, 1f)] public float lowGambleSuccessRate = 0.6f;   // ÇÏ±Ş ¼º°ø È®·ü (¿¹½Ã)
-    [Range(0f, 1f)] public float highGambleSuccessRate = 0.35f; // °í±Ş ¼º°ø È®·ü (¿¹½Ã)
+    [Header("ë„ë°• ì„±ê³µ í™•ë¥  (0~1)")]
+    [Range(0f, 1f)] public float lowGambleSuccessRate = 0.6f;   // í•˜ê¸‰ ì„±ê³µ í™•ë¥  (ì˜ˆì‹œ)
+    [Range(0f, 1f)] public float highGambleSuccessRate = 0.35f; // ê³ ê¸‰ ì„±ê³µ í™•ë¥  (ì˜ˆì‹œ)
 
-    [Header("È®·ü UI")]
+    [Header("í™•ë¥  UI")]
     public ShopProbabilityUI probabilityUI;
     public List<ShopProbabilityTable> probabilityTables;
 
-    [Header("ÇÊÅÍ UI(¼±ÅÃ)")]
+    [Header("í•„í„° UI(ì„ íƒ)")]
     [SerializeField] private Transform costButtonParent;
     [SerializeField] private Transform jobButtonParent;
     [SerializeField] private Transform originButtonParent;
@@ -40,7 +40,7 @@ public class ShopManager : MonoBehaviour
     private readonly HashSet<JobSynergy> selectedJobs = new();
     private readonly HashSet<OriginSynergy> selectedOrigins = new();
 
-    public event System.Action<bool> OnGambleLowResult;   // true=¼º°ø, false=½ÇÆĞ
+    public event System.Action<bool> OnGambleLowResult;   // true=ì„±ê³µ, false=ì‹¤íŒ¨
     public event System.Action<bool> OnGambleHighResult;
 
     private SummonManager _summon;
@@ -50,41 +50,41 @@ public class ShopManager : MonoBehaviour
         _summon = SummonManager.Instance; 
     }
 
-    int PickCostByWeight(float[] probs) // probs ±æÀÌ 5, ÇÕ=1
+    int PickCostByWeight(float[] probs) // probs ê¸¸ì´ 5, í•©=1
     {
         float roll = Random.value; // 0~1
         float acc = 0f;
         for (int i = 0; i < probs.Length; i++)
         {
             acc += probs[i];
-            if (roll <= acc) return i + 1; // ÄÚ½ºÆ®=ÀÎµ¦½º+1
+            if (roll <= acc) return i + 1; // ì½”ìŠ¤íŠ¸=ì¸ë±ìŠ¤+1
         }
         return 1;
     }
 
     UnitData PickOneOfCost(int cost)
     {
-        // UnitData¿¡ cost ÇÊµå°¡ ÀÌ¹Ì ÀÖÀ½ (³× ÄÚµå ±âÁØ)
+        // UnitDataì— cost í•„ë“œê°€ ì´ë¯¸ ìˆìŒ (ë„¤ ì½”ë“œ ê¸°ì¤€)
         var list = allUnitDatas.Where(u => u != null && u.cost == cost).ToList();
         if (list.Count == 0) return null;
         int r = Random.Range(0, list.Count);
         return list[r];
     }
 
-    // ÀÎµ¦½Ì º¸Á¤ & Ç×»ó Á¤±ÔÈ­ ÈÄ UI ¾÷µ¥ÀÌÆ®
+    // ì¸ë±ì‹± ë³´ì • & í•­ìƒ ì •ê·œí™” í›„ UI ì—…ë°ì´íŠ¸
     void UpdateProbabilityUI()
     {
         if (probabilityUI == null || probabilityTables == null || probabilityTables.Count == 0)
         {
-            Debug.LogWarning("È®·ü UI ¶Ç´Â È®·ü Å×ÀÌºíÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogWarning("í™•ë¥  UI ë˜ëŠ” í™•ë¥  í…Œì´ë¸”ì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
 
         int level = PlayerLevelManager.Instance.Level;
-        int idx = level - 1; // 1-±â¹İ ¡æ 0-±â¹İ
+        int idx = level - 1; // 1-ê¸°ë°˜ â†’ 0-ê¸°ë°˜
         if (idx < 0 || idx >= probabilityTables.Count)
         {
-            Debug.LogWarning($"ÇöÀç ÇÃ·¹ÀÌ¾î ·¹º§({level})¿¡ ÇØ´çÇÏ´Â È®·ü Å×ÀÌºíÀÌ ¾ø½À´Ï´Ù.");
+            Debug.LogWarning($"í˜„ì¬ í”Œë ˆì´ì–´ ë ˆë²¨({level})ì— í•´ë‹¹í•˜ëŠ” í™•ë¥  í…Œì´ë¸”ì´ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -97,113 +97,113 @@ public class ShopManager : MonoBehaviour
     {
         if (probabilityTables.Count < PlayerLevelManager.Instance.Level)
         {
-            Debug.LogWarning("ÇöÀç ÇÃ·¹ÀÌ¾î ·¹º§¿¡ ÇØ´çÇÏ´Â È®·ü Å×ÀÌºíÀÌ ¾ø½À´Ï´Ù. Level :" + PlayerLevelManager.Instance.Level);
+            Debug.LogWarning("í˜„ì¬ í”Œë ˆì´ì–´ ë ˆë²¨ì— í•´ë‹¹í•˜ëŠ” í™•ë¥  í…Œì´ë¸”ì´ ì—†ìŠµë‹ˆë‹¤. Level :" + PlayerLevelManager.Instance.Level);
             return;
         }
 
         if (!CurrencyManager.Instance.SpendGold(expCost))
         {
-            Debug.Log("°ñµå ºÎÁ·");
+            Debug.Log("ê³¨ë“œ ë¶€ì¡±");
             return;
         }
 
         PlayerLevelManager.Instance.AddExp(expPerBuy);
         UpdateProbabilityUI();
     }
-    // === µµ¹Ú ÁøÀÔ: ÇÏ±Ş(1~3ÄÚ½ºÆ®) ===
+    // === ë„ë°• ì§„ì…: í•˜ê¸‰(1~3ì½”ìŠ¤íŠ¸) ===
     public void GambleLow()
     {
         var gm = GridManager.Instance;
         if (!gm.HasPlaceableCell())
         {
-            Debug.Log("¹èÄ¡ÇÒ Ä­ÀÌ ¾ø½À´Ï´Ù.");
+            Debug.Log("ë°°ì¹˜í•  ì¹¸ì´ ì—†ìŠµë‹ˆë‹¤.");
             OnGambleLowResult?.Invoke(false);
             return;
         }
 
         if (!CurrencyManager.Instance.SpendEssence(lowGambleEssenceCost))
         {
-            Debug.Log("Á¤¼ö°¡ ºÎÁ·ÇÕ´Ï´Ù.");
+            Debug.Log("ì •ìˆ˜ê°€ ë¶€ì¡±í•©ë‹ˆë‹¤.");
             OnGambleLowResult?.Invoke(false);
             return;
         }
 
-        // ¼º°ø/½ÇÆĞ¸¸ ÆÇÁ¤
+        // ì„±ê³µ/ì‹¤íŒ¨ë§Œ íŒì •
         if (!RollSuccess(lowGambleSuccessRate))
         {
-            Debug.Log("[GambleLow] ½ÇÆĞ (Á¤¼ö ¼Ò¸ğ, º¸»ó ¾øÀ½)");
+            Debug.Log("[GambleLow] ì‹¤íŒ¨ (ì •ìˆ˜ ì†Œëª¨, ë³´ìƒ ì—†ìŒ)");
             OnGambleLowResult?.Invoke(false);
             return;
         }
 
-        // ¼º°ø ¡æ ½ÇÁ¦ ¼ÒÈ¯Àº SummonManager°¡ ´ã´ç (1~3ÄÚ)
+        // ì„±ê³µ â†’ ì‹¤ì œ ì†Œí™˜ì€ SummonManagerê°€ ë‹´ë‹¹ (1~3ì½”)
         bool ok = SummonManager.Instance.TrySummonFree_ByCostRange_AutoPlace(1, 3);
         if (!ok)
         {
-            // ¹èÄ¡/Ç® ¹®Á¦ µîÀ¸·Î ¼ÒÈ¯ ½ÇÆĞ ½Ã È¯ºÒ(¼±ÅÃ)
+            // ë°°ì¹˜/í’€ ë¬¸ì œ ë“±ìœ¼ë¡œ ì†Œí™˜ ì‹¤íŒ¨ ì‹œ í™˜ë¶ˆ(ì„ íƒ)
             CurrencyManager.Instance.AddEssence(lowGambleEssenceCost);
-            Debug.LogWarning("[GambleLow] ¼ÒÈ¯ ½ÇÆĞ ¡æ Á¤¼ö È¯ºÒ");
+            Debug.LogWarning("[GambleLow] ì†Œí™˜ ì‹¤íŒ¨ â†’ ì •ìˆ˜ í™˜ë¶ˆ");
             OnGambleLowResult?.Invoke(false);
             return;
         }
 
-        Debug.Log("[GambleLow] ¼º°ø! À¯´Ö ¼ÒÈ¯ ¿Ï·á");
+        Debug.Log("[GambleLow] ì„±ê³µ! ìœ ë‹› ì†Œí™˜ ì™„ë£Œ");
         OnGambleLowResult?.Invoke(true);
     }
-    // === µµ¹Ú ÁøÀÔ: °í±Ş(4~5ÄÚ½ºÆ®) ===
+    // === ë„ë°• ì§„ì…: ê³ ê¸‰(4~5ì½”ìŠ¤íŠ¸) ===
     public void GambleHigh()
     {
         var gm = GridManager.Instance;
         if (!gm.HasPlaceableCell())
         {
-            Debug.Log("¹èÄ¡ÇÒ Ä­ÀÌ ¾ø½À´Ï´Ù.");
+            Debug.Log("ë°°ì¹˜í•  ì¹¸ì´ ì—†ìŠµë‹ˆë‹¤.");
             OnGambleHighResult?.Invoke(false);
             return;
         }
 
         if (!CurrencyManager.Instance.SpendEssence(highGambleEssenceCost))
         {
-            Debug.Log("Á¤¼ö°¡ ºÎÁ·ÇÕ´Ï´Ù.");
+            Debug.Log("ì •ìˆ˜ê°€ ë¶€ì¡±í•©ë‹ˆë‹¤.");
             OnGambleHighResult?.Invoke(false);
             return;
         }
 
-        // ¼º°ø/½ÇÆĞ¸¸ ÆÇÁ¤
+        // ì„±ê³µ/ì‹¤íŒ¨ë§Œ íŒì •
         if (!RollSuccess(highGambleSuccessRate))
         {
-            Debug.Log("[GambleHigh] ½ÇÆĞ (Á¤¼ö ¼Ò¸ğ, º¸»ó ¾øÀ½)");
+            Debug.Log("[GambleHigh] ì‹¤íŒ¨ (ì •ìˆ˜ ì†Œëª¨, ë³´ìƒ ì—†ìŒ)");
             OnGambleHighResult?.Invoke(false);
             return;
         }
 
-        // ¼º°ø ¡æ ½ÇÁ¦ ¼ÒÈ¯Àº SummonManager°¡ ´ã´ç (4~5ÄÚ)
+        // ì„±ê³µ â†’ ì‹¤ì œ ì†Œí™˜ì€ SummonManagerê°€ ë‹´ë‹¹ (4~5ì½”)
         bool ok = SummonManager.Instance.TrySummonFree_ByCostRange_AutoPlace(4, 5);
         if (!ok)
         {
             CurrencyManager.Instance.AddEssence(highGambleEssenceCost);
-            Debug.LogWarning("[GambleHigh] ¼ÒÈ¯ ½ÇÆĞ ¡æ Á¤¼ö È¯ºÒ");
+            Debug.LogWarning("[GambleHigh] ì†Œí™˜ ì‹¤íŒ¨ â†’ ì •ìˆ˜ í™˜ë¶ˆ");
             OnGambleHighResult?.Invoke(false);
             return;
         }
 
-        Debug.Log("[GambleHigh] ¼º°ø! À¯´Ö ¼ÒÈ¯ ¿Ï·á");
+        Debug.Log("[GambleHigh] ì„±ê³µ! ìœ ë‹› ì†Œí™˜ ì™„ë£Œ");
         OnGambleHighResult?.Invoke(true);
     }
-    // === ¼º°ø ÆÇÁ¤ ===
+    // === ì„±ê³µ íŒì • ===
     private bool RollSuccess(float successRate01)
     {
         float r = Random.value; // [0,1)
         return r <= Mathf.Clamp01(successRate01);
     }
 
-    // === ÄÚ½ºÆ® ¹üÀ§¿¡¼­ "ÇöÀç ·¹º§ È®·üÇ¥"¸¦ ¹üÀ§ ³»·Î ÀçÁ¤±ÔÈ­ÇØ¼­ ÄÚ½ºÆ® ¼±ÅÃ ÈÄ À¯´Ö ÇÈ ===
+    // === ì½”ìŠ¤íŠ¸ ë²”ìœ„ì—ì„œ "í˜„ì¬ ë ˆë²¨ í™•ë¥ í‘œ"ë¥¼ ë²”ìœ„ ë‚´ë¡œ ì¬ì •ê·œí™”í•´ì„œ ì½”ìŠ¤íŠ¸ ì„ íƒ í›„ ìœ ë‹› í”½ ===
     private UnitData PickUnitByCostRangeWeighted(int minCost, int maxCost)
     {
-        // 1) ÇöÀç ·¹º§ È®·ü(±æÀÌ 5)À» °¡Á®¿À°í ¹üÀ§ ¹ÛÀº 0À¸·Î ¸¸µç µÚ ÀçÁ¤±ÔÈ­
-        float[] probs = GetCurrentLevelProbabilities(); // Á¤±ÔÈ­ º¸Àå(ÇÕ=1) ¶Ç´Â Æú¹é »ı¼º
+        // 1) í˜„ì¬ ë ˆë²¨ í™•ë¥ (ê¸¸ì´ 5)ì„ ê°€ì ¸ì˜¤ê³  ë²”ìœ„ ë°–ì€ 0ìœ¼ë¡œ ë§Œë“  ë’¤ ì¬ì •ê·œí™”
+        float[] probs = GetCurrentLevelProbabilities(); // ì •ê·œí™” ë³´ì¥(í•©=1) ë˜ëŠ” í´ë°± ìƒì„±
         if (probs == null || probs.Length != 5)
         {
-            // Å×ÀÌºíÀÌ ¾ø´Ù¸é ±Õµî È®·ü·Î ¹üÀ§ ³» ÄÚ½ºÆ® ¼±ÅÃ
+            // í…Œì´ë¸”ì´ ì—†ë‹¤ë©´ ê· ë“± í™•ë¥ ë¡œ ë²”ìœ„ ë‚´ ì½”ìŠ¤íŠ¸ ì„ íƒ
             int costUniform = PickCostUniformInRange(minCost, maxCost);
             return PickOneOfCost(costUniform) ?? PickUnitByCostRange(minCost, maxCost);
         }
@@ -218,18 +218,18 @@ public class ShopManager : MonoBehaviour
 
         if (sum <= 0f)
         {
-            // ¹üÀ§ ³» °¡ÁßÄ¡°¡ ¸ğµÎ 0ÀÌ¸é ¹üÀ§ ³» ±Õµî
+            // ë²”ìœ„ ë‚´ ê°€ì¤‘ì¹˜ê°€ ëª¨ë‘ 0ì´ë©´ ë²”ìœ„ ë‚´ ê· ë“±
             int costUniform = PickCostUniformInRange(minCost, maxCost);
             return PickOneOfCost(costUniform) ?? PickUnitByCostRange(minCost, maxCost);
         }
 
-        // ÀçÁ¤±ÔÈ­
+        // ì¬ì •ê·œí™”
         for (int i = 0; i < probs.Length; i++) probs[i] /= sum;
 
-        // 2) ÄÚ½ºÆ® ¼±ÅÃ
+        // 2) ì½”ìŠ¤íŠ¸ ì„ íƒ
         int chosenCost = PickCostByWeight(probs);
 
-        // 3) ÇØ´ç ÄÚ½ºÆ® À¯´Ö Áß 1°³ ¼±ÅÃ (¾øÀ¸¸é ¹üÀ§ ÀüÃ¼ Æú¹é)
+        // 3) í•´ë‹¹ ì½”ìŠ¤íŠ¸ ìœ ë‹› ì¤‘ 1ê°œ ì„ íƒ (ì—†ìœ¼ë©´ ë²”ìœ„ ì „ì²´ í´ë°±)
         return PickOneOfCost(chosenCost) ?? PickUnitByCostRange(minCost, maxCost);
     }
 
@@ -238,11 +238,11 @@ public class ShopManager : MonoBehaviour
         minCost = Mathf.Clamp(minCost, 1, 5);
         maxCost = Mathf.Clamp(maxCost, 1, 5);
         if (minCost > maxCost) (minCost, maxCost) = (maxCost, minCost);
-        return Random.Range(minCost, maxCost + 1); // max Æ÷ÇÔ
+        return Random.Range(minCost, maxCost + 1); // max í¬í•¨
     }
 
-    // ÇöÀç ·¹º§ È®·ü Å×ÀÌºí¿¡¼­ ±æÀÌ 5ÀÇ È®·ü º¤ÅÍ¸¦ °¡Á®¿È(ÇÕ=1).
-    // ¾øÀ¸¸é ±Õµî È®·ü ¹İÈ¯.
+    // í˜„ì¬ ë ˆë²¨ í™•ë¥  í…Œì´ë¸”ì—ì„œ ê¸¸ì´ 5ì˜ í™•ë¥  ë²¡í„°ë¥¼ ê°€ì ¸ì˜´(í•©=1).
+    // ì—†ìœ¼ë©´ ê· ë“± í™•ë¥  ë°˜í™˜.
     private float[] GetCurrentLevelProbabilities()
     {
         if (probabilityTables != null && probabilityTables.Count > 0)
@@ -251,10 +251,10 @@ public class ShopManager : MonoBehaviour
             int idx = Mathf.Clamp(level - 1, 0, probabilityTables.Count - 1);
             var table = probabilityTables[idx];
             table.Normalize();
-            var p = table.GetProbabilities(); // ±æÀÌ 5
+            var p = table.GetProbabilities(); // ê¸¸ì´ 5
             if (p != null && p.Length == 5) return p;
         }
-        // Æú¹é: ±Õµî
+        // í´ë°±: ê· ë“±
         return new float[] { 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
     }
 
@@ -262,7 +262,7 @@ public class ShopManager : MonoBehaviour
     {
         if (allUnitDatas == null || allUnitDatas.Count == 0) return null;
 
-        // 1) ¹üÀ§ ³» ¿ì¼±
+        // 1) ë²”ìœ„ ë‚´ ìš°ì„ 
         var pool = allUnitDatas
             .Where(u => u != null && u.cost >= minCost && u.cost <= maxCost)
             .ToList();
@@ -270,7 +270,7 @@ public class ShopManager : MonoBehaviour
         if (pool.Count > 0)
             return pool[Random.Range(0, pool.Count)];
 
-        // 2) Æú¹é: ÀüÃ¼¿¡¼­ ¾Æ¹«°Å³ª
+        // 2) í´ë°±: ì „ì²´ì—ì„œ ì•„ë¬´ê±°ë‚˜
         var all = allUnitDatas.Where(u => u != null).ToList();
         if (all.Count > 0)
             return all[Random.Range(0, all.Count)];

@@ -76,7 +76,7 @@ public class SynergyManager : MonoSingleton<SynergyManager>
             Recalculate();
             ApplySynergies();
         }
-        else if (state == GameManager.GameState.Shop || state == GameManager.GameState.Prepare)
+        else if (state == GameManager.GameState.Prepare)
         {
             RemoveSynergies(); // 정책에 따라 유지/해제 결정
         }

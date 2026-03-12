@@ -28,7 +28,7 @@
 
 | 문제 | 심각도 | 근거 |
 |------|--------|------|
-| 상점 페이즈 완전 비활성화 | 높음 | `GameManager.WaveLoop()`에 Shop 페이즈 분기 없음. `GameState.Shop` 열거형은 있으나 `SetGameState(Shop)` 호출 없음 |
+| 상점 UI 항상 접근 가능 (페이즈 분리) | — | Shop 페이즈 제거됨. 도박/상점 UI는 버튼으로 언제든 호출 가능 (`UIManager.ShowGambleUI()`) |
 | 유닛 배치 네트워크 동기화 없음 | 높음 | `SummonManager.TrySpawnUnitAtFirstFreeCell()`이 `Instantiate()`만 사용. NetworkObject 스폰 아님 |
 | 유닛 전투 네트워크 동기화 없음 | 높음 | `Unit.cs`는 일반 MonoBehaviour. 멀티에서 각 클라이언트가 독립적으로 공격 계산 |
 | SummonManager 랜덤이 클라이언트 사이드 | 중간 | `Random.value` 사용. 멀티에서 플레이어마다 다른 유닛 소환 |
@@ -51,7 +51,7 @@
 | 1-1 | 유닛 데이터 추가 (Cost01~05) | Archer/Magicion 외 최소 10~15종 UnitData ScriptableObject 생성, prefab 연결 | 낮음 | 없음 |
 | 1-2 | 몬스터 데이터 정비 | MonsterTest들을 정식 MonsterData로 교체, WaveSet 5웨이브 이상 구성 | 낮음 | 없음 |
 | 1-3 | WaveLoop 클리어 대기 로직 수정 | 각 그룹 종료 후 `AliveCount == 0`이 될 때까지 대기하는 코루틴 추가 | 낮음 | 없음 |
-| 1-4 | 상점 페이즈 활성화 | `WaveLoop()`에 Shop 페이즈 복원, `UIManager.ShowGambleUI()` 호출 연동, 타이머 작동 | 중간 | 없음 |
+| ~~1-4~~ | ~~상점 페이즈 활성화~~ | ~~제거됨~~ Shop 페이즈 없이 도박/상점 버튼으로 상시 이용 가능 | — | — |
 | 1-5 | 골드 리워드 시스템 | 웨이브 클리어/몬스터 처치 시 골드 지급 로직 연결 (`MonsterData.goldReward` → `CurrencyManager.AddGold`) | 낮음 | 1-2 |
 | 1-6 | 기본 사운드 추가 | 공격, 몬스터 처치, 소환 효과음 최소 구현 (AudioSource 컴포넌트 수준) | 낮음 | 없음 |
 
@@ -113,7 +113,7 @@
        │
        ├──▶ [1-3 웨이브 클리어 대기 수정]
        │
-       ├──▶ [1-4 상점 페이즈 활성화] ──▶ [1-5 골드 리워드]
+       ├──▶ [1-5 골드 리워드]
        │
        └──▶ [2-1 시너지 효과 검증] ──▶ [2-8 밸런싱]
                     │
@@ -156,7 +156,7 @@ Phase 3 완성
 - [ ] 소환 확률 테이블 레벨 1~5 기입
 
 ### 게임 루프
-- [ ] Prepare → Shop → Battle → (반복) → Win/Lose 전체 흐름 작동
+- [ ] Prepare → Battle → (반복) → Win/Lose 전체 흐름 작동
 - [ ] 준비 시간 타이머 표시
 - [ ] 웨이브 클리어 후 다음 웨이브로 자동 진행
 - [ ] 필드 한도 도달 시 패배 판정 작동
@@ -214,7 +214,7 @@ Phase 3 완성
 
 | 목적 | 파일 경로 |
 |------|----------|
-| 웨이브 루프 수정, 상점 페이즈 활성화 | `Assets/_Project/01_Scripts/Systems/GameLoop/GameManager.cs` |
+| 웨이브 루프 수정 | `Assets/_Project/01_Scripts/Systems/GameLoop/GameManager.cs` |
 | 네트워크 소환 서버화 (Phase 4 대상) | `Assets/_Project/01_Scripts/Systems/Economy/SummonManager.cs` |
 | 유닛 네트워크 동기화 참고 모델 | `Assets/_Project/01_Scripts/Systems/Monsters/Monster.cs` |
 | 멀티플레이 경제 시스템 | `Assets/_Project/01_Scripts/Systems/Network/NetworkPlayer.cs` |
